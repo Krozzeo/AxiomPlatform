@@ -1,0 +1,62 @@
+name: P1 acceptance
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm run check
+
+  real-product:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: platform
+      - uses: actions/checkout@v4
+        with:
+          repository: Krozzeo/AxiomGameEngine
+          ref: 1000f735d64c949cbd7b5a0629ece5980f9dcbd0
+          path: game-engine
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: rustup toolchain install 1.90.0 --profile minimal --target wasm32-unknown-unknown
+      - run: rustup default 1.90.0
+      - run: npm ci
+        working-directory: game-engine
+      - run: npm run build
+        working-directory: game-engine
+      - run: npx playwright install --with-deps chromium
+        working-directory: game-engine
+      - run: npm run check
+        env:
+          AXIOM_ENGINE_PATH: ../game-engine
+      - run: npm run test:browser
+        env:
+          AXIOM_ENGINE_PATH: ../game-engine
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-browser-evidence
+          path: platform/.axiom/p1-browser
+          include-hidden-files: true

@@ -27,3 +27,9 @@ Documentar cualquier modificación de alcance con decisión nueva y evidencias. 
 El run posterior de la base 871a72f terminó con fallo M17 y del gate agregado: [run 39507425121](https://github.com/Krozzeo/AxiomGameEngine/actions/runs/39507425121), 44/46 trabajos aprobados. Se registró [#51](https://github.com/Krozzeo/AxiomGameEngine/issues/51), aserción de posiciones de runtime sin cambio, sin causa confirmada. No se presenta la base como totalmente verde por el CI 329 anterior del mismo árbol. La rama P0 y Platform tienen sus propias verificaciones; este fallo sigue pendiente en el motor.
 
 Actualización del motor publicada en rama docs/platform-p0-and-game-engine-identity mediante [PR #52](https://github.com/Krozzeo/AxiomGameEngine/pull/52), todavía sin integrar al entregar P0. Check local del motor aprobado, 441/441 Node; CI remoto independiente.
+
+## Actualización P1
+
+Host/Hub funcional en feat/p1-local-host y adaptador del motor en feat/p1-platform-adapter (basado en P0 fcc7435, PR #52 pendiente al comenzar). [Guía](P1_GUIDE.md), [contrato implementado](adr/0002-p1-host-and-product-ipc.md) e [informe](reports/P1_REPORT.md). El estado P0 anterior es histórico. No hay extracción GitHub/AI, catálogo persistente o instalador. P1 pasó pruebas locales conjuntas y navegador Null; CI/main deben comprobarse por separado antes de avanzar P2.
+
+Consumidor fijado en CI: AxiomGameEngine 1000f735d64c949cbd7b5a0629ece5980f9dcbd0, PR #53 hacia main (incluye P0 hasta integrar #52). No depender de main del motor hasta que contenga el adaptador.

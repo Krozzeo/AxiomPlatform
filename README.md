@@ -2,7 +2,7 @@
 
 Entorno local común para la familia Axiom: Hub de productos y proyectos, servicios locales e integración con agentes AI. Axiom Game Engine es su primer producto; CAD, matemáticas y animación son direcciones futuras, todavía sin implementación.
 
-**Estado: P0 documental.** La arquitectura está definida; no existe aún un ejecutable independiente de Platform, instalador, SDK publicado ni migración funcional. P1 implementará el primer recorrido con Game Engine. Los ejemplos de contratos de P0 son especificaciones preliminares, no APIs disponibles.
+**Estado: P1 funcional en rama para revisión.** Host local, Hub y adaptador del motor con creación/apertura, guardado y cierre. [Arranque y prueba](docs/P1_GUIDE.md) · [Evidencias y límites](docs/reports/P1_REPORT.md). No es todavía un instalador; P2–P5 siguen pendientes. La especificación original de P0 permanece como antecedente.
 
 - [Documento maestro](docs/MASTER_PLAN.md): visión, alcance y decisiones.
 - [Mapa documental](docs/index.md) y [contexto para continuar](docs/AI_HANDOFF.md).
@@ -22,4 +22,4 @@ Este repositorio contiene la planificación de Platform y alojará sus servicios
 
 ## Trabajar con esta entrega
 
-Leer el documento maestro y el handoff antes de proponer código. Para comprobar enlaces y entregables documentales: `python scripts/check_docs.py`. No se requieren herramientas del motor para leer o verificar P0. [Contribución](CONTRIBUTING.md).
+Leer el documento maestro, el handoff y la guía P1 antes de proponer código. Ejecutar npm run check; para aceptación conjunta establecer AXIOM_ENGINE_PATH. Para comprobar enlaces y entregables documentales: `python scripts/check_docs.py`. No se requieren herramientas del motor para leer o verificar P0. [Contribución](CONTRIBUTING.md).

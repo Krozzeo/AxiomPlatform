@@ -2,6 +2,10 @@
 
 Fecha: 2026-10-21. Estado: decisiones de P0 adoptadas por el propietario; implementación de Platform pendiente. Nombre canónico: **Axiom**, nunca Axion en identificadores nuevos.
 
+## Actualización P1
+
+P1 tiene implementación funcional en ramas, verificada localmente con el motor real y navegador Null. [Informe](reports/P1_REPORT.md) y [guía](P1_GUIDE.md). Las descripciones P0 siguientes son antecedentes de la planificación; main/CI de la entrega se revisan por separado.
+
 ## Propósito
 
 Crear una familia de aplicaciones especializadas de juegos e ingeniería, utilizables manualmente desde el navegador y diseñadas para que agentes AI operen mediante herramientas semánticas verificables. Platform ofrece el entorno y los servicios comunes. Game Engine es el primer producto real; un CAD paramétrico, un entorno matemático y una aplicación de animación son posibilidades futuras, sin fecha o alcance funcional aprobado.

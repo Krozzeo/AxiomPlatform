@@ -4,6 +4,9 @@ Fecha: 2026-10-21. P0 define arquitectura y planificación; no acredita implemen
 
 | Necesidad | Documento |
 | --- | --- |
+| Ejecutar P1 | [Guía](P1_GUIDE.md) |
+| Resultado P1 | [Informe](reports/P1_REPORT.md) |
+| Contrato implementado P1 | [ADR-P0002](adr/0002-p1-host-and-product-ipc.md) |
 | Visión, alcance y decisiones adoptadas | [Documento maestro](MASTER_PLAN.md) |
 | Milestones y gates | [Roadmap P0–P5](ROADMAP.md) |
 | Cierre documental de P0 | [Aceptación](P0_ACCEPTANCE.md) |

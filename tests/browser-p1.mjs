@@ -1,0 +1,53 @@
+import assert from 'node:assert/strict';
+import {mkdtemp,mkdir,rm,writeFile,readFile} from 'node:fs/promises';
+import {join,resolve} from 'node:path';
+import {tmpdir} from 'node:os';
+import {pathToFileURL} from 'node:url';
+import {startHost} from '../services/local-host/server.mjs';
+
+if(!process.env.AXIOM_ENGINE_PATH)throw Error('AXIOM_ENGINE_PATH must identify the tested Game Engine checkout.');
+const engine=resolve(process.env.AXIOM_ENGINE_PATH);
+const {chromium}=await import(pathToFileURL(join(engine,'node_modules/playwright/index.mjs')));
+const root=await mkdtemp(join(tmpdir(),'axiom-platform-browser-')),evidence=resolve('.axiom/p1-browser');
+await mkdir(evidence,{recursive:true});let host,browser,hub,editor;
+const report={criteria:[],pageErrors:[],renderer:'Null — UI acceptance, not GPU acceptance'};
+try{
+  host=await startHost({root,manifests:[join(engine,'platform/product.json')]});
+  browser=await chromium.launch({headless:true});
+  const context=await browser.newContext({viewport:{width:1440,height:960}});
+  hub=await context.newPage();hub.on('pageerror',e=>report.pageErrors.push(e.message));
+  hub.setDefaultTimeout(30000);await hub.goto(host.url);
+  await hub.locator('#product option').waitFor({state:'attached'});await hub.locator('#name').fill('P1 browser acceptance');
+  await hub.getByRole('button',{name:'Crear y abrir',exact:true}).click();
+  const card=hub.locator('#sessions article').first();await card.getByRole('link',{name:'Abrir editor'}).waitFor();
+  const sessionId=await card.getAttribute('data-session-id');
+  const popup=context.waitForEvent('page');await card.getByRole('link',{name:'Abrir editor'}).click();editor=await popup;
+  editor.on('pageerror',e=>report.pageErrors.push(e.message));editor.setDefaultTimeout(30000);
+  const url=host.manager.catalog().sessions.find(s=>s.sessionId===sessionId).editorUrl;
+  await editor.goto(url.replace('/#','/?renderer=null#'));
+  await editor.locator('#project-title').filter({hasText:'P1 browser acceptance'}).waitFor();
+  assert.equal(await editor.locator('#axiom-hub').isVisible(),false);
+  await editor.locator('#create-menu > summary').click();await editor.locator('#scene-add').click();
+  await editor.locator('#entities .entity').first().waitFor();
+  await hub.getByRole('button',{name:'Actualizar estado'}).click();
+  await card.getByText('Cambios sin guardar',{exact:true}).waitFor();
+  await card.getByRole('button',{name:'Cerrar',exact:true}).click();
+  await hub.locator('#close-dialog').getByRole('button',{name:'Cancelar',exact:true}).click();
+  await card.getByText('Cambios sin guardar',{exact:true}).waitFor();
+  assert.equal(host.manager.catalog().sessions.find(s=>s.sessionId===sessionId).state,'ready');
+  await card.getByRole('button',{name:'Guardar',exact:true}).click();await card.getByText('Guardado',{exact:true}).waitFor();
+  const saved=host.manager.catalog().sessions.find(s=>s.sessionId===sessionId),projectPath=join(root,saved.path);
+  assert.equal(JSON.parse(await readFile(projectPath,'utf8')).scene.entities.length,1);
+  await hub.screenshot({path:join(evidence,'platform.png')});await editor.screenshot({path:join(evidence,'game-engine.png')});
+  report.criteria.push('Hub create and real product process ready','Editor opens the selected project in an independent tab','Manual entity edit is visible as dirty in Platform','Cancel close retains the live dirty session','Platform Save persists the real engine scene');
+  editor.on('dialog',d=>d.accept());await editor.close();editor=null;
+  await card.getByRole('button',{name:'Cerrar',exact:true}).click();await hub.locator('#close-dialog').getByRole('button',{name:'Guardar y cerrar',exact:true}).click();
+  await card.getByText('Sesión cerrada',{exact:true}).waitFor();
+  await hub.locator('#path').fill(saved.path);await hub.getByRole('button',{name:'Abrir proyecto',exact:true}).click();
+  await hub.locator('#sessions article').nth(1).getByRole('link',{name:'Abrir editor'}).waitFor();
+  assert.equal(host.manager.catalog().sessions.filter(s=>s.state==='ready')[0].status.projectId,saved.status.projectId);
+  report.criteria.push('Close and reopen preserve project identity and saved scene');
+  assert.deepEqual(report.pageErrors,[]);report.passed=true;
+}catch(error){report.failure=error.message;if(hub)await hub.screenshot({path:join(evidence,'failure.png')}).catch(()=>{});throw error;}
+finally{await writeFile(join(evidence,'report.json'),JSON.stringify(report,null,2));await browser?.close();await host?.close();await rm(root,{recursive:true,force:true});}
+console.log(JSON.stringify(report));
