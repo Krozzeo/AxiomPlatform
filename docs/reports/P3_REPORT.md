@@ -1,24 +1,11 @@
-# Informe P3 — AI y cambios
+# P3 — shared AI and changes (historical report)
 
-2026-10-21. Ramas feat/p3-ai-and-changes y feat/p3-platform-ai, sobre P2 (228e1be/d6aad38). Proveedor público 017e54168f87ea5a0d5b97adfbb2314673bc298d, dependencia HTTPS fijada con integridad en el motor. CI conjunto fija consumidor 9697b5829baa60c0cde48d80b5eea35457f17670. No se integró P2 ni P3 en main. #55 permanece pendiente; el usuario pidió continuar P3 con ese estado visible.
+2026-10-21. Review branches feat/p3-ai-and-changes / feat/p3-platform-ai over P2 (228e1be/d6aad38). Public provider017e54168f87ea5a0d5b97adfbb2314673bc298d, pinned HTTPS/integrity; joint consumer9697b5829baa60c0cde48d80b5eea35457f17670. P2/P3 were not merged into main. Owner explicitly requested P3 with #55 visible.
 
-## Entregado
+Delivered provider/contracts/model filtering, turn/task runtime, session credential broker, scoped persistent usage and disconnect/cancellation/epochs; tool registry/validation, diff/hashes/human gates and journal receipts/pending operations. Engine consumes these while retaining game tools/instructions/PMD, reconciliation and application/rollback/resources. Hosted model/limits persist but connection must be retested after reopening. Hub exposed available credential and reported/unknown usage.
 
-- Proveedor HTTP/contratos/modelos, runtime de turnos y ciclo de tarea, broker de credencial de sesión, ledger persistente sin secretos y control de desconexión/cancelación/épocas.
-- Registro/validación de herramientas, diff/hashes/gates humanos y codec de journal con recibos/operaciones pendientes.
-- Adaptador de Game Engine que usa los módulos comunes, conserva herramientas/instrucciones/PMD y aplicación/rollback de dominio. Modelo guardado por proyecto alojado, conexión explícita al reabrir.
-- Hub muestra credencial disponible y consumo informado/desconocido. Guía, ADR y contexto actualizados.
+Local Platform 21/21, no skipped joint tests. Three real-process AI integration journeys cover manual/AI approval/diff/Apply/reopen/two projects, cancelled late response/provider429 and stale review/concurrent MAIN/edited proposal without overwrite. Generic tests cover endpoint/size/redaction, cancelled turns, scoped/restarted ledger/late shutdown, registry and journal. Existing13 P1/P2 tests remained. Engine check445/445 and focused assistant/work-order/workspace95/95 passed with the public installed package; saving limits without selecting a model/reopen without requests was verified.
 
-## Verificación local
+P3 browser: create/edit/save, shared host connection with cleared key, human plan approval, isolated tools, Review and human Apply persisting X=2; Hub reported fixture250 tokens, no pageErrors. Controlled AI HTTP/Null; not real key/bill/model quality/GPU. Unknown usage stays unknown; OPENAI_API_KEY is stripped from children, previous journals/preferences preserved.
 
-Platform: 21/21 pruebas, sin omitidas con AXIOM_ENGINE_PATH. Incluye tres integraciones con procesos reales: edición manual y AI/aprobación/diff/Apply/reapertura/dos proyectos; cancelación con respuesta tardía y proveedor 429; revisión obsoleta/divergencia de MAIN/propuesta editada sin sobrescritura. Pruebas genéricas cubren errores/2 MiB/redacción, no ejecutar turnos cancelados, ledger por proyecto/reinicio/cierre tardío, registro y journal. Los 13 tests previos de P1/P2 se conservan.
-
-Engine: npm run check 445/445 sin fallos/omitidas. Los 95 tests enfocados de asistente, work orders y propuestas pasan, incluyendo reanudación sin repetir efectos, aprobación, presupuestos, aceptación y rollback. El paquete final público está instalado; la prueba adicional acredita guardar límites sin elegir modelo ni generar solicitudes al reabrir. CI se verifica independientemente.
-
-Navegador P3: crear/editar/guardar desde UI, conectar mediante host y limpiar campo de clave, plan con confirmación, propuesta aislada, Review y Apply humano que persiste X=2; Hub informa 250 tokens del fixture; sin pageErrors. Evidencias .axiom/p3-browser/report.json, review.png y platform.png (generadas, no fuente). P1/P2 se ejecutan como regresión conjunta al entregar.
-
-## Límites y estado de integración
-
-HTTP AI simulado; no una clave, factura o evaluación de modelo real. Null es aceptación UI. La cancelación puede dejar consumo desconocido, nunca lo convierte en cero. No se guardan claves, OPENAI_API_KEY se elimina del entorno heredado por el hijo, ni se eliminan journals/configuraciones previas. Modelo guardado no equivale a conexión probada.
-
-P3 se publica por PR apilado sobre las ramas P2. Los resultados remotos se registran en los PR; no extrapolar el CI aprobado de Platform P2. Engine #55/#47/#51 y rendimiento denso siguen con su seguimiento. P4 es distribución/UI, P5 segundo consumidor; Unity/shaders/GPU M19–M40 no reciben crédito por reestructurar.
+Remote Platform acceptance8 (39640460620) and docs10 (39640460471) passed. Final Engine CI336 (39640404321) passed43/46, with browser M18.3.11 and M17 plus aggregate gate failing. These are not resolved by local acceptance. #55/#47/#51/dense physics/native GitHub/real model remain tracked. Original-language detail is retained in archive/original-language.

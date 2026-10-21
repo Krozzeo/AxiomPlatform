@@ -2,6 +2,7 @@
 $ErrorActionPreference='Stop'
 try {
  [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12
+ $builtInModules=Join-Path $PSHOME 'Modules';if(($env:PSModulePath -split [IO.Path]::PathSeparator) -notcontains $builtInModules){$env:PSModulePath=$builtInModules+[IO.Path]::PathSeparator+$env:PSModulePath}
  $platformRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
  $bundleRoot=Split-Path -Parent $platformRoot
  if(-not $EnginePath){$EnginePath=Join-Path $bundleRoot 'AxiomEngine'}

@@ -1,65 +1,38 @@
-# Axiom Platform — Documento maestro
+# Axiom Platform — master plan
 
-Fecha: 2026-10-21. Estado: P0/P1 integradas y P2 implementada en ramas para revisión; P3 implementada en ramas para revisión; P4–P5 pendientes. Nombre canónico: **Axiom**, nunca Axion en identificadores nuevos.
+Updated 2026-10-21. Canonical name: **Axiom**. Public MIT repositories: AxiomPlatform and AxiomGameEngine. P0/P1 are integrated; P2/P3/P4 are review candidates. Commercial decisions remain deferred.
 
-## Actualización P1
+## Purpose
 
-P1 fue integrada tras CI aprobado y aceptación manual del usuario. [Informe histórico](reports/P1_REPORT.md) y [guía P1](P1_GUIDE.md). Su evidencia no acredita automáticamente P2.
+Build a family of specialized local applications for games and engineering. People use full manual browser interfaces; AI agents use validated semantic domain operations. Platform supplies the shared environment and services. Game Engine is the first real consumer. A parametric CAD, mathematical environment and animation application are possibilities, with no approved full product scope or delivery date.
 
-## Actualización P2
+A person opens Platform, creates/adds a project, opens the compatible product, edits manually, optionally requests an isolated AI proposal, reviews evidence and applies it without overwriting concurrent work. Session accounts are shared while repository, publication and AI preferences remain project-specific. Incompatibility is diagnosed before writes. Exported games run without the development environment.
 
-P1 fue aceptada manualmente y se integró con CI. P2 implementa catálogo/servicios compartidos en ramas para revisión; [informe](reports/P2_REPORT.md). La decisión comercial sigue aplazada. Los estados P0/P1 anteriores se conservan como historia.
+## Accepted decisions
 
-## Actualización P3
+1. Two repositories initially; no repository per helper library. Both are MIT by the owner's later instruction, superseding the initial no-license proposal. Preserve third-party notices and historical releases.
+2. Platform owns the Hub, shared services and integration SDK; specialized domains remain in products. No universal renderer, geometry kernel or scene format is assumed.
+3. Independently versioned products. Platform is the ordinary entry point; direct product startup remains available for development and automation. Exported runtimes remain independent.
+4. Extract gradually behind public ports/adapters. No stack rewrite, permanent source copies, submodules or simultaneous-only merges as the integration mechanism.
+5. Separate Platform, product, project and session configuration. Credentials stay outside projects and repositories; current credentials live in memory.
+6. Shared AI provides transport, turn execution, cancellation, usage, tool validation and review gates. Domain tools, context, PMD content, acceptance and transactional application remain product-owned.
+7. Native formats remain specialized, with explicit exchange contracts. A CAD does not become a Game Engine entity graph by default.
+8. Official integrations first. Marketplace, third-party extensions, real-time collaboration, private cloud and cross-product automation are future scope.
+9. Updates do not interrupt active tasks. Declare compatibility, retain the prior installation and require recoverable copies and consent for incompatible data migrations.
+10. MIT is the current licensing decision; it does not decide future support or monetization.
 
-AI y revisión genéricas extraídas y consumidas por el motor; cuenta AI compartida en sesión, preferencias por proyecto y autoridad de dominio conservada. [Guía](P3_GUIDE.md), [ADR](adr/0004-p3-ai-and-review.md) e [informe](reports/P3_REPORT.md). P2/P3 aún no integradas y #55 sigue abierto. P4/P5 continúan pendientes.
+## Current vertical slices
 
-## Propósito
+P1: descriptor/IPC host, real product lifecycle and direct startup. P2: persistent catalog/preferences, authorized storage/import and shared GitHub account/transport. P3: shared AI/runtime/usage/tool/review contracts, with product application and recovery. P4: unified project/session Hub, separate Settings, reusable UI primitives, relocatable Windows launcher, installation registration/deferred activation/rollback, guarded rename/removal/deletion and seeded Game Engine projects. See [P4](P4_GUIDE.md) and [roadmap](ROADMAP.md).
 
-Crear una familia de aplicaciones especializadas de juegos e ingeniería, utilizables manualmente desde el navegador y diseñadas para que agentes AI operen mediante herramientas semánticas verificables. Platform ofrece el entorno y los servicios comunes. Game Engine es el primer producto real; un CAD paramétrico, un entorno matemático y una aplicación de animación son posibilidades futuras, sin fecha o alcance funcional aprobado.
+This is a prepared local distribution, not a signed online product marketplace or automatic Internet updater. P5 will validate the contracts with one small second-domain consumer; its exact scope must be agreed before implementation.
 
-## Usuarios y recorridos objetivo
+## Product roadmap remains independent
 
-- Una persona abre Platform, agrega un proyecto y lo abre en su producto compatible.
-- La persona edita manualmente; un agente utiliza operaciones de dominio con las mismas validaciones.
-- Una propuesta se inspecciona, valida y aplica sin perder cambios concurrentes.
-- Una cuenta externa puede estar conectada en la sesión, con repositorio y preferencias independientes por proyecto.
-- Una aplicación o formato incompatible produce un diagnóstico antes de escribir datos.
-- Un juego exportado se ejecuta sin Platform, editor, AI o daemon de desarrollo.
+Game Engine retains the functional implementation of the selected Unity API, graphics shaders, compute and GPU physics in M19–M40. Platform restructuring earns no Unity/API/performance coverage. M19 can advance without waiting for P5 if no technical dependency exists. Complete runtime/editor inventory, audited denominators and measured priorities remain M19 work.
 
-Estos recorridos son objetivos. P0 no los declara implementados fuera del motor actual.
+## Baseline and evidence
 
-## Decisiones aceptadas
+P0 inspected Engine `871a72f6d2c720e99e0a8d1598c0f35af69c4d78`. The consolidation candidate passed CI 329, but a later run of that base failed M17 (44/46), recorded in Engine #51. P1 subsequently integrated after CI and user acceptance. P2/P3 are not integrated by starting P4. Inspector #47, M17 #51, drag cleanup #55, dense physics performance, real-account/native-dialog acceptance and real-model quality/cost must retain separate evidence. [Current handoff](AI_HANDOFF.md).
 
-1. Dos repositorios iniciales: AxiomPlatform y AxiomGameEngine, públicos y con licencia MIT por instrucción posterior del propietario. Se conservan avisos de terceros y el historial de licencias anteriores del motor.
-2. Platform alberga Hub, servicios comunes y SDK de integración; Game Engine mantiene sus dominios. No se crean repositorios por biblioteca en P0.
-3. Productos con versiones y pruebas propias. Platform es la entrada habitual; el motor conserva arranque directo para desarrollo y automatización. Exportados independientes.
-4. Extracción gradual, sin reescritura del stack ni copia permanente de carpetas como mecanismo de integración.
-5. Configuración separada por Platform, producto, proyecto y sesión. Credenciales fuera del proyecto y del repositorio.
-6. AI común para conexión/orquestación; herramientas, reglas, contexto y evidencias de dominio pertenecen al producto.
-7. Formatos nativos independientes, envoltura común mínima e intercambio explícito. Un CAD no usa obligatoriamente entidades o mallas del motor como modelo paramétrico.
-8. Integraciones oficiales primero. Extensiones externas, marketplace, colaboración en tiempo real, nube propia y automatización entre productos quedan fuera de P1–P4.
-9. Actualización sin interrumpir tareas activas; compatibilidad declarada; migraciones incompatibles requieren confirmación y copia recuperable.
-10. El modelo comercial se posterga. MIT es la decisión de licencia actual y no decide servicios, soporte o monetización futura.
-
-## Alcance y límites
-
-Platform comparte infraestructura demostrada, no un motor universal. Renderer, compute, físicas, geometría exacta y cálculo matemático permanecen especializados hasta tener una necesidad real de reutilización. Los componentes compartidos deben existir detrás de contratos públicos; Platform no importa clases de escenas, Unity o Game Engine.
-
-Game Engine conserva la implementación propia funcional de la API objetivo de Unity, shaders y físicas GPU planificados en M19–M40. La separación no implementa ni aumenta su cobertura. No se renumeran esas milestones ni se exige terminar toda Platform antes de avanzar en ellas.
-
-## Éxito y planificación
-
-P0 es documentación coherente, trazable al código existente y lista para iniciar P1. P1 demuestra un recorrido vertical con el motor existente; P2 extrae servicios; P3 separa AI; P4 estabiliza interfaz compartida y distribución; P5 verifica la arquitectura con un segundo consumidor pequeño. No hay fechas o estimaciones de cobertura inventadas. [Gates](ROADMAP.md).
-
-## Antecedentes de inspección P0 y supuestos originales
-
-En la base de P0, el motor combinaba editor de navegador, Rust/Wasm, WebGPU/Null, C# y daemon Node de producción; el daemon Rust tenía alcance menor. Su Hub enumeraba productos futuros no disponibles y los servicios de Hub, GitHub y AI se inicializaban junto a SceneWorkspace. P1/P2 desacoplan host, catálogo y transporte/cuenta GitHub; AI queda para P3.
-
-Se usa como base de inspección el commit del motor `871a72f6d2c720e99e0a8d1598c0f35af69c4d78`. Su árbol coincide con el candidato que aprobó CI 329; esa evidencia histórica no acredita futuros commits ni todas las repeticiones de CI. La validación manual de GitHub nativo y el fallo intermitente de Inspector siguen siendo pendientes separados.
-
-Los supuestos originales de P1 (apertura sin migrar documentos, negociación del primer recorrido y arranque directo conservado) fueron comprobados por esa entrega. P2 y las etapas siguientes mantienen pruebas y recuperación independientes.
-
-## Pendiente de CI descubierto al documentar P0
-
-El run posterior de la base 871a72f terminó con fallo M17 y del gate agregado: [run 39507425121](https://github.com/Krozzeo/AxiomGameEngine/actions/runs/39507425121), 44/46 trabajos aprobados. Se registró [#51](https://github.com/Krozzeo/AxiomGameEngine/issues/51), aserción de posiciones de runtime sin cambio, sin causa confirmada. No se presenta la base como totalmente verde por el CI 329 anterior del mismo árbol. La rama P0 y Platform tienen sus propias verificaciones; este fallo sigue pendiente en el motor.
+Browser/daemon Node, Rust/Wasm, WebGPU/Null and C# remain the stack. The Rust daemon has a narrower scope than the production Node daemon; this separation does not silently replace it. Never describe a historical green run as acceptance of a later commit.

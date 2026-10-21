@@ -1,34 +1,32 @@
-# Matriz de propiedad y extracción
+# Ownership and extraction matrix
 
-Base inspeccionada: AxiomGameEngine `871a72f`. Inventario original de P0. Actualización P2: transporte GitHub, picker y Documentos ya se extraen al proveedor y son reexportados por el motor en ramas P2; catálogo/ajustes del host son persistentes. Publicación/validación sigue en el producto. Actualización P3: núcleo AI/transporte/consumo, registro/validador, diff/gates y codec de journal extraídos; contexto/herramientas/transacción y autonomía determinista de juegos permanecen en producto, según ADR-P0004. Las demás filas conservan su planificación. **P** = extraer a Platform; **G** = conservar en Game Engine; **D** = dividir mediante contrato; **L** = evaluar más adelante. P1 detalla símbolos e imports de su tanda antes de moverlos.
+Original inventory: Engine `871a72f`. P1 extracted host/lifecycle through a product adapter; P2 extracted common GitHub/OS/files; P3 extracted generic AI/review; P4 adds verified UI primitives and local distribution. P = Platform; G = Game Engine; split = public port/adapters; later = reuse only after evidence.
 
-| Componente actual del motor | Tipo | Propiedad futura y operación | Etapa y evidencia requerida |
-| --- | --- | --- | --- |
-| daemon/bootstrap/hub-settings.mjs | D | Ajustes/catalogación comunes P; descriptor game-engine G. Reemplazar lista fija por registro. | P1–P2; catálogo sin imports del motor |
-| apps/editor/src/hub* | D | Hub P; plantillas, validación y demos de juegos G. | P1–P2; crear/abrir/reabrir juego |
-| daemon/bootstrap/server.mjs | D | Host y sesiones P; bootstrap y rutas de dominio G. No mover archivo completo. | P1–P3; arranque directo y alojado |
-| folder-picker.mjs, atomic-file.mjs, open-editor.mjs | D | Servicios de OS/archivos P; apertura concreta y permisos del proyecto G/adaptador. | P2; selector, cancelación y rutas limitadas |
-| project-store.mjs, scene-workspace.mjs, command-bus.mjs | D | Proyecto/documento/escena G; contratos de almacenamiento y comandos P. | P2–P3; mismas invariantes y persistencia |
-| github/client.mjs | P | Transporte de cuenta/repositorios común con credencial de sesión. | P2; errores, permisos y desconexión |
-| github/publication.mjs, bundle.mjs, import-project.mjs, history.mjs | D | Transporte/cuenta y ubicación aislada de metadatos P; bundle, revisión, recibos e historial de publicación de juegos G. Una abstracción común de recibos requiere otro consumidor. | P2 implementada según ADR-P0003; divergencia y recuperación de publicación verificadas |
-| workspaces/manager.mjs, files.mjs, diff.mjs | D | Protocolo transaccional/revisión P; snapshots SceneWorkspace y validación G. | P3; cambios concurrentes, cancelación y rollback |
-| agent/openai-assistant.mjs y servicio de agentes | D | Proveedores, consumo, tareas y ejecución P; contexto de escenas y políticas G. | P3; tarea manual y agente equivalentes |
-| agent/contracts.mjs, typed-tools.mjs y handlers | D | Registro/validación genérica P; catálogo semántico y handlers de juegos G. | P3; conformance de herramienta |
-| agent/editor-bridge.mjs y bridge de UI | D | Canal y control de generación P; captura/adopción de snapshots G. | P3; una respuesta atrasada no revierte estado |
-| daemon/mcp/stdio.mjs | D | Transporte P; capacidades de dominio G. | P3; no ampliar permisos por exponer MCP |
-| engine/project/pmd.mjs, document-sections.mjs, ai-history.mjs | D | Mecanismo documental/historial P; contenido, plantillas y gates G. | P3–P4; historial conservado y aislado |
-| protocol/src/protocol.ts | P | Sobre de mensajes/diagnóstico común, adaptando identidad. | P1; versiones y errores incompatibles |
-| protocol/schema y tool/error catalogs | D | Mensajes, diagnóstico y registro P; entity, transform, rigid-body, project-document, scripts, replay G. | P1–P3; validación antes/después |
-| dock-layout, panel-layout, chat y componentes comunes de apps/editor/src | D | Primitivas reutilizables P; composición específica del editor G. | P4; preferencias y teclado conservados |
-| main.ts, Hierarchy, Inspector, Scene y editores especializados | G | Mantener composición y semántica de Game Engine. | Sin extracción general |
-| engine/assets y asset-pipeline.mjs | D/L | Importación, derivados y recursos de juegos G; almacenamiento/jobs comunes cuando se pruebe necesario. | P2 contratos; compartir procesamiento después |
-| engine/assets/cad.mjs | G | Importador estático del motor; no es kernel paramétrico de un futuro CAD. | Mantener avisos de terceros |
-| daemon/bootstrap/scripting y engine/scripting | G/L | C#, compilación, ABI, bindings y scripting Unity G; runner genérico solo con segundo uso. | M19–M40; no extraer por nombre |
-| engine/core, wasm, renderer, físicas, audio y animación | G/L | Lógica y recursos especializados G; utilidades compartidas solo con contrato probado. | Milestones del motor |
-| engine/testing y engine/replay | D | Prueba/replay de juegos G; protocolo de trabajos/evidencias P. | P3–P4; evidencia no confundida con aceptación |
-| demos y tests del motor | G | Conservar evidencia y regresiones; nuevas pruebas del contrato se añaden en ambos lados. | Cada tanda |
-| daemon/axiom-daemon | G/L | Daemon Rust parcial; no sustituye al Node productivo por esta decisión. | Sin reescritura impuesta |
-| .axiom, dist, target, node_modules | G/local | Datos locales y generados; nunca transferir a repositorios como fuente de Platform. | Revisar cada publicación |
-| docs/adr, reports y archive del motor | G | Historia del producto; Platform referencia baseline sin reescribir evidencias. | P0 y permanente |
+| Existing component | Ownership and boundary | Stage / required evidence |
+| --- | --- | --- |
+| hub-settings and editor Hub | P catalog/preferences; G templates/demos/format validation | P1/P2 real create/open/reopen |
+| bootstrap/server | P host/sessions; G domain bootstrap/routes; do not move whole file | P1–P3 direct/hosted startup |
+| folder-picker, atomic-file, open-editor | P OS/files infrastructure; G concrete opening/project authorization | P2/P4 cancellation, timeout, bounded paths |
+| project-store, scene-workspace, command-bus | G documents/scenes/transactions; P lifecycle/storage contracts | P1–P4 same invariants/persistence |
+| github/client | P transport/session account | P2 permissions/errors/disconnect |
+| publication, bundle, import-project, history | P transport/scoped metadata location; G game bundle/review/receipts/publication history | P2 divergence and ambiguous-write recovery; generalize receipts only with another real consumer |
+| workspaces manager/files/diff | P generic diff/hashes/review/journal; G snapshots/validation/resource transaction | P3 concurrency/cancellation/rollback |
+| OpenAiAssistant/agent service | P HTTP/model/turn/cancellation/usage; G game context/instructions/normalization/acceptance | P3 manual and AI paths |
+| contracts, typed-tools, handlers | P generic registry/validator; G semantic catalog/handlers | P3 tool conformance |
+| editor bridge | P transport/generation contracts; G snapshots/adoption | P3 stale response cannot revert state |
+| MCP stdio | Common transport boundary; G domain capabilities | No permission expansion from exposing MCP |
+| PMD/document sections/AI history | Generic mechanisms may be shared; content/templates/gates remain G | P3/P4 preserved isolated history; no speculative extraction |
+| protocol/messages/errors | P common identity/envelope/diagnostics; G entity/transform/body/project/scripts/replay schemas | P1–P3 validate both sides |
+| dock/layout/chat/presentation | P reusable primitives only after proof; G editor composition | P4 shared option/icon primitives and preferences/keyboard; no wholesale dock rewrite |
+| main/Hierarchy/Inspector/Scene/specialized editors | G composition and meaning | No general extraction |
+| assets/pipeline | G game import/derivatives; common storage/jobs only when proven | P2 contracts; further processing later |
+| CAD asset importer | G static importer; not a future parametric kernel | Preserve third-party notices |
+| scripting/C#/ABI/bindings | G Unity-compatible runtime; generic runner only with second use | Engine M19–M40 |
+| core/Wasm/renderer/physics/audio/animation | G specialized behavior/resources | Engine roadmap; utility reuse only behind proven contract |
+| testing/replay | G game tests/replay; P generic task/evidence protocol | Evidence distinct from acceptance |
+| demos/tests | G historical regressions; add joint contract tests in both repos | Every batch |
+| Rust daemon | G partial daemon; not a replacement for production Node | No imposed rewrite |
+| .axiom/dist/target/node_modules | Generated/local, never Platform source | Inspect each distribution |
+| ADRs/reports/archive | Product history; Platform links baselines without rewriting results | Permanent |
 
-Regla para archivos nuevos: si contiene semántica de un único dominio, pertenece al producto. Si mezcla infraestructura con dominio, introducir puerto/adaptador antes de extraer. Evitar dependencias circulares y fuentes compartidas por copia o submódulo como flujo inicial.
+New code with one-domain meaning belongs to that product. Mixed infrastructure/domain code gets a port before extraction. No circular imports or permanent source-copy integration.

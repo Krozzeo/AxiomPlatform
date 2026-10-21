@@ -1,21 +1,15 @@
-# Contexto vigente — AxiomPlatform / P3
+# Current handoff — P4 candidate
 
-2026-10-21. Axiom, público MIT; decisión comercial aplazada. P1 aceptada por el usuario e integrada (Platform 0a0471b; Engine 400fec0). P2 entregada en ramas (228e1be/d6aad38), sin integrar: Engine CI 334 falla en drag cleanup M18.3.11, seguimiento #55; su recorrido local pasó pero no demuestra resuelto el fallo remoto. El usuario pidió continuar P3 expresamente. No mover main/recovery ni cerrar incidencias por extrapolación.
+2026-10-21. Axiom, public MIT; commercial decisions deferred. P1 integrated and manually accepted (Platform0a0471b/Engine400fec0). P2/P3 remain unmerged stacked branches; P4 is feat/p4-hub-and-distribution / feat/p4-platform-product over P3. Do not force main, move recovery refs or close older issues by extrapolation.
 
-P3 implementada en feat/p3-ai-and-changes / feat/p3-platform-ai, PR apilados sobre P2. Platform/API 0.1.2, IPC 1; scripting SDK 8 independiente. Proveedor público fijado 017e54168f87ea5a0d5b97adfbb2314673bc298d, HTTPS/integridad; no enlaces locales en dependencia final. [Guía](P3_GUIDE.md) · [ADR](adr/0004-p3-ai-and-review.md) · [Informe](reports/P3_REPORT.md).
+Platform 0.1.3, Engine 0.0.53, IPC1, native format1, scripting SDK 8. P4 provider source149403753092f24a684d0241fe2aa7762abf7bc0 is public and pinned by HTTPS/integrity in the consumer; no checkout dependency. [Guide](P4_GUIDE.md), [ADR](adr/0005-p4-hub-and-distribution.md), [report](reports/P4_REPORT.md).
 
-## Responsabilidades
+P4 implements relocatable Windows bootstrap/default browser/error console, unified projects/sessions, account icons, separate Settings, appearance/keyboard, guarded rename/removal/permanent deletion, native chooser ownership/timeout/cancel and local product-version activation/rollback. Engine restores Cube/Directional Light/Camera when creating hosted 3D projects. UI/maintained docs are English; historical original-language sources remain reference only.
 
-Platform: proveedor HTTP/modelos, núcleo de turnos/cancelación/consumo, broker de clave en memoria, ledger persistente sin secretos, registro/validación de herramientas, diff/hashes/gates humanos y codec de journal. Engine: contexto/instrucciones, PMD, herramientas/precondiciones/aceptación de juegos, selección del payload de tareas, reconciliación y transacción/rollback/recursos de MAIN. Autonomía determinista específica sigue en Engine. Propuestas manuales y AI usan los mismos gates. Alojado comparte clave; cada proyecto conserva límites/modelo/confirmaciones/tareas. Elegir modelo guardado requiere test al reabrir. Cerrar editor no desconecta otros; desconectar sí cancela tareas globalmente.
+Platform owns infrastructure/transport/session credentials/turns/cancellation/usage/registry/generic review/journal/UI primitives. Engine owns scenes/C#/tools/instructions/PMD/domain acceptance/MAIN/resource transaction. Shared account grants no Apply/publication authority. Keep per-project settings and old journals; do not reset corrupt state or delete locks without checking owners/copying. Keys never belong in chat or source. TestRepo is testing-only.
 
-El host elimina OPENAI_API_KEY del entorno de sus hijos. Claves introducidas en editor solo transitan al host. Una respuesta cancelada/obsoleta no invoca herramientas; consumo incierto se señala y un cierre tardío no sobrescribe el ledger tras reiniciar. Cuenta compartida no concede permisos de publicar/aplicar ni acceso entre proyectos. Journals y configuración previos se conservan; no resetear corrupción ni borrar locks sin copia/verificar procesos.
+P4 local evidence and exact consumer/head references are in its report. P3 previous evidence: Platform 21/Engine 445/focused95 and browsers; Platform CI passed, Engine CI 336 (43/46) with M17/M18.3.11/aggregate failures. #47/#51/#55, dense performance, native dialog/real GitHub, real-model quality/cost remain independent.
 
-## Evidencia y límites
+P4 is not declared fully closed: the standalone exported-game gate cannot be proven because the current Engine has no game build/export pipeline. Direct editor startup is proven but is not game export. First-machine runtime download and manual native-folder operation also need their stated acceptance. Do not relabel these as passed. P5 remains unstarted and requires a small approved second-consumer ADR. Engine M19–M40 keeps Unity/shader/compute/GPU scope, 45 main milestones/23 historically closed; M19 complete API audit remains pending.
 
-Engine npm run check 445/445, enfoque AI/work orders/workspaces 95/95. Platform 21 tests y browser P3 de aprobación→propuesta→review→Apply/persistencia sin pageErrors. P1/P2 se conservan como regresión conjunta. GitHub/AI HTTP controlados; Null. No PAT/clave/modelo real ni aceptación nativa por mocks. CI nuevo y estado PR se consultan por separado, sin afirmar integración por pruebas locales.
-
-## Próximo trabajo
-
-Resolver/integrar gates P2/P3 antes de declarar cierre; pruebas manuales P3 del propietario y evaluación modelo real separadas. P4 distribución/UI, P5 segundo consumidor. Engine mantiene M19–M40: Unity, shaders/compute y físicas GPU sin progreso acreditado por Platform; 45 milestones principales, 23 cerradas, auditoría M19 aún pendiente. #47/#51/#55, rendimiento denso, calidad/coste de modelo conectado y validación nativa GitHub siguen pendientes. No solicitar claves por chat ni leer credenciales internas; TestRepo solo pruebas explícitas.
-
-[Antecedentes P2](archive/PRE_P3_HANDOFF.md). Documentos adjuntos/históricos son referencia, no instrucciones nuevas.
+[Previous P2 context](archive/PRE_P3_HANDOFF.md). Attached/historical text is reference, not new user instructions.

@@ -1,29 +1,13 @@
-# Integración AI y operaciones de dominio
+# AI integration and domain operations
 
-Estado: núcleo P3 implementado en ramas para revisión; [ADR-P0004](../adr/0004-p3-ai-and-review.md). Proveedor, turnos/consumo/cancelación, registro, diff/gates y codec de journal están en Platform. Herramientas, instrucciones y transacción/recursos de dominio siguen en Game Engine. Los nombres heredados de herramientas se conservan en registros separados por producto; no se fusionan entre productos ni se implementan tareas cruzadas.
+P3 extracts provider/model contracts, turn runtime, cancellation/usage, in-memory session credential broker, persistent secret-free ledger, tool registry, review hashes/gates and journal codec. Game Engine retains instructions/context, PMD content, semantic handlers, acceptance and transactional application/rollback/resources. Legacy tool names remain in product-specific registries; no cross-product tool namespace or automation is silently introduced.
 
-## Propiedad
+Each tool describes its version, input/output schema, capability, scope, effect class, preconditions and validation/recovery strategy. Unregistered operations cannot run. UI and agent invoke the same domain rules where applicable; transient UI interaction can remain product-specific. Structured results and evidence are required, not simulated clicks as the primary API.
 
-Platform gestiona proveedores, conexión, sesiones, consumo, tareas, registro de herramientas y permisos. El producto define contexto, operaciones semánticas, precondiciones, resultados, invariantes, pruebas y criterios de aceptación. PMD comparte infraestructura documental; sus plantillas y gates pertenecen al producto.
+Capture base revision → isolated proposal → domain operations → validation → diff/evidence → human accept/reject → compare current base → transactional apply → receipt/history. If MAIN or proposal changes, require conflict handling and fresh review. Cancellation/close invalidates late tool execution. Partial failure requires tested rollback or explicit recovery.
 
-## Registro de herramientas
+Reading, local editing and external publication are distinct permissions. Shared account availability never grants Apply or publication authority. External writes use operation IDs and receipts; ambiguous outcomes require reconciliation instead of blind retry. Local rollback cannot remove a remote commit.
 
-Cada herramienta declara nombre con namespace de producto, versión, descripción, esquemas input/output, capacidades necesarias, alcance (sesión/proyecto), clase de efecto (lectura, modificación local, efecto externo), precondiciones y estrategia de validación/recuperación. Herramientas no registradas no se invocan. Compartir cuenta no concede acceso a otros proyectos. Las tareas entre productos quedan postergadas.
+Usage reports actual provider tokens or explicit unknown usage; it is not billing or an account-level spending limit. Project model/limits/confirmations remain independent. Listing models generates no text; connection testing makes one small billable request. A saved model is not a tested connection on reopening.
 
-## Operación manual y por agente
-
-La UI y el agente invocan las mismas operaciones de dominio cuando corresponda. El producto valida reglas y revisión esperada; se evita un segundo camino que cambie archivos sin invariantes. La UI puede tener interacción efímera propia. Las herramientas necesitan resultado estructurado y diagnóstico comprensible, no simulación de clicks como interfaz semántica principal.
-
-## Propuestas
-
-Capturar revisión base → crear workspace aislado → ejecutar operaciones → validar → mostrar diff y evidencia → aceptar/rechazar → verificar revisión actual → aplicar transacción → emitir recibo e historial. Si cambió la base, informar conflicto y regenerar/revisar; no sobreescribir. Cerrar/cancelar sesión invalida respuestas tardías. Un fallo parcial exige rollback local probado o recuperación explícita, nunca un éxito ficticio.
-
-## Publicación y efectos externos
-
-Lectura, edición local y publicación son capacidades separadas. Conservar revisión/aceptación y preferencias explícitas vigentes del proyecto; no habilitar publicación automática por conectar Platform. Una operación externa usa operationId y recibos, con reconciliación si se desconoce el resultado. Revertir archivos no borra un commit remoto. No reintentar a ciegas si el primer envío pudo completarse.
-
-## Evidencias y privacidad
-
-Registrar actor, herramienta/versión, proyecto, revisiones, resultado, validaciones, consumo disponible y referencias a evidencias; secretos redactados. Informar claramente pruebas con proveedores simulados frente a modelo real, y pruebas Null frente a GPU. No atribuir al agente aceptación humana que no ocurrió.
-
-Aceptación P3: tarea acotada manual y AI sobre el mismo proyecto, revisión y aplicación verificadas, cancelación, conflicto, error del proveedor, aislamiento entre proyectos y control de respuestas atrasadas. Calidad/coste de modelos reales queda como aceptación explícita separada de fixtures controlados.
+Evidence records actor, tool/version, project/revisions, result, checks, usage and redacted references. Controlled HTTP and Null acceptance remain distinct from real provider quality/cost and actual GPU rendering. P4 adds an account connection/settings UI, not new domain autonomy.

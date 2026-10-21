@@ -1,28 +1,18 @@
-# Proyectos, configuración y sesiones
+# Projects, configuration and sessions
 
-## Modelo
+Product: specialized application. Project: persistent documents of one product. Workspace: future optional grouping of projects. Session: temporary processes, tasks and connections. The implemented Hub has one project list with live-session state; it does not introduce a multidomain workspace document format.
 
-Producto = aplicación especializada. Proyecto = documentos persistentes de un producto. Workspace = agrupación opcional de proyectos, futura. Sesión = estado temporal de conexiones, procesos y tareas. P1 administra proyectos individuales; no implementa todavía un formato de workspace multidominio.
-
-| Nivel | Datos | Regla de escritura |
+| Level | Data | Ownership |
 | --- | --- | --- |
-| Platform | Idioma, apariencia, productos instalados, raíces predeterminadas y proveedores configurados | Preferencias locales del usuario; sin secretos en texto plano |
-| Producto | Atajos y preferencias específicas del editor | Namespace productId |
-| Proyecto | Documentos, repositorio/rama, publicación, configuración AI, build y plantilla | Validación del producto y revisión para mutaciones |
-| Sesión | Credencial activa, permisos, procesos y tareas | Memoria por defecto; revocar al desconectar/cerrar |
+| Platform | Appearance, sorting, installed versions, default product, storage root and catalog | Local user profile, no credentials |
+| Product | Editor shortcuts and domain preferences | productId namespace |
+| Project | Native content, repository/branch/publication, AI limits/model, build/template | Product validation and revision/approval rules |
+| Session | Active credentials, permissions, processes and tasks | Memory by default; revoke on disconnect/shutdown |
 
-Los defaults de Platform se aplican al crear configuración nueva; no sustituyen preferencias explícitas del proyecto. La migración identifica precedencia y conserva valores actuales. No cambiar los defaults de publicación ya acordados en Game Engine por extraer servicios.
+Defaults apply to new configuration and never overwrite explicit project preferences. Existing publication defaults remain intact. A connected account is not permission to publish any project. Combine provider identity, scopes, the project's destination and authorization for the specific effect. No open project means account status alone; active projects also contribute repository status.
 
-## Credenciales y aislamiento
+Credentials never enter Git, projects, diagnostics or persistent profile data. Persistent secure storage would require a separately implemented opt-in OS facility; it is not implemented. Disconnect invalidates new/stale requests and flags uncertain external writes for reconciliation; it cannot undo remote commits. OPENAI_API_KEY is removed from hosted child environments.
 
-Cuenta disponible en la sesión no equivale a permiso para publicar cualquier proyecto. La operación combina identidad, permisos del proveedor, destino del proyecto y autorización de la acción. Sin proyecto abierto solo se evalúa conexión de cuenta; con proyecto, se distingue cuenta conectada y destino válido.
+Resolve paths under authorized canonical roots and reject escaping links. Adding outside storage creates a bounded copy and preserves the original. Adding an existing project inside storage registers it in place. Removing a catalog entry changes no files. Permanent deletion is separate: require a closed session, reviewed canonical folder, unchanged fingerprint, short-lived plan and exact typed project name. Never delete the storage root or a folder containing another registered project.
 
-No escribir tokens en Git, documentos, logs, diagnósticos o URLs. Persistencia entre sesiones únicamente opt-in y mediante almacén seguro del SO; si no existe, mantener memoria y explicar el límite. P0 no implementa ese almacén ni reemplaza el comportamiento actual del motor. Desconectar cancela nuevas operaciones, elimina credenciales y marca las publicaciones inciertas para reconciliación; no promete deshacer un commit remoto.
-
-## Archivos y migración
-
-Identidad estable y referencias relativas portátiles. Catálogo local guarda rutas, no credenciales ni todos los contenidos. Resolver rutas dentro de raíces autorizadas y detectar enlaces que escapan. Antes de migración incompatible: mostrar versión, copia recuperable y efectos; requerir decisión explícita. Nunca abrir con escritura usando una versión que desconoce el formato.
-
-## Interoperabilidad futura
-
-Cada intercambio declara unidades, ejes, handedness, precisión, tolerancia, formato/versión y procedencia. Elegir copia importada o vínculo actualizable. Detectar referencias rotas y ciclos. Un intercambio que pierde restricciones o historial paramétrico lo indica antes de aceptarlo. Mantener formatos nativos; no convertir todo en escenas del motor.
+Installation updates retain documents in place and never migrate them implicitly. Incompatible migrations require explicit scope, a recoverable copy and proven restore. Future exchange formats must declare units, axes, handedness, precision/tolerance, provenance, copy versus link and lost constraints; native formats remain independent.

@@ -1,36 +1,17 @@
-# Validación y riesgos
+# Validation and risks
 
-## Gates por cambio
-
-| Tipo | Comprobaciones |
+| Change | Required evidence |
 | --- | --- |
-| P0 documental | Enlaces relativos, entregables, consistencia de decisiones, licencia/nombre, preservación del roadmap y revisión del diff |
-| Contrato | Validación de mensajes, versión incompatible, capacidad ausente, cancelación, timeout, cierre y respuesta atrasada |
-| Persistencia | Crear/abrir/guardar/reabrir, defaults existentes, conflicto, fallo de escritura y recuperación |
-| Cuenta/GitHub | Sesión compartida con destinos aislados, desconexión, permiso insuficiente, divergencia y resultado incierto |
-| AI | Herramientas semánticas, scope, propuesta, validación, revisión, conflicto y evidencia depurada |
-| Distribución | Instalación, integridad, versión compatible, actualización diferida, rollback y proyecto intacto |
-| Producto | Arranque desde Hub y directo; build/exportado sin Platform; pruebas de dominio del motor |
+| Documentation | Valid local links/deliverables, consistent decisions, MIT/identity and preserved product roadmap |
+| Contracts | Incompatible version, missing capability, timeout/process death, cancellation and late response |
+| Persistence | Create/open/edit/save/reopen, defaults, stale revision, write failure and recovery |
+| GitHub | Shared session with isolated project destinations, disconnect/permissions/divergence/ambiguous publication |
+| AI | Semantic tools, scope, isolated proposal, review/conflict, cancellation and redacted evidence |
+| Distribution | Verified dependencies, compatible registration, deferred activation, rollback and intact project |
+| Product | Hosted and direct startup, standalone export and domain regression |
 
-El proveedor prueba contratos; el motor prueba su adaptador; una integración con versiones exactas acredita el recorrido conjunto. No hace falta repetir toda prueba pesada para corregir un enlace, pero los checks obligatorios del repositorio se respetan. No reducir asserts o gates para hacer pasar la migración.
+Provider tests validate public contracts; product tests validate adapters; exact pinned joint tests validate the complete path. Do not weaken assertions to pass extraction. Run required checks, scaling optional expensive tests to the change.
 
-## Riesgos y respuesta
+Risks: speculative abstractions (require real consumers); domain coupling (boundary checks); fragile coordinated releases (provider first); data loss (revision/transaction/restore); cross-project credential/permission leakage (separate scope); common-process failures (isolated sessions); indefinitely postponing Engine work (independent roadmap); misleading evidence (label fixtures/real, Null/GPU and historical/new).
 
-| Riesgo | Mitigación | Señal de bloqueo |
-| --- | --- | --- |
-| Sobreingeniería | Extraer necesidades comprobadas y revisar con segundo consumidor pequeño | Un módulo solo existe para un producto hipotético |
-| Platform acoplada al motor | Tipos de dominio fuera del SDK, prueba de dependencias | Import de escenas/Unity desde Platform |
-| Publicaciones coordinadas frágiles | Versiones fijadas, cambios compatibles y proveedor primero | Dos merges simultáneos obligatorios |
-| Pérdida de datos | Revisiones, transacciones, copias y ensayo de recuperación | No se puede reabrir estado previo |
-| Credencial o contexto cruzado | Separar cuenta, proyecto y permisos; redacción | Un proyecto hereda destino o permiso ajeno |
-| Fallo común afecta a todos | Sesiones y recursos aislados; procesos/workers cuando convenga | Cierre de producto corrompe otros proyectos |
-| Detener el motor indefinidamente | Roadmaps independientes y tandas acotadas | M19 queda bloqueada sin dependencia técnica |
-| Confundir evidencia | Informar mocks/modelo real, Null/GPU e histórico/nuevo | Se declara aceptación sin prueba correspondiente |
-
-## Límites iniciales heredados
-
-No resolver por renombrado: rendimiento físico denso, validación manual nativa GitHub aplazada, calidad/coste con modelo conectado y fallo intermitente de Inspector #47. El estado del motor es su fuente canónica. P0 no ejecuta CAD/Math, GPU physics ni una nueva aplicación Platform.
-
-## Pendiente de CI descubierto al documentar P0
-
-El run posterior de la base 871a72f terminó con fallo M17 y del gate agregado: [run 39507425121](https://github.com/Krozzeo/AxiomGameEngine/actions/runs/39507425121), 44/46 trabajos aprobados. Se registró [#51](https://github.com/Krozzeo/AxiomGameEngine/issues/51), aserción de posiciones de runtime sin cambio, sin causa confirmada. No se presenta la base como totalmente verde por el CI 329 anterior del mismo árbol. La rama P0 y Platform tienen sus propias verificaciones; este fallo sigue pendiente en el motor.
+Retain inherited limitations: dense physics performance, real-account/native-dialog validation, model quality/cost, Inspector #47, M17 #51 and drag cleanup #55. P0's later base run 39507425121 failed M17/aggregate (44/46), despite earlier CI 329 success of the same tree. P4 does not close those issues through unrelated tests. Current evidence belongs in each report.

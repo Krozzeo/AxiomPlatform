@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: Krozzeo/AxiomGameEngine
-          ref: 9697b5829baa60c0cde48d80b5eea35457f17670
+          ref: 6f554f4ec798cb3e5ed4cc7714df75aa129fd404
           path: game-engine
       - uses: actions/setup-node@v4
         with:
@@ -60,6 +60,9 @@ jobs:
       - run: npm run test:browser:p3
         env:
           AXIOM_ENGINE_PATH: ../game-engine
+      - run: npm run test:browser:p4
+        env:
+          AXIOM_ENGINE_PATH: ../game-engine
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -68,4 +71,5 @@ jobs:
             platform/.axiom/p1-browser
             platform/.axiom/p2-browser
             platform/.axiom/p3-browser
+            platform/.axiom/p4-browser
           include-hidden-files: true

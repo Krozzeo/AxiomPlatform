@@ -1,19 +1,13 @@
-# ADR-P0004 — Núcleo AI y revisión con adaptadores de dominio
+# ADR-P0004 — Generic AI/review with domain adapters
 
-2026-10-21. Implementado en ramas P3 para revisión. Base Platform 228e1be, Engine d6aad38; P2 no se integra por avanzar esta tanda.
+2026-10-21. P3 review branches based on Platform 228e1be and Engine d6aad38; proceeding does not integrate P2.
 
-## Decisión
+Extract OpenAI HTTP/model/limits/usage, turn execution and task lifecycle into services/ai. Product adapters supply context, tool normalization, freshness guards, instructions and acceptance. Do not move OpenAiAssistant whole: C#/scene/PMD rules are domain code. Count actual late response usage while refusing tool execution after cancellation.
 
-Extraer transporte OpenAI/modelos/límites/consumo, ejecución de turnos y ciclo de tarea a services/ai. El adaptador de producto suministra contexto, normalización de herramientas, guard de vigencia, instrucciones y aceptación final. No trasladar OpenAiAssistant completo: contiene reglas de C#, escenas y PMD. El núcleo compartido cuenta uso real antes de rechazar una respuesta tardía y no permite convertirla en nuevas herramientas.
+Hosted AiAccount owns one credential. SharedAiProvider uses session/project IPC; epoch changes invalidate old connections and cancellation bypasses the request queue. Global disconnect affects all; closing one product cancels its work only. Remove OPENAI_API_KEY from children. Persist only scoped usage counters, redact returned errors and mark pending usage unknown at host close. Late shutdown responses cannot overwrite a new session's ledger.
 
-En modo alojado, AiAccount mantiene una credencial de sesión; SharedAiProvider usa IPC ligado a sesión/proyecto desde el host. Epoch invalida conexiones anteriores; cancelación llega fuera de la cola de solicitudes. Desconectar afecta a todos y cerrar un producto solo cancela sus solicitudes. El host elimina OPENAI_API_KEY del entorno de sus hijos. Una clave introducida en el editor transita al host. El ledger solo conserva contadores por producto/proyecto; errores y respuestas se redactan antes de devolverlas. Un cierre del host registra uso pendiente como desconocido y una respuesta posterior no escribe sobre un ledger de una sesión nueva.
+ToolRegistry validates each product's existing names without globally combining registries. Host/adapter, not model arguments, fix identity/revision/capabilities. Manual and AI proposals use the same extracted diff/hashes/human review gate. Journal codec retains receipts/pending calls; payload selection/reconciliation and MAIN resource transaction stay in the product. Deterministic game autonomy remains domain implementation.
 
-ToolRegistry valida los contratos existentes dentro de cada producto: nombres heredados de herramientas permanecen compatibles y nunca se fusionan globalmente entre productos. Identidad de producto/sesión/revisión y capacidades se fijan por host/adaptador, no por argumentos del modelo. Propuestas manuales y AI usan el mismo cálculo de diferencias, hashes y guard humano extraídos. Persistencia genérica de journals conserva recibos/pending calls; su selección de campos y semántica de reconciliación siguen en el adaptador. La transacción que valida/promueve recursos y modifica MAIN pertenece al producto.
+Publish a compatible pinned provider before the consumer, retaining project documents/SDK 8. Saved model/limits are preferences, not proof of a live connection; retest on opening. P3 local evidence: Platform 21, Engine 445 plus browser P1/P2/P3 with controlled HTTP/Null. No real keys or model-quality claim; #55 and new CI are separate. [Guide](../P3_GUIDE.md).
 
-El proveedor se instala por HTTPS con commit/integridad, publicado antes del consumidor; no requiere merges simultáneos. No cambia el SDK C# ni los documentos de juego. Preferencias/modelo se recuerdan; la conexión debe probarse de nuevo al abrir. La autonomía determinista del motor queda como implementación de dominio, no como orquestador universal.
-
-## Evidencia y límites
-
-21 tests Platform y 445 Engine, con aprobación/revisión/cancelación/errores/conflictos y exactamente una ejecución al reanudar cubiertos. Navegadores P1/P2/P3, HTTP AI controlado, Null. No se usaron credenciales reales ni se atribuye calidad de modelo a estas pruebas. Los checks remotos y #55 siguen independientes. [Guía y recorridos](../P3_GUIDE.md).
-
-Contrato del proveedor contrastado con [documentación oficial de Responses](https://developers.openai.com/api/docs/guides/migrate-to-responses): store:false, output tipado y conservación de resultados/llamadas por call_id. No hay migración de modelos, streaming o cambio de endpoint en P3.
+Provider contract uses [official Responses behavior](https://developers.openai.com/api/docs/guides/migrate-to-responses): store:false, typed output and call_id-associated results. No endpoint/model migration or streaming change was part of P3.

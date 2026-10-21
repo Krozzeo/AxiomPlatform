@@ -1,29 +1,13 @@
-# P2 — Catálogo persistente y servicios compartidos
+# P2 — persistent catalog and shared services (historical report)
 
-2026-10-21. Ramas feat/p2-shared-services y feat/p2-platform-services. Base Platform 0a0471b y motor 400fec0, tras integrar P1 con CI y aceptación manual del usuario. CI conjunto fija el consumidor Game Engine d6aad384d2a0f06ac841e7e56b2eab79bfdd766a; su dependencia de servicios está fijada al commit público 78d219b04d16b13074d76414483bc121cef32be9 de Platform.
+2026-10-21. Review branches feat/p2-shared-services / feat/p2-platform-services, based on integrated Platform0a0471b/Engine400fec0. Joint workflow pinned Engined6aad384d2a0f06ac841e7e56b2eab79bfdd766a, consuming public Platform78d219b04d16b13074d76414483bc121cef32be9 by HTTPS/integrity. Starting P3/P4 does not integrate P2.
 
-## Aceptación anterior
+Prior acceptance: owner ran P1 check6/6, browser passed:true with no pageErrors and confirmed manual tests. Platform Windows/Linux/product/browser and Engine CI332 passed before merging Platform PR1/EnginePR53 (includesP0). Recovery refs were retained.
 
-El usuario ejecutó npm run check de P1: 6/6, sin omitidas; navegador passed:true sin pageErrors y confirmó pruebas manuales sin problemas. Antes de integrar: Platform CI de contratos Windows/Linux + producto/browser y Game Engine CI 332 aprobados. Se integraron PR Platform #1 y motor #53 (incluye P0); referencias de recuperación anteriores intactas.
+P2 delivered persistent settings/catalog/registration, native folder selection, folder/file opening, source-preserving local import and product-validated GitHub listing/import. One host session owns GitHub credential via IPC; repository/preferences/history/publication stay product-specific. Engine reexports the installed pinned public provider rather than copying source or using a checkout link.
 
-## Entrega P2
+Local evidence: Platform 13 tests (P1 contracts, settings corruption/locks, bounded/link-safe copying, picker/cancel, account epochs/revocation and three real-process integration journeys). Covered catalog/root restart, unchanged source, two connected editors with isolated destinations/preferences, close without disconnecting the other, global disconnect, stale review invalidation, restart without token and uncertain commit reconciliation without duplicate/divergence writes. P1/P2 browsers passed without pageErrors. Engine npm run check444/444, including legacy native preference/history adoption. A lost storage-change race found by UI testing was fixed by serializing explicit actions and capturing values before refresh.
 
-Catálogo persistente y ajustes/registro; selección de carpetas, apertura por carpeta/archivo e importación local conservando el original; listado/importación GitHub validados por producto; transporte común y cuenta por sesión con broker IPC, sin credenciales persistidas. Configuración/historial/publicación siguen por proyecto. El motor reexporta código común desde paquete de fuente HTTPS fijado e integridad, sin requerir autenticación SSH ni un enlace de desarrollo.
+Limits: controlled HTTP and native chooser results, no real PAT/publication/manual Windows selection. Null does not prove GPU. Profiles/projects have separate locks; do not auto-reset corruption or remove live/stale locks without inspecting owners and copying data. Root changes do not move documents; duplicate identities reuse/reject existing entries. In-flight remote effects need journal reconciliation. Developer-style install remained until P4.
 
-## Comprobaciones locales
-
-- 13 tests Platform: contratos de P1, almacenamiento/corrupción/locks, copia acotada y enlaces, selector/cancelación, épocas de cuenta/revocación y tres recorridos con procesos reales del motor.
-- Las integraciones prueban reinicio/recientes/raíz, importación sin modificar origen, dos editores conectados y destinos/preferencias aislados, cierre sin desconectar los demás, desconexión común, invalidación de revisión, reinicio sin token y recuperación de commit incierto sin duplicar/divergencia sin escribir.
-- Navegador P1 conserva create/edit/Cancel/Save/close/reopen. Navegador P2 pasa importación local, cuenta/repositorios/importación remota, cancelación de selector, autosave de raíz, reinicio del backend y reapertura desde catálogo, sin pageErrors.
-- Motor: npm run check 444/444 aprobadas, sin fallos ni omitidas, incluida la regresión de adopción de ajustes/historial nativos. CI de P2 se comprueba por separado.
-- La prueba UI encontró un cambio de almacenamiento perdido al coincidir con un refresco. Se serializan acciones explícitas y se captura el valor al cambiar, preservando la comprobación del reinicio.
-
-## Límites
-
-GitHub se valida con transporte controlado, sin PAT real ni publicaciones en la cuenta del usuario; selector nativo con resultados controlados. La implementación Windows usa el selector real heredado, pero su operación manual de P2 queda para el usuario. Null no acredita GPU. AI/modelos, #47/#51, rendimiento denso, shaders y físicas GPU no quedan resueltos por esta entrega.
-
-El perfil y los proyectos tienen locks separados. No recuperar automáticamente un lock tras cierre forzado sin verificar procesos/copiar datos. Identidad duplicada en otra carpeta no crea destinos compartidos: se rechaza o reutiliza la entrada existente. Cambiar almacenamiento no mueve documentos. Las configuraciones inválidas no se resetean para aparentar éxito.
-
-La credencial puede transitar por una petición del editor al conectar, pero solo el host la retiene. Un efecto remoto ya en vuelo no se deshace al desconectar; el journal del producto conserva la recuperación. La instalación conserva requisitos de desarrollador hasta P4.
-
-P2 se entrega mediante PR. Su cierre remoto requiere comprobar los checks nuevos y la integración, sin extrapolar los resultados de P1. P3 es la siguiente etapa de Platform; M19–M40 del motor permanecen intactas.
+Remote checks are independent of local evidence. Engine CI334 later failed M18.3.11 drag cleanup (#55), despite the local browser pass. #47/#51/dense physics/model quality/shaders/GPU remain separate. Original-language detail is retained in archive/original-language.

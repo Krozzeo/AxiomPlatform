@@ -1,48 +1,21 @@
-# Contrato preliminar de producto — SDK de Platform
+# Product contract and Platform SDK
 
-Actualización: P1 implementa API 0.1.0 / protocolo 1, descriptor ejecutable y cliente IPC; [ADR-P0002](../adr/0002-p1-host-and-product-ipc.md). El formato real del motor sigue schemaVersion 1. El texto siguiente conserva el diseño de P0 como antecedente.
+Current Platform package/API line: 0.1.x; IPC protocol 1. Game Engine retains native project schemaVersion 1 and scripting SDK 8. These numbers are independent. The executable manifest validator in packages/contracts is authoritative; the original P0 descriptor was illustrative.
 
-Estado original: especificación de P0, versión de diseño 0. No hay esquema ejecutable o SDK publicado. P1 implementará y validará una primera versión; los nombres del ejemplo pueden ajustarse mediante ADR sin migrar proyectos actuales en P0.
+Descriptors declare manifestVersion, protocolVersion, productId, displayName, productVersion, supported Platform API range, supported project format IDs/versions, capabilities and an official-local adapter entry. Register explicitly prepared installations; never execute project-provided shell commands. The adapter entry must resolve inside its installation. Project identity is portable; a local path is not identity.
 
-## Descriptor y proyecto
+## Lifecycle
 
-```json
-{
-  "manifestVersion": 1,
-  "productId": "axiom.game-engine",
-  "displayName": "Axiom Game Engine",
-  "productVersion": "0.0.52",
-  "platformApiRange": ">=0.1.0 <0.2.0",
-  "projectFormats": [{"id": "axiom.game-project", "versions": [1]}],
-  "capabilities": ["project.open", "project.create", "project.close"],
-  "launch": {"adapter": "official-local"}
-}
-```
+1. Validate the installation/descriptor and detect a project without modifying it.
+2. Negotiate protocol, product identity/version, capabilities and authorized roots.
+3. Acquire ownership and reject another write owner.
+4. Wait for explicit product ready; expose timeout/process failure.
+5. Create/open through the product; validate the native document and return revision/status.
+6. Save with the expected editor revision. Closing requires Save/Discard/Cancel; pending buffers and active work retain their guards.
+7. Release resources on close/failure without silently repairing documents.
 
-Los números de Platform y formato son ilustrativos, no asignaciones al formato existente. No ejecutar un comando arbitrario obtenido de un proyecto. El host resuelve el adaptador desde instalaciones oficiales registradas. El proyecto aporta productId, projectId, formatVersion y referencias a documentos del producto; una ruta es local y no identidad portátil.
+P1 requires detect/create/open/status/save/close. P2 adds import and GitHub project listing. P4 adds optional project.rename to the Game Engine descriptor; it preserves project identity, content and format. A rename on a dirty or busy live product is rejected. Closed rename obtains product storage ownership and revision validation.
 
-## Apertura y ciclo de vida
+Messages carry request/session/product identity and correlated results. Mutations include operationId; duplicates return the retained receipt or explicit uncertainty, never blindly repeat effects. Closed generations cannot apply late results. Minimum diagnostics include incompatibleVersion, unsupportedCapability, permissionDenied, projectBusy, revisionConflict, cancelled, operationFailed and resultUnknown. A domain failure is not success because HTTP returned a response.
 
-1. Detectar el proyecto sin modificarlo y solicitar al adaptador un diagnóstico de compatibilidad.
-2. Negociar versión de protocolo, capacidades, raíces y modo de apertura.
-3. Reservar sesión e identificar quién posee el documento; detectar otra apertura de escritura.
-4. Iniciar producto y esperar ready explícito, con error y cancelación visibles. Un timeout no significa éxito.
-5. Abrir documento por identificador/ruta autorizada; producto valida y responde estado/revisión.
-6. Guardar mediante el producto. Cerrar con decisión sobre cambios pendientes y tareas activas.
-7. Al fallar, liberar recursos y conservar un diagnóstico; no escribir ni reparar silenciosamente.
-
-El adaptador debe cubrir detect, compatibility, launch, ready, open/create, dirty/status, save, close y diagnostics. Capacidades AI, publicación y preview son opt-in posteriores, no métodos vacíos que simulen soporte.
-
-## Mensajes y concurrencia
-
-Sobre común: protocolVersion, messageId, sessionId, productId, projectId cuando aplique, correlationId, actor y payload. Mutaciones incluyen expectedRevision y operationId. La recepción de duplicados no repite efectos: devolver recibo conocido o estado desconocido explícito. Producto y host deben descartar respuestas de sesiones cerradas o generaciones anteriores.
-
-Errores mínimos: incompatibleVersion, unsupportedCapability, permissionDenied, projectBusy, revisionConflict, cancelled y operationFailed; con mensaje humano, evidencia depurada y sugerencia. No exponer stack o secretos como única explicación.
-
-## Responsabilidades
-
-Host: registro, permisos, ciclo de vida y negociación. SDK: tipos/esquemas/cliente, sin clases del motor. Adaptador: traducir contratos a operaciones de producto. Producto: invariantes, documento, validación, herramientas y resultado. Un fallo de dominio nunca se convierte en éxito porque el transporte respondió HTTP 200.
-
-## Conformidad inicial
-
-P1 prueba apertura, cierre cancelado, guardado/reapertura, versión incompatible sin escritura, proceso fallido y arranque directo del motor. P2 añade importación y cuentas; P3 herramientas/propuestas. El SDK de Platform es diferente del SDK 8 de scripting del motor.
+Host owns registration/permissions/lifecycle; SDK owns generic validation/client; adapter owns translation; product owns document invariants and results. Optional capabilities must perform real work. Conformance tests cover incompatible descriptors/documents without writes, failed processes, lifecycle, stale revisions, service isolation and direct startup.

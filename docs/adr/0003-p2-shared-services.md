@@ -1,23 +1,13 @@
-# ADR-P0003 — Servicios comunes y persistencia P2
+# ADR-P0003 — P2 shared services and persistence
 
-2026-10-21. Implementado en ramas para revisión; CI y aceptación nativa real separados.
+2026-10-21. Review candidate; remote CI and real native acceptance remain independent.
 
-## Decisión
+Platform owns persistent catalog/preferences, OS folder selection/Documents, atomic JSON, bounded copying and GitHub account/transport. Engine reexports these from a public HTTPS commit archive with lockfile integrity, no checkout links or moving-branch dependency. The package is private with respect to npm-registry publication, not a private GitHub archive.
 
-Platform posee catálogo reciente, ubicación/configuración local, selección nativa de carpetas, escritura JSON atómica, copia acotada y transporte/cuenta GitHub. Se extraen client.mjs y folder-picker/documentos del motor con procedencia registrada; el motor los reexporta desde una dependencia HTTPS fijada al commit de Platform e integridad en package-lock. No hay copias permanentes, enlaces entre checkouts ni dependencia de una rama mutable. El paquete es fuente privada para npm-registry, instalable desde su archivo público; no se publicó en npm.
+The host profile contains registration/preferences/projects under a lock. Do not reset corrupt data or move project files when changing storage. CLI overrides are explicit; subsequent startups reuse configuration. startHost tests receive stateRoot or isolated defaults; CLI uses a user profile.
 
-El host mantiene un perfil con plataforma/registro/preferencias y entradas de proyecto, protegido por lock. No silencia corrupción ni borra datos al cambiar raíz. La CLI conserva los argumentos iniciales como overrides explícitos; después reutiliza configuración. La biblioteca startHost recibe stateRoot explícito o usa un perfil aislado bajo la raíz de prueba; la CLI usa el perfil de usuario.
+One host account retains its credential only in memory. Product IPC binds each request to a session. Editor-entered tokens transit to the host; account identity/epoch invalidates old requests/reviews. Closing one product does not disconnect others. Disconnect/revocation affects all; already dispatched remote effects need receipts/reconciliation rather than promised rollback.
 
-Cuenta GitHub por host, credencial solo retenida en su memoria. Los productos solicitan servicios mediante mensajes IPC ligados a su sesión. La credencial introducida desde un editor solo transita hacia el host. La cuenta emite identidad/época a los productos; cambiarla invalida revisiones y solicitudes antiguas. Cerrar un editor libera su cliente sin desconectar los demás. Desconectar/revocar afecta a todos; operaciones externas ya iniciadas requieren recibo/reconciliación, no se prometen deshacer.
+Game destinations, explicit defaults, publication history/journal and bundle validation remain product/project-specific. Metadata is outside user documents; legacy native data is adopted only for matching identity. Hub endpoints expose connect/list, not arbitrary GitHub requests; import broker traffic is read-only. Product detects formats/resources; Platform grants source reads and bounded copy. Original files remain intact; no universal format is introduced.
 
-Los destinos, defaults explícitos, historial y journal de publicación pertenecen al producto/proyecto. Se almacenan fuera de los documentos del usuario bajo un directorio derivado de su carpeta, y se adopta configuración nativa anterior solo para la identidad correspondiente. La publicación y su validación no se trasladan al host. Los endpoints de la UI de Platform no permiten invocar peticiones GitHub arbitrarias; solo conexión/listado. Las importaciones del broker son de lectura.
-
-El producto reconoce archivos, formato y selección de recursos de importación. Platform ofrece raíz/grant explícito de lectura y copia acotada; el origen no se modifica. GitHub import/list son capacidades opcionales nuevas, compatibles con protocolo 1 / API 0.1. La UI solo ofrece importación con adaptador P2. No se introduce un formato universal nuevo.
-
-## Alternativas y consecuencias
-
-Se descartó copiar un token a cada daemon o mantener clientes de transporte duplicados. Se conserva el Hub nativo para arranque independiente con el mismo transporte compartido; el catálogo de sesiones alojadas lo administra Platform. Las instalaciones oficiales se consideran código confiable: proceso separado no equivale a sandbox de SO para plugins externos. P3 y el dominio Unity/GPU permanecen fuera de esta extracción.
-
-## Evidencia
-
-Aceptación manual y automática P1 del usuario registrada en [informe P2](../reports/P2_REPORT.md). Tests P2 prueban persistencia, rutas, origen intacto, cuenta compartida, preferencias, desconexión, divergencia y commit incierto sin duplicado. Selector/servicio remoto se controlan en pruebas; aceptación manual nativa/PAT real sigue diferenciada. [Guía](../P2_GUIDE.md).
+Rejected per-daemon credential copies and duplicate transports. Direct Engine Hub uses the same installed transport, while Platform manages hosted sessions. Official installations are trusted code, not sandboxed plugins. P3, Unity and GPU are outside P2. [Evidence](../reports/P2_REPORT.md), [current guide](../P2_GUIDE.md).

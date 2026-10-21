@@ -1,25 +1,21 @@
 # Axiom Platform
 
-Entorno local común para la familia Axiom: Hub de productos y proyectos, servicios locales e integración con agentes AI. Axiom Game Engine es su primer producto; CAD, matemáticas y animación son direcciones futuras, todavía sin implementación.
+A local browser workspace for the Axiom family: a product/project Hub, shared local services and semantic AI integration. Axiom Game Engine is the first working product. CAD, mathematics and animation applications remain future directions.
 
-**Estado: P1 integrada y aceptada; P2 y P3 candidatas en ramas para revisión.** Catálogo y ajustes persistentes, selector/importación y cuenta GitHub compartidos, con publicación y destinos propios de cada producto/proyecto. [Ejecutar P2](docs/P2_GUIDE.md) · [Evidencia y límites](docs/reports/P2_REPORT.md). P3 añade AI/revisión compartidas: [guía P3](docs/P3_GUIDE.md). Instalador y P4–P5 siguen pendientes.
+**Current candidate: 0.1.3 / P4.** P1 is integrated and manually accepted. P2, P3 and P4 are stacked review candidates; local acceptance does not merge them or resolve earlier Game Engine CI failures.
 
-- [Documento maestro](docs/MASTER_PLAN.md): visión, alcance y decisiones.
-- [Mapa documental](docs/index.md) y [contexto para continuar](docs/AI_HANDOFF.md).
-- [Roadmap P0–P5](docs/ROADMAP.md) y [aceptación de P0](docs/P0_ACCEPTANCE.md).
-- [Arquitectura](docs/architecture/ARCHITECTURE.md), [propiedad de componentes](docs/architecture/OWNERSHIP_MATRIX.md) y [migración](docs/architecture/MIGRATION_PLAN.md).
-- [Axiom Game Engine](https://github.com/Krozzeo/AxiomGameEngine): producto existente y primer consumidor.
+Extract the prepared combined bundle and double-click **Start Axiom.cmd**. It checks dependencies, prepares missing local runtimes and opens the browser. A source checkout uses `Start-Axiom.cmd` with the sibling `AxiomEngine` folder, or an explicit EnginePath. [Startup and P4 acceptance](docs/P4_GUIDE.md).
 
-## Principios
+- [Master plan](docs/MASTER_PLAN.md) and [documentation map](docs/index.md).
+- [Roadmap P0–P5](docs/ROADMAP.md) and [current handoff](docs/AI_HANDOFF.md).
+- [Architecture](docs/architecture/ARCHITECTURE.md), [ownership](docs/architecture/OWNERSHIP_MATRIX.md) and [compatibility](docs/architecture/RELEASE_AND_COMPATIBILITY.md).
+- [P4 evidence and limits](docs/reports/P4_REPORT.md).
+- [Axiom Game Engine](https://github.com/Krozzeo/AxiomGameEngine).
 
-Operación manual completa y herramientas semánticas para agentes; funcionamiento local; productos especializados; contratos explícitos y versiones compatibles; extracción gradual desde necesidades comprobadas; recuperación antes de migraciones incompatibles. Los juegos exportados funcionan sin Platform.
+Platform owns infrastructure and contracts. Game Engine owns scenes, Unity-compatible scripting, rendering, shaders, physics, audio, animation and export. Its M19–M40 roadmap is unchanged. Exported games do not require Platform.
 
-## Repositorios y licencia
+Development, UI and maintained documentation use English. Historical original-language snapshots are retained as reference, not current instructions. [Contributing](CONTRIBUTING.md).
 
-Este repositorio contiene la planificación, servicios, Hub y SDK de Platform. El motor conserva escenas, scripting compatible con Unity, físicas, shaders, renderizado y exportación. Sus milestones M19–M40 continúan separadas de P0–P5.
+Run `npm run check` with AXIOM_ENGINE_PATH set for joint tests; `npm run test:browser:p4` checks the Hub with controlled account/picker fixtures. `python scripts/check_docs.py` verifies documentation links and required deliverables.
 
-[MIT](LICENSE), por decisión del propietario. La monetización y el modelo comercial permanecen pendientes. La licencia de este repositorio no sustituye licencias de dependencias o material de terceros.
-
-## Trabajar con esta entrega
-
-Leer el documento maestro, el handoff y la guía P3 antes de proponer código. Ejecutar npm run check; para aceptación conjunta establecer AXIOM_ENGINE_PATH. Para comprobar enlaces y entregables documentales: `python scripts/check_docs.py`. No se requieren herramientas del motor para leer o verificar P0. [Contribución](CONTRIBUTING.md).
+[MIT](LICENSE). Dependencies retain their licenses. Commercial services and monetization remain undecided.
