@@ -10,7 +10,7 @@ Base inspeccionada: AxiomGameEngine `871a72f`. Inventario original de P0. Actual
 | folder-picker.mjs, atomic-file.mjs, open-editor.mjs | D | Servicios de OS/archivos P; apertura concreta y permisos del proyecto G/adaptador. | P2; selector, cancelación y rutas limitadas |
 | project-store.mjs, scene-workspace.mjs, command-bus.mjs | D | Proyecto/documento/escena G; contratos de almacenamiento y comandos P. | P2–P3; mismas invariantes y persistencia |
 | github/client.mjs | P | Transporte de cuenta/repositorios común con credencial de sesión. | P2; errores, permisos y desconexión |
-| github/publication.mjs, bundle.mjs, import-project.mjs, history.mjs | D | Transporte, recibos e historial común P; bundle, revisión y adopción de escenas G. | P2; divergencia y recuperación de publicación |
+| github/publication.mjs, bundle.mjs, import-project.mjs, history.mjs | D | Transporte/cuenta y ubicación aislada de metadatos P; bundle, revisión, recibos e historial de publicación de juegos G. Una abstracción común de recibos requiere otro consumidor. | P2 implementada según ADR-P0003; divergencia y recuperación de publicación verificadas |
 | workspaces/manager.mjs, files.mjs, diff.mjs | D | Protocolo transaccional/revisión P; snapshots SceneWorkspace y validación G. | P3; cambios concurrentes, cancelación y rollback |
 | agent/openai-assistant.mjs y servicio de agentes | D | Proveedores, consumo, tareas y ejecución P; contexto de escenas y políticas G. | P3; tarea manual y agente equivalentes |
 | agent/contracts.mjs, typed-tools.mjs y handlers | D | Registro/validación genérica P; catálogo semántico y handlers de juegos G. | P3; conformance de herramienta |

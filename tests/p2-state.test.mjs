@@ -34,6 +34,10 @@ test('P2 account epochs reject stale requests and revoked accounts broadcast dis
   await assert.rejects(account.invoke('request',{path:'/user',epoch:connected.epoch}),/changed/);
   revoked=true;await assert.rejects(account.invoke('request',{path:'/user',epoch:account.epoch}),e=>!e.message.includes('sensitive'));
   assert.equal(account.status().connected,false);assert.equal(JSON.stringify(states).includes('fake-token'),false);
+  revoked=false;await account.connect('third-fake-token');const previousEpoch=account.epoch;
+  revoked=true;await assert.rejects(account.invoke('repositories'),/expired/);
+  assert.equal(account.status().account,null);assert.equal(account.epoch,previousEpoch+1);
+  assert.equal(states.at(-1).connected,false);
 });
 test('P2 Windows folder picker sends paths as data and cancellation has no effect',async()=>{
   let seen;

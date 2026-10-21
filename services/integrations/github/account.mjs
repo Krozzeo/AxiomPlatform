@@ -14,7 +14,7 @@ export class GitHubAccount{
       if(!this.status().connected)throw githubError('Connect GitHub in Platform first.','AX_GITHUB_0002');
       if(data.epoch!==undefined&&data.epoch!==this.epoch)throw githubError('The GitHub account changed. Review this operation again.','AX_GITHUB_0002');
       try{
-        if(action==='repositories')return this.client.repositories();
+        if(action==='repositories')return await this.client.repositories();
         if(action!=='request'||typeof data.path!=='string'||!/^\/(?:user(?:[/?]|$)|repos\/|graphql$)/.test(data.path)||data.path.length>2048||/[\\#\r\n]/.test(data.path)||!['GET','POST'].includes(data.options?.method??'GET'))throw githubError('Unsupported GitHub service request.');
         return await this.client.request(data.path,data.options);
       }catch(error){if(!this.client.token){this.user=null;this.changed();}throw error;}
