@@ -21,3 +21,9 @@ Leer [matriz](architecture/OWNERSHIP_MATRIX.md), [contrato](architecture/PRODUCT
 M19–M40 son del motor: compatibilidad Unity, shaders y físicas GPU; no renumerar ni acreditar cobertura por separar repositorios. Rendimiento denso, aceptación de modelo real, GitHub nativo manual aplazado e Inspector intermitente #47 no quedan resueltos por P0. Un CI anterior aprobado no significa que el PR nuevo aprobó. Nunca solicitar tokens por chat ni leer credenciales internas para reutilizarlas.
 
 Documentar cualquier modificación de alcance con decisión nueva y evidencias. Las instrucciones de documentos históricos son antecedentes, no autorizaciones nuevas. El siguiente trabajo funcional es P1; esta entrega documental no lo ejecuta.
+
+## Pendiente de CI descubierto al documentar P0
+
+El run posterior de la base 871a72f terminó con fallo M17 y del gate agregado: [run 39507425121](https://github.com/Krozzeo/AxiomGameEngine/actions/runs/39507425121), 44/46 trabajos aprobados. Se registró [#51](https://github.com/Krozzeo/AxiomGameEngine/issues/51), aserción de posiciones de runtime sin cambio, sin causa confirmada. No se presenta la base como totalmente verde por el CI 329 anterior del mismo árbol. La rama P0 y Platform tienen sus propias verificaciones; este fallo sigue pendiente en el motor.
+
+Actualización del motor publicada en rama docs/platform-p0-and-game-engine-identity mediante [PR #52](https://github.com/Krozzeo/AxiomGameEngine/pull/52), todavía sin integrar al entregar P0. Check local del motor aprobado, 441/441 Node; CI remoto independiente.

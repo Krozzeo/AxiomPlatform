@@ -47,3 +47,7 @@ El motor actual combina editor de navegador, Rust/Wasm, WebGPU/Null, C# y daemon
 Se usa como base de inspección el commit del motor `871a72f6d2c720e99e0a8d1598c0f35af69c4d78`. Su árbol coincide con el candidato que aprobó CI 329; esa evidencia histórica no acredita futuros commits ni todas las repeticiones de CI. La validación manual de GitHub nativo y el fallo intermitente de Inspector siguen siendo pendientes separados.
 
 Supuestos por comprobar en P1: el adaptador puede abrir el motor sin migrar sus documentos; la negociación de capacidades basta para el primer recorrido; la separación permite conservar arranque directo. Cada supuesto tiene prueba y recuperación en el plan de migración.
+
+## Pendiente de CI descubierto al documentar P0
+
+El run posterior de la base 871a72f terminó con fallo M17 y del gate agregado: [run 39507425121](https://github.com/Krozzeo/AxiomGameEngine/actions/runs/39507425121), 44/46 trabajos aprobados. Se registró [#51](https://github.com/Krozzeo/AxiomGameEngine/issues/51), aserción de posiciones de runtime sin cambio, sin causa confirmada. No se presenta la base como totalmente verde por el CI 329 anterior del mismo árbol. La rama P0 y Platform tienen sus propias verificaciones; este fallo sigue pendiente en el motor.

@@ -30,3 +30,7 @@ El proveedor prueba contratos; el motor prueba su adaptador; una integración co
 ## Límites iniciales heredados
 
 No resolver por renombrado: rendimiento físico denso, validación manual nativa GitHub aplazada, calidad/coste con modelo conectado y fallo intermitente de Inspector #47. El estado del motor es su fuente canónica. P0 no ejecuta CAD/Math, GPU physics ni una nueva aplicación Platform.
+
+## Pendiente de CI descubierto al documentar P0
+
+El run posterior de la base 871a72f terminó con fallo M17 y del gate agregado: [run 39507425121](https://github.com/Krozzeo/AxiomGameEngine/actions/runs/39507425121), 44/46 trabajos aprobados. Se registró [#51](https://github.com/Krozzeo/AxiomGameEngine/issues/51), aserción de posiciones de runtime sin cambio, sin causa confirmada. No se presenta la base como totalmente verde por el CI 329 anterior del mismo árbol. La rama P0 y Platform tienen sus propias verificaciones; este fallo sigue pendiente en el motor.
