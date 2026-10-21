@@ -1,5 +1,9 @@
 # Changelog
 
+## P3 — 2026-10-21 (candidata en rama)
+
+AI compartida por contratos: proveedor/turnos/consumo, clave de sesión alojada, registro/validador, journal y diff/gates humanos. Contexto, herramientas y transacción de juegos siguen en Engine. P2 no se integra por esta entrega; #55 y aceptación de modelo real permanecen pendientes.
+
 ## P2 — Servicios comunes · 2026-10-21
 
 Catálogo/ajustes persistentes, selección e importación, cuenta/transporte GitHub compartidos con destinos por proyecto; proveedor fijado HTTPS con integridad, configuración nativa adoptada selectivamente. P1 aceptada por usuario e integrada con CI. P2 candidata en ramas; pruebas nativas/reales diferenciadas.

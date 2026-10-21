@@ -1,6 +1,6 @@
 # Axiom Platform — Documento maestro
 
-Fecha: 2026-10-21. Estado: P0/P1 integradas y P2 implementada en ramas para revisión; P3–P5 pendientes. Nombre canónico: **Axiom**, nunca Axion en identificadores nuevos.
+Fecha: 2026-10-21. Estado: P0/P1 integradas y P2 implementada en ramas para revisión; P3 implementada en ramas para revisión; P4–P5 pendientes. Nombre canónico: **Axiom**, nunca Axion en identificadores nuevos.
 
 ## Actualización P1
 
@@ -9,6 +9,10 @@ P1 fue integrada tras CI aprobado y aceptación manual del usuario. [Informe his
 ## Actualización P2
 
 P1 fue aceptada manualmente y se integró con CI. P2 implementa catálogo/servicios compartidos en ramas para revisión; [informe](reports/P2_REPORT.md). La decisión comercial sigue aplazada. Los estados P0/P1 anteriores se conservan como historia.
+
+## Actualización P3
+
+AI y revisión genéricas extraídas y consumidas por el motor; cuenta AI compartida en sesión, preferencias por proyecto y autoridad de dominio conservada. [Guía](P3_GUIDE.md), [ADR](adr/0004-p3-ai-and-review.md) e [informe](reports/P3_REPORT.md). P2/P3 aún no integradas y #55 sigue abierto. P4/P5 continúan pendientes.
 
 ## Propósito
 

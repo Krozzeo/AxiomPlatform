@@ -1,6 +1,6 @@
 # Integración AI y operaciones de dominio
 
-Estado: contrato objetivo de P0. Las implementaciones actuales siguen en Game Engine hasta su extracción validada en P3.
+Estado: núcleo P3 implementado en ramas para revisión; [ADR-P0004](../adr/0004-p3-ai-and-review.md). Proveedor, turnos/consumo/cancelación, registro, diff/gates y codec de journal están en Platform. Herramientas, instrucciones y transacción/recursos de dominio siguen en Game Engine. Los nombres heredados de herramientas se conservan en registros separados por producto; no se fusionan entre productos ni se implementan tareas cruzadas.
 
 ## Propiedad
 

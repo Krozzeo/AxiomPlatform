@@ -1,6 +1,6 @@
 # Roadmap Axiom Platform — P0 a P5
 
-Seis milestones propias. P0/P1 integradas, con aceptación manual del usuario y CI aprobado; P2 implementada y verificada localmente en ramas para revisión; P3–P5 pendientes. [Informe P2](reports/P2_REPORT.md). [Informe P1](reports/P1_REPORT.md). Sin fechas prometidas. Se cierran por evidencia, no por archivos creados. Game Engine conserva M19–M40, incluyendo Unity, shaders y físicas GPU.
+Seis milestones propias. P0/P1 integradas, con aceptación manual del usuario y CI aprobado; P2 implementada y verificada localmente en ramas para revisión; P3 implementada en ramas para revisión; P4–P5 pendientes. [Informe P2](reports/P2_REPORT.md). [Informe P1](reports/P1_REPORT.md). Sin fechas prometidas. Se cierran por evidencia, no por archivos creados. Game Engine conserva M19–M40, incluyendo Unity, shaders y físicas GPU.
 
 | Milestone | Entrega exacta | Dependencia | Gate de cierre |
 | --- | --- | --- | --- |
@@ -21,4 +21,4 @@ P1.1: fijar manifiesto/esquemas y seleccionar el primer recorrido. P1.2: registr
 
 ## Seguimiento
 
-P0 se acredita con [aceptación documental](P0_ACCEPTANCE.md), P1 con su informe y aceptación manual posterior, y P2 con pruebas locales e informe para revisión de CI/aceptación nativa. P3–P5 siguen pendientes. Cada cierre requiere SHAs, plataformas, comandos/recorridos, resultados y límites. Porcentajes funcionales de Platform todavía no se han medido; seis etapas no equivalen a seis partes de esfuerzo iguales.
+P0 se acredita con [aceptación documental](P0_ACCEPTANCE.md), P1 con su informe y aceptación manual posterior, y P2 con pruebas locales e informe para revisión de CI/aceptación nativa. P3 cuenta con [informe](reports/P3_REPORT.md) y aceptación controlada; P4–P5 siguen pendientes. Cada cierre requiere SHAs, plataformas, comandos/recorridos, resultados y límites. Porcentajes funcionales de Platform todavía no se han medido; seis etapas no equivalen a seis partes de esfuerzo iguales.

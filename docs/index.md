@@ -23,3 +23,5 @@ Fecha: 2026-10-21. P0 define arquitectura y planificación; no acredita implemen
 | Decisiones y pendientes | [Registro de decisiones](adr/0001-platform-foundation.md) |
 
 Orden: maestro → arquitectura → matriz → contratos → migración → aceptación. Los contratos de Platform pertenecen a este repositorio; el adaptador y el comportamiento de Game Engine pertenecen a su repositorio. Los detalles futuros requieren validación en P1 y nuevas decisiones registradas cuando cambien el alcance.
+
+- [P3: ejecución y pruebas](P3_GUIDE.md) · [ADR](adr/0004-p3-ai-and-review.md) · [Informe](reports/P3_REPORT.md).

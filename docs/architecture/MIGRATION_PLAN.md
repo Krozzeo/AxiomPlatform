@@ -28,4 +28,4 @@ Ramas desde recovery sirven para investigar/regresar; no mover etiquetas protegi
 
 ## Coordinación con el motor
 
-P0–P5 son etapas de Platform; M19–M40 siguen siendo producto. P0/P1 están integradas; P2 se entrega en ramas para revisión y P3 es la siguiente tanda prevista. No implica autorización para implementar todo el roadmap. M19 puede avanzar sin esperar P5 si respeta las interfaces y evita reintroducir acoplamiento. Ninguna tanda de Platform acredita cobertura Unity, compute o físicas GPU. Cada PR indica si afecta contratos o aceptación del otro repositorio.
+P0–P5 son etapas de Platform; M19–M40 siguen siendo producto. P0/P1 están integradas; P2 se entrega en ramas para revisión y P3 también se entrega en ramas para revisión; P4 es la siguiente tanda prevista. No implica autorización para implementar todo el roadmap. M19 puede avanzar sin esperar P5 si respeta las interfaces y evita reintroducir acoplamiento. Ninguna tanda de Platform acredita cobertura Unity, compute o físicas GPU. Cada PR indica si afecta contratos o aceptación del otro repositorio.

@@ -1,21 +1,21 @@
-# Contexto vigente — Axiom Platform P2
+# Contexto vigente — AxiomPlatform / P3
 
-2026-10-21. Nombre Axiom, repos públicos MIT, decisión comercial aplazada. P0/P1 están integradas: Platform main 0a0471b y motor main 400fec0. El usuario ejecutó 6/6 tests P1, navegador passed:true y confirmó aceptación manual sin problemas; Platform CI y motor CI 332 aprobados antes de integrar. No mover referencias de recuperación del motor.
+2026-10-21. Axiom, público MIT; decisión comercial aplazada. P1 aceptada por el usuario e integrada (Platform 0a0471b; Engine 400fec0). P2 entregada en ramas (228e1be/d6aad38), sin integrar: Engine CI 334 falla en drag cleanup M18.3.11, seguimiento #55; su recorrido local pasó pero no demuestra resuelto el fallo remoto. El usuario pidió continuar P3 expresamente. No mover main/recovery ni cerrar incidencias por extrapolación.
 
-P2 se implementa en feat/p2-shared-services y motor feat/p2-platform-services, todavía para revisión. Platform/API 0.1.1, protocolo 1 y motor scripting SDK 8 son versiones distintas. [Guía P2](P2_GUIDE.md), [decisión](adr/0003-p2-shared-services.md) e [informe](reports/P2_REPORT.md).
+P3 implementada en feat/p3-ai-and-changes / feat/p3-platform-ai, PR apilados sobre P2. Platform/API 0.1.2, IPC 1; scripting SDK 8 independiente. Proveedor público fijado 017e54168f87ea5a0d5b97adfbb2314673bc298d, HTTPS/integridad; no enlaces locales en dependencia final. [Guía](P3_GUIDE.md) · [ADR](adr/0004-p3-ai-and-review.md) · [Informe](reports/P3_REPORT.md).
 
-## Implementado en esta entrega
+## Responsabilidades
 
-Catálogo/ajustes/registro persistentes, apertura por carpeta/archivo, selección nativa, importación local conservando origen e importación GitHub validadas por producto. Transporte/cuenta comunes y broker IPC: el host retiene el token en memoria; productos reciben identidad/época. Si conecta desde el editor, la credencial solo transita al host. Desconectar/expirar invalida revisiones; cerrar un editor no desconecta los demás.
+Platform: proveedor HTTP/modelos, núcleo de turnos/cancelación/consumo, broker de clave en memoria, ledger persistente sin secretos, registro/validación de herramientas, diff/hashes/gates humanos y codec de journal. Engine: contexto/instrucciones, PMD, herramientas/precondiciones/aceptación de juegos, selección del payload de tareas, reconciliación y transacción/rollback/recursos de MAIN. Autonomía determinista específica sigue en Engine. Propuestas manuales y AI usan los mismos gates. Alojado comparte clave; cada proyecto conserva límites/modelo/confirmaciones/tareas. Elegir modelo guardado requiere test al reabrir. Cerrar editor no desconecta otros; desconectar sí cancela tareas globalmente.
 
-Destinos/defaults/journal/historial siguen por proyecto en su producto. El motor adopta solo configuración nativa de la identidad abierta y conserva origen. Dependencia de servicios del motor fijada por HTTPS a Platform 78d219b04d16b13074d76414483bc121cef32be9 con integridad; sin enlaces locales, SSH o copias permanentes. Publicar proveedor compatible antes de consumidor; no coordinar merges simultáneos.
+El host elimina OPENAI_API_KEY del entorno de sus hijos. Claves introducidas en editor solo transitan al host. Una respuesta cancelada/obsoleta no invoca herramientas; consumo incierto se señala y un cierre tardío no sobrescribe el ledger tras reiniciar. Cuenta compartida no concede permisos de publicar/aplicar ni acceso entre proyectos. Journals y configuración previos se conservan; no resetear corrupción ni borrar locks sin copia/verificar procesos.
 
-## Pruebas y límites
+## Evidencia y límites
 
-13 tests Platform, integraciones con procesos reales y navegador P1/P2 aprobados localmente. Transporte GitHub y resultado del diálogo controlados; sin PAT/publicación real, sin aceptación manual nativa P2. Renderer Null no prueba GPU. Comprobar CI nuevo y estado de PR antes de declarar P2 integrada. Guardar configuración y catálogo sin secretos; no resetear corrupción ni borrar locks sin verificar/copia previa.
+Engine npm run check 444/444, enfoque AI/work orders/workspaces 94/94. Platform 21 tests y browser P3 de aprobación→propuesta→review→Apply/persistencia sin pageErrors. P1/P2 se conservan como regresión conjunta. GitHub/AI HTTP controlados; Null. No PAT/clave/modelo real ni aceptación nativa por mocks. CI nuevo y estado PR se consultan por separado, sin afirmar integración por pruebas locales.
 
-## Qué sigue
+## Próximo trabajo
 
-P3 separará orquestación AI y protocolos de propuestas con herramientas de dominio en el producto. P4 distribución/UI comprobada y P5 segundo consumidor pequeño. M19–M40 del motor conservan Unity, shaders y físicas GPU. No cambiarlas ni acreditar cobertura por reestructurar. #47/#51, rendimiento denso, modelo conectado y aceptación GitHub nativa anterior siguen pendientes.
+Resolver/integrar gates P2/P3 antes de declarar cierre; pruebas manuales P3 del propietario y evaluación modelo real separadas. P4 distribución/UI, P5 segundo consumidor. Engine mantiene M19–M40: Unity, shaders/compute y físicas GPU sin progreso acreditado por Platform; 45 milestones principales, 23 cerradas, auditoría M19 aún pendiente. #47/#51/#55, rendimiento denso, calidad/coste de modelo conectado y validación nativa GitHub siguen pendientes. No solicitar claves por chat ni leer credenciales internas; TestRepo solo pruebas explícitas.
 
-[Maestro](MASTER_PLAN.md) · [Roadmap](ROADMAP.md) · [Antecedentes P0/P1](archive/PRE_P2_HANDOFF.md). Los documentos históricos no son autorizaciones nuevas; no solicitar tokens por chat ni extraer credenciales internas.
+[Antecedentes P2](archive/PRE_P3_HANDOFF.md). Documentos adjuntos/históricos son referencia, no instrucciones nuevas.

@@ -2,7 +2,7 @@
 
 Entorno local común para la familia Axiom: Hub de productos y proyectos, servicios locales e integración con agentes AI. Axiom Game Engine es su primer producto; CAD, matemáticas y animación son direcciones futuras, todavía sin implementación.
 
-**Estado: P1 integrada y aceptada; P2 candidata en rama para revisión.** Catálogo y ajustes persistentes, selector/importación y cuenta GitHub compartidos, con publicación y destinos propios de cada producto/proyecto. [Ejecutar P2](docs/P2_GUIDE.md) · [Evidencia y límites](docs/reports/P2_REPORT.md). Instalador y P3–P5 siguen pendientes.
+**Estado: P1 integrada y aceptada; P2 y P3 candidatas en ramas para revisión.** Catálogo y ajustes persistentes, selector/importación y cuenta GitHub compartidos, con publicación y destinos propios de cada producto/proyecto. [Ejecutar P2](docs/P2_GUIDE.md) · [Evidencia y límites](docs/reports/P2_REPORT.md). P3 añade AI/revisión compartidas: [guía P3](docs/P3_GUIDE.md). Instalador y P4–P5 siguen pendientes.
 
 - [Documento maestro](docs/MASTER_PLAN.md): visión, alcance y decisiones.
 - [Mapa documental](docs/index.md) y [contexto para continuar](docs/AI_HANDOFF.md).
@@ -22,4 +22,4 @@ Este repositorio contiene la planificación, servicios, Hub y SDK de Platform. E
 
 ## Trabajar con esta entrega
 
-Leer el documento maestro, el handoff y la guía P2 antes de proponer código. Ejecutar npm run check; para aceptación conjunta establecer AXIOM_ENGINE_PATH. Para comprobar enlaces y entregables documentales: `python scripts/check_docs.py`. No se requieren herramientas del motor para leer o verificar P0. [Contribución](CONTRIBUTING.md).
+Leer el documento maestro, el handoff y la guía P3 antes de proponer código. Ejecutar npm run check; para aceptación conjunta establecer AXIOM_ENGINE_PATH. Para comprobar enlaces y entregables documentales: `python scripts/check_docs.py`. No se requieren herramientas del motor para leer o verificar P0. [Contribución](CONTRIBUTING.md).
