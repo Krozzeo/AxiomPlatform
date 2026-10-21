@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,mkdir,rm,writeFile,readFile,access,symlink} from 'node:fs/promises';
+import {mkdtemp,mkdir,rm,writeFile,readFile,access,symlink,realpath} from 'node:fs/promises';
 import {join,resolve,dirname} from 'node:path';
 import {tmpdir} from 'node:os';
 import {randomUUID} from 'node:crypto';
@@ -69,4 +69,11 @@ test('P4 deletion refuses storage roots, nested registered projects, linked data
  store.value.recents.push({projectId:'other',path:join(folder,'nested','other.json')});await assert.rejects(deletion.review(entry),e=>e.code==='projectBusy');store.value.recents.pop();
  const plan=await deletion.review(entry);deletion.plans.get(plan.planId).expires=0;await assert.rejects(deletion.remove(entry,{planId:plan.planId,confirmName:'Game'}),e=>e.code==='invalidRequest');await access(file);
  const target=join(root,'outside');await mkdir(target);await symlink(target,join(folder,'linked'),process.platform==='win32'?'junction':'dir');await assert.rejects(deletion.review(entry),e=>e.code==='permissionDenied');await access(file);await access(target);
+});
+
+
+test('P4 deletion accepts an explicitly authorized root alias while preserving root and nested-project guards',async t=>{
+ const {ProjectDeletion}=await import('../services/local-host/deletion.mjs'),base=await temp(t),root=join(base,'projects'),alias=join(base,'alias');await mkdir(join(root,'game'),{recursive:true});await symlink(root,alias,process.platform==='win32'?'junction':'dir');const file=join(alias,'game','project.json');await writeFile(file,'{}');const entry={projectId:'game',path:file,name:'Game'},store=memory(),manager={root:alias,store},deletion=new ProjectDeletion(manager);store.value.recents=[entry];
+ const plan=await deletion.review(entry);assert.equal(plan.folder,await realpath(join(root,'game')));store.value.recents.push({projectId:'nested',path:join(alias,'game','other.json')});await assert.rejects(deletion.review(entry),e=>e.code==='projectBusy');store.value.recents.pop();store.value.recents.push({projectId:'nested-canonical',path:join(await realpath(root),'game','other.json')});await assert.rejects(deletion.review(entry),e=>e.code==='projectBusy');store.value.recents.pop();await writeFile(join(alias,'root.json'),'{}');await assert.rejects(deletion.review({...entry,path:join(alias,'root.json')}),e=>e.code==='permissionDenied');
+ await deletion.remove(entry,{planId:plan.planId,confirmName:'Game'});await assert.rejects(access(file),e=>e.code==='ENOENT');await access(root);await access(join(root,'root.json'));
 });

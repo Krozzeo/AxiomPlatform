@@ -12,7 +12,7 @@ Engine hosted creation now requests its existing 3D starter preset instead of an
 
 ## Local evidence
 
-Platform check29/29 with real Engine, no skips, covering previous P1–P3 plus P4 install/persist-failure/chooser/browser-open/Windows hash+ZIP helpers/real rename+deletion/real version switch+rollback. Browser P1/P2/P3 and P4 cover current flows, controlled accounts and chooser results, no pageErrors. P4 screenshots are generated under .axiom/p4-browser and visually reviewed in dark/light modes. Engine focused adapter3/3 verifies starter content, identity/revision preservation, dirty-buffer rejection and closed rename. Full final product checks/distribution smoke are recorded with the final delivery.
+Platform check30/30 with real Engine, no skips, covering previous P1–P3 plus P4 install/persist-failure/chooser/browser-open/Windows hash+ZIP helpers/real rename+deletion/real version switch+rollback. Browser P1/P2/P3 and P4 cover current flows, controlled accounts and chooser results, no pageErrors. P4 screenshots are generated under .axiom/p4-browser and visually reviewed in dark/light modes. Engine focused adapter3/3 verifies starter content, identity/revision preservation, dirty-buffer rejection and closed rename. Full final product checks/distribution smoke are recorded with the final delivery.
 
 ## Open closure gates and limits
 
@@ -24,6 +24,10 @@ GitHub/AI tests use controlled HTTP and Null. No real PAT, publication, API key/
 
 ## Final local regression
 
-Game Engine npm run check:446/446 Node, no failures/skips; build, tool catalog, bindings, schema, architecture and daemon parity passed. Scripting reference drift check passed. Platform check:29/29 with real Engine, no failures/skips; browsers P1/P2/P3/P4 passed with pageErrors:[], controlled HTTP/picker and Null. Documentation links passed in both repositories. These results do not claim old full browser CI failures are fixed or the remaining P4 manual/export gates passed.
+Game Engine npm run check:446/446 Node, no failures/skips; build, tool catalog, bindings, schema, architecture and daemon parity passed. Scripting reference drift check passed. Platform check:30/30 with real Engine, no failures/skips; browsers P1/P2/P3/P4 passed with pageErrors:[], controlled HTTP/picker and Null. Documentation links passed in both repositories. These results do not claim old full browser CI failures are fixed or the remaining P4 manual/export gates passed.
 
 Joint workflow pins Game Engine `6f554f4ec798cb3e5ed4cc7714df75aa129fd404`, not a moving branch. P4 source provider remains `149403753092f24a684d0241fe2aa7762abf7bc0`; later Platform documentation/bootstrap environment changes are not new Engine service dependencies.
+
+## Windows CI follow-up
+
+First P4 acceptance run39676128015 passed Linux contracts and the complete real-product/browser suite but exposed a Windows short-path versus canonical-root mismatch in deletion review. The guard now compares canonical root/folder consistently while preserving authorized alias resolution and nested-project checks. Added an alias regression covering review, nested canonical/alias entries, root refusal and actual deletion of disposable files; local check30/30. The new CI run decides remote closure, not this local pass.
