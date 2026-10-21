@@ -6,6 +6,7 @@ import {SessionManager} from './manager.mjs';
 import {CODES} from '../../packages/contracts/index.mjs';
 import {PlatformState} from './state.mjs';
 import {GitHubAccount} from '../integrations/github/account.mjs';
+import {AiAccount} from '../ai/account.mjs';
 import {pickFolder} from '../local-files/folders.mjs';
 import {join,resolve} from 'node:path';
 
@@ -14,11 +15,11 @@ const headers={
   'Cross-Origin-Opener-Policy':'same-origin', 'Cross-Origin-Resource-Policy':'same-origin',
   'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Cache-Control':'no-store'
 };
-export async function startHost({root,manifests,port=0,timeoutMs,stateRoot,githubClient,folderPicker=pickFolder}={}) {
+export async function startHost({root,manifests,port=0,timeoutMs,stateRoot,githubClient,aiProvider,folderPicker=pickFolder}={}) {
   const store=await PlatformState.load(stateRoot??join(resolve(root),'.axiom-platform'),{root,manifests});
   let manager;
   const account=new GitHubAccount({client:githubClient,onChange:state=>manager?.accountChanged(state)});
-  try{manager=await SessionManager.create({root:store.value.projectRoot,manifests:store.value.manifests,timeoutMs,store,account});}catch(error){await store.close();throw error;}
+  let ai;try{ai=await new AiAccount({provider:aiProvider,usagePath:join(store.root,'ai-usage.json'),onChange:state=>manager?.aiChanged(state)}).initialize();manager=await SessionManager.create({root:store.value.projectRoot,manifests:store.value.manifests,timeoutMs,store,account,ai});}catch(error){await store.close();throw error;}
   const token=randomBytes(32).toString('base64url');let origin,closing;
   const reply=(res,status,value)=>{res.writeHead(status,{...headers,'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(value));};
   const assets=new Map([['/',['index.html','text/html']],['/app.mjs',['app.mjs','text/javascript']],['/styles.css',['styles.css','text/css']],['/p2.css',['p2.css','text/css']]]);
@@ -48,12 +49,12 @@ export async function startHost({root,manifests,port=0,timeoutMs,stateRoot,githu
       const asset=assets.get(url.pathname);
       if(req.method==='GET'&&asset){const content=await readFile(new URL('../../apps/hub/'+asset[0],import.meta.url));res.writeHead(200,{...headers,'Content-Type':asset[1]+'; charset=utf-8'});return res.end(content);}
       return reply(res,404,{code:'invalidRequest',message:'Not found.'});
-    }catch(error){const known=CODES.includes(error.code)||/^AX_GITHUB_\d{4}$/.test(error.code??'');reply(res,known?409:500,{code:known?error.code:'operationFailed',message:known?error.message:'Platform could not complete the operation. Check the local project and product installation.'});}
+    }catch(error){const known=CODES.includes(error.code)||/^AX_(?:GITHUB|AI)_\d{4}$/.test(error.code??'');reply(res,known?409:500,{code:known?error.code:'operationFailed',message:known?error.message:'Platform could not complete the operation. Check the local project and product installation.'});}
   });
   try{await new Promise((yes,no)=>{server.once('error',no);server.listen(port,'127.0.0.1',yes);});}
   catch(error){await manager.shutdown();await store.close();throw error;}
   origin=`http://127.0.0.1:${server.address().port}`;
-  return {origin,token,url:`${origin}/#token=${token}`,manager,account,close:()=>closing??=(async()=>{
-    const done=new Promise(yes=>server.close(yes));server.closeAllConnections();try{await manager.shutdown();await account.disconnect();await done;}finally{await store.close();}
+  return {origin,token,url:`${origin}/#token=${token}`,manager,account,ai,close:()=>closing??=(async()=>{
+    const done=new Promise(yes=>server.close(yes));server.closeAllConnections();try{await manager.shutdown();await account.disconnect();await ai.close();await done;}finally{await store.close();}
   })()};
 }

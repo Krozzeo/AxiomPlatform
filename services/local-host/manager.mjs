@@ -6,13 +6,13 @@ import {ProductClient} from '../../packages/sdk/client.mjs';
 import {authorizedPath, inside} from './paths.mjs';
 
 export class SessionManager {
-  constructor({root, products, timeoutMs, store, account}) {
+  constructor({root, products, timeoutMs, store, account,ai}) {
     this.root = root; this.products = products; this.timeoutMs = timeoutMs;
     this.sessions = new Map(); this.owners = new Map();
     this.pending = Promise.resolve(); this.receipts = new Map();
-    this.store=store;this.account=account;
+    this.store=store;this.account=account;this.ai=ai;
   }
-  static async create({root, manifests, timeoutMs,store,account}) {
+  static async create({root, manifests, timeoutMs,store,account,ai}) {
     await mkdir(resolve(root), {recursive: true});
     root = await realpath(root);
     const products = new Map();
@@ -25,10 +25,10 @@ export class SessionManager {
       products.set(manifest.productId, {manifest,entry});
     }
     assert(products.size > 0, 'invalidRequest','Register at least one product installation.');
-    return new SessionManager({root,products,timeoutMs,store,account});
+    return new SessionManager({root,products,timeoutMs,store,account,ai});
   }
   catalog() {
-    return {version: PLATFORM_VERSION, projectRoot:this.root, preferences:this.store?.value.preferences??{},recents:(this.store?.value.recents??[]).filter(p=>inside(this.root,p.path)),github:this.account?.status(),products:[...this.products.values()].map(p => p.manifest), sessions:[...this.sessions.values()].map(s => this.view(s))};
+    return {version: PLATFORM_VERSION, projectRoot:this.root, preferences:this.store?.value.preferences??{},recents:(this.store?.value.recents??[]).filter(p=>inside(this.root,p.path)),github:this.account?.status(),ai:this.ai?{...this.ai.status(),usage:structuredClone(this.ai.usage)}:null,products:[...this.products.values()].map(p => p.manifest), sessions:[...this.sessions.values()].map(s => this.view(s))};
   }
   view(s) {
     return {sessionId:s.id,productId:s.productId,state:s.state,path:s.path ? relative(this.root,s.path) : null,status:s.status ?? null,error:s.error ?? null,editorUrl:s.state === 'ready' ? s.editorUrl : null};
@@ -66,9 +66,10 @@ export class SessionManager {
     assert([...this.sessions.values()].filter(s=>['starting','ready'].includes(s.state)).length < 8,'projectBusy','Close a product before opening another session (limit 8).');
     const s = {id:randomUUID(), productId:data.productId, path, state:'starting'};
     const client = new ProductClient(product.entry,{timeoutMs:this.timeoutMs,productId:data.productId,onExit:()=>{
+      this.ai?.cancelOwner(s.id);
       if (!['closed','failed'].includes(s.state)) { s.state='failed'; s.error={code:'operationFailed',message:'Product process exited. Unsaved edits may be lost; reopen saved data.'}; }
       if (s.path) this.owners.delete(s.path.toLowerCase());
-    },onService:value=>{assert(s.state==='starting'||s.state==='ready','permissionDenied','Product session is closed.');assert(value.service==='github'&&this.account,'unsupportedCapability','Shared service is not available.');return this.account.invoke(value.action,value.data);}});
+    },onService:value=>{assert(s.state==='starting'||s.state==='ready','permissionDenied','Product session is closed.');if(value.service==='ai'){assert(this.ai&&s.state==='ready'&&s.status?.projectId,'permissionDenied','Open a project before using AI.');return this.ai.invoke(s.id,s.productId+':'+s.status.projectId,value.action,value.data).then(result=>value.action==='request'?result:{response:result,state:this.ai.status()});}assert(value.service==='github'&&this.account,'unsupportedCapability','Shared service is not available.');return this.account.invoke(value.action,value.data);}});
     s.client = client; this.sessions.set(s.id,s);
     try {
       const hello = await client.call('initialize',this.initialize(),s.id);
@@ -101,7 +102,8 @@ export class SessionManager {
       await client.stop(); throw error;
     }
   }
-  initialize(extra={}){return {platformVersion:PLATFORM_VERSION,authorizedRoot:this.root,...(this.store?{projectStateRoot:join(this.store.root,'projects')}:{}),services:this.account?{github:this.account.status()}: {},...extra};}
+  initialize(extra={}){return {platformVersion:PLATFORM_VERSION,authorizedRoot:this.root,...(this.store?{projectStateRoot:join(this.store.root,'projects')}:{}),services:{...(this.account?{github:this.account.status()}:{}),...(this.ai?{ai:this.ai.status()}: {})},...extra};}
+  aiChanged(state){for(const s of this.sessions.values())s.client?.notify({kind:'service.ai',state});}
   accountChanged(state){for(const s of this.sessions.values())s.client?.notify({kind:'service.account',state});}
   configure(data){const task=this.pending.then(()=>this.applySettings(data));this.pending=task.catch(()=>{});return task;}
   async applySettings(data){
@@ -134,7 +136,7 @@ export class SessionManager {
     assert(s && s.state==='ready','operationFailed','The selected session is not available.');
     const result=await s.client.call('project.'+data.action,{expectedRevision:data.expectedRevision,decision:data.decision,operationId:data.operationId},s.id);
     s.status=result.status;
-    if(data.action==='close' && result.closed){s.state='closed';this.owners.delete(s.path.toLowerCase());await s.client.stop();}
+    if(data.action==='close' && result.closed){s.state='closed';this.ai?.cancelOwner(s.id);this.owners.delete(s.path.toLowerCase());await s.client.stop();}
     return {...this.view(s),cancelled:result.cancelled === true};
   }
   async shutdown() {

@@ -22,6 +22,9 @@ async function performAction(fn,silent=false){
 const mutate=data=>api('/v1/sessions',{...data,operationId:crypto.randomUUID()});
 function button(label,fn,kind='secondary'){const b=document.createElement('button');b.textContent=label;b.className=kind;b.onclick=()=>void action(fn);return b;}
 function render(){
+  $('ai-status').textContent=catalog.ai?.hasCredential?'Credencial disponible durante esta sesión.':'Sin credencial de sesión.';
+  const usage=Object.values(catalog.ai?.usage??{}),total=usage.reduce((n,s)=>n+s.totalTokens,0),unknown=usage.reduce((n,s)=>n+s.unreportedRequests,0);
+  $('ai-usage').textContent=total+' tokens informados'+(unknown?' · '+unknown+' solicitudes con consumo no confirmado':'')+'. El consumo informado no es una estimación de precio.';
   $('root').textContent=catalog.projectRoot;$('sessions').replaceChildren();$('empty').hidden=catalog.sessions.length>0;
   if(document.activeElement!==$('storage'))$('storage').value=catalog.projectRoot;
   $('recent-projects').replaceChildren();$('recent-empty').hidden=catalog.recents.length>0;

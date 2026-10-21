@@ -1,6 +1,6 @@
 {
   "name": "axiom-platform",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -12,12 +12,21 @@
     "test": "node --test tests/*.test.mjs",
     "check": "node scripts/check-boundaries.mjs && node --test tests/*.test.mjs",
     "test:browser": "node tests/browser-p1.mjs",
-    "test:browser:p2": "node tests/browser-p2.mjs"
+    "test:browser:p2": "node tests/browser-p2.mjs",
+    "test:browser:p3": "node tests/browser-p3.mjs"
   },
   "exports": {
     "./github": "./services/integrations/github/client.mjs",
     "./folders": "./services/local-files/folders.mjs",
     "./files": "./services/local-files/files.mjs",
-    "./github-peer": "./packages/sdk/github-peer.mjs"
+    "./github-peer": "./packages/sdk/github-peer.mjs",
+    "./ai/models": "./services/ai/models.mjs",
+    "./ai/contracts": "./services/ai/contracts.mjs",
+    "./ai/runtime": "./services/ai/runtime.mjs",
+    "./ai/provider": "./services/ai/provider.mjs",
+    "./ai/journal": "./services/ai/journal.mjs",
+    "./ai-peer": "./packages/sdk/ai-peer.mjs",
+    "./tools": "./packages/sdk/tools.mjs",
+    "./changes": "./services/changes/review.mjs"
   }
 }

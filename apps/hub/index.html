@@ -2,7 +2,7 @@
 <html lang="es">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Axiom Platform</title><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/p2.css"></head>
 <body>
-  <header><div class="brand">AXIOM <span>Platform</span></div><nav><button id="github-toggle" class="quiet">GitHub · Sin conexión</button><span class="version">0.1.1 · P2</span></nav></header>
+  <header><div class="brand">AXIOM <span>Platform</span></div><nav><button id="github-toggle" class="quiet">GitHub · Sin conexión</button><span class="version">0.1.2 · P3</span></nav></header>
   <main>
     <section class="intro"><p class="eyebrow">TU ESPACIO DE TRABAJO LOCAL</p><h1>Un lugar para tus proyectos.</h1><p>Abre un producto de la familia Axiom. Tus documentos y recursos permanecen en tu equipo.</p></section>
     <p id="error" role="alert" hidden></p><p id="notice" role="status" hidden></p>
@@ -17,6 +17,7 @@
       <details id="github-account"><summary>Cuenta de GitHub</summary><div class="detail-body"><form id="github-connect-form"><label for="github-token">Token de acceso</label><input id="github-token" type="password" autocomplete="off" required><p class="hint">La conexión se comparte durante esta sesión de Platform. El token no se guarda en tus proyectos.</p><button type="submit">Conectar GitHub</button></form><div id="github-connected" hidden><p id="github-account-name"></p><div class="account-actions"><button id="account-refresh" class="quiet">Actualizar repositorios</button><button id="account-disconnect" class="secondary">Desconectar</button></div></div></div></details>
     </section>
     <section class="workspace"><div class="section-title"><h2>Mis proyectos</h2><button id="refresh" class="quiet">Actualizar estado</button></div><p id="recent-empty">Los proyectos que crees o importes aparecerán aquí.</p><div id="recent-projects"></div></section>
+    <section class="workspace"><h2>AI compartida</h2><p id="ai-status">Sin credencial de sesión.</p><p class="hint">Conecta la API desde el panel AI de un editor. La credencial se comparte durante esta sesión; cada proyecto conserva su modelo, límites y confirmaciones. Revisa las propuestas en el editor antes de aplicarlas.</p><p id="ai-usage"></p></section>
     <section class="workspace"><h2>Sesiones de trabajo</h2><p id="empty">Todavía no hay proyectos abiertos.</p><div id="sessions"></div></section>
     <footer><span>Carpeta autorizada</span><code id="root"></code><p>Guarda tus cambios antes de cerrar Platform. El editor se abre en una pestaña independiente.</p></footer>
   </main>

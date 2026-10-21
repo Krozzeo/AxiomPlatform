@@ -10,7 +10,8 @@ export class ProductClient {
     this.pending = new Map();
     this.dead = false;
     this.productId=productId;
-    this.child = fork(entry, [], {stdio: ['ignore','ignore','ignore','ipc'], windowsHide: true});
+    const env={...process.env};delete env.OPENAI_API_KEY;
+    this.child = fork(entry, [], {stdio: ['ignore','ignore','ignore','ipc'], windowsHide: true,env});
     this.child.on('message', value => {
       if(value?.kind==='service.request'){
         if(value.sessionId!==this.sessionId||!onService)return;

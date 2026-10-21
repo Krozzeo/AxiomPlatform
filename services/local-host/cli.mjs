@@ -11,7 +11,7 @@ for(let i=0;i<args.length;i++){
   else throw Error('Usage: npm start -- --product <installation/product.json> --projects-root <directory> [--port 4320]');
 }
 const host=await startHost({root,manifests,port,stateRoot});
-console.log('Axiom Platform 0.1.1 — local session. Open this URL in your browser:');
+console.log('Axiom Platform 0.1.2 — local session. Open this URL in your browser:');
 console.log(host.url);
 let closing=false;
 for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>{
