@@ -30,8 +30,13 @@ try {
  $prepared=(Test-Path -LiteralPath $stamp) -and ((Get-Content -LiteralPath $stamp -Raw).Trim() -eq $hash) -and (Test-Path -LiteralPath (Join-Path $EnginePath 'node_modules/axiom-platform/package.json'))
  if(-not $prepared){Write-Host 'Installing locked Engine dependencies ...';Push-Location $EnginePath;try{& $npm ci --no-audit --no-fund --cache (Join-Path $dataRoot 'npm-cache');if($LASTEXITCODE -ne 0){throw 'npm ci failed. Check your internet connection and the npm output above.'}}finally{Pop-Location};Set-Content -LiteralPath $stamp -Value $hash -Encoding ASCII}
  if(-not (Test-Path -LiteralPath (Join-Path $EnginePath 'dist/editor/axiom-kernel.wasm'))){Write-Host 'No built editor found. Building from source (Rust 1.90 is required) ...';Push-Location $EnginePath;try{& $npm run build;if($LASTEXITCODE -ne 0){throw 'Editor build failed. Download the complete prepared ZIP or install the Rust toolchain shown above.'}}finally{Pop-Location}}
+ $mathPath=Join-Path $bundleRoot 'AxiomMathLab'
+ if(Test-Path -LiteralPath (Join-Path $mathPath 'platform/product.json')){
+  Write-Host 'Preparing Axiom Math Lab ...';Push-Location $mathPath;try{& $npm ci --no-audit --no-fund --cache (Join-Path $dataRoot 'npm-cache');if($LASTEXITCODE -ne 0){throw 'Math Lab dependency installation failed.'}}finally{Pop-Location}
+ }
  if($PrepareOnly){Write-Host 'Dependencies are ready.' -ForegroundColor Green;exit 0}
  $arguments=@((Join-Path $platformRoot 'services/local-host/cli.mjs'),'--product',(Join-Path $EnginePath 'platform/product.json'),'--settings-root',$SettingsRoot,'--port','0')
+ if(Test-Path -LiteralPath (Join-Path $mathPath 'platform/product.json')){$arguments+=@('--product',(Join-Path $mathPath 'platform/product.json'))}
  if(-not (Test-Path -LiteralPath (Join-Path $SettingsRoot 'platform.json'))){$documents=[Environment]::GetFolderPath('MyDocuments');$arguments+=@('--projects-root',(Join-Path $documents 'Axiom Projects'))}
  if(-not $NoBrowser){$arguments+='--open'}
  Write-Host 'Starting Axiom Platform. Keep this console open; Ctrl+C stops the session.' -ForegroundColor Green

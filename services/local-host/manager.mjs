@@ -37,7 +37,7 @@ export class SessionManager {
     this.pending = task.catch(() => {}); return task;
   }
   async perform(data) {
-    assert(data && ['open','create','import','github-projects','status','save','close','rename','remove','delete-review','delete','add-local'].includes(data.action), 'invalidRequest','Unknown session action.');
+    assert(data && ['open','create','import','github-projects','status','save','close','rename','remove','delete-review','delete','open-folder','add-local'].includes(data.action), 'invalidRequest','Unknown session action.');
     const mutation = data.action !== 'status';
     if (mutation) {
       assert(typeof data.operationId === 'string' && /^[a-zA-Z0-9_-]{8,100}$/.test(data.operationId), 'invalidRequest','A unique operationId is required.');
@@ -46,7 +46,7 @@ export class SessionManager {
       assert(this.receipts.size < 256, 'projectBusy','Session operation limit reached. Restart Platform after closing projects.');
     }
     try {
-      const result = ['rename','remove','delete-review','delete','add-local'].includes(data.action)?await this.manageProject(data):['import','github-projects'].includes(data.action)?await this.importProject(data):['open','create'].includes(data.action) ? await this.launch(data) : await this.operate(data);
+      const result = ['rename','remove','delete-review','delete','open-folder','add-local'].includes(data.action)?await this.manageProject(data):['import','github-projects'].includes(data.action)?await this.importProject(data):['open','create'].includes(data.action) ? await this.launch(data) : await this.operate(data);
       if (mutation) this.receipts.set(data.operationId,{key:JSON.stringify(data),result:structuredClone(result)});
       return result;
     }catch(error){if(mutation)this.receipts.set(data.operationId,{key:JSON.stringify(data),error:{code:error.code??'operationFailed',message:error.message}});throw error;}
@@ -58,7 +58,7 @@ export class SessionManager {
     if (data.action === 'open') {
       assert(typeof data.path==='string','invalidRequest','Choose a project path.');
       path = await authorizedPath(this.root, data.path,{directory:(await lstat(resolve(this.root,data.path))).isDirectory()});
-      assert(!this.owners.has(path.toLowerCase()), 'projectBusy','This project is already open in Platform.');
+      const existing=this.sessions.get(this.owners.get(path.toLowerCase()));if(existing?.state==='ready'&&existing.productId===data.productId)return this.view(existing);assert(!existing,'projectBusy','This project is already open in Platform.');
     } else {
       assert(typeof data.name === 'string' && data.name.trim().length > 0 && data.name.length <= 128, 'invalidRequest','Enter a project name of 1–128 characters.');
     }
@@ -102,11 +102,12 @@ export class SessionManager {
       await client.stop(); throw error;
     }
   }
-  initialize(extra={}){return {platformVersion:PLATFORM_VERSION,authorizedRoot:this.root,...(this.store?{projectStateRoot:join(this.store.root,'projects')}:{}),services:{...(this.account?{github:this.account.status()}:{}),...(this.ai?{ai:this.ai.status()}: {})},...extra};}
+  initialize(extra={}){return {platformVersion:PLATFORM_VERSION,platformOrigin:this.platformOrigin,authorizedRoot:this.root,...(this.store?{projectStateRoot:join(this.store.root,'projects')}:{}),services:{...(this.account?{github:this.account.status()}:{}),...(this.ai?{ai:this.ai.status()}: {})},...extra};}
   aiChanged(state){for(const s of this.sessions.values())s.client?.notify({kind:'service.ai',state});}
   accountChanged(state){for(const s of this.sessions.values())s.client?.notify({kind:'service.account',state});}
   configure(data){const task=this.pending.then(()=>this.applySettings(data));this.pending=task.catch(()=>{});return task;}
   async applySettings(data){
+    if(data.aiTransport!==undefined){const t=data.aiTransport;assert(t&&Number.isInteger(t.timeoutSeconds)&&t.timeoutSeconds>=15&&t.timeoutSeconds<=300&&Number.isInteger(t.maxConcurrentRequests)&&t.maxConcurrentRequests>=1&&t.maxConcurrentRequests<=8&&Number.isInteger(t.maxResponseBytes)&&t.maxResponseBytes>=262144&&t.maxResponseBytes<=2097152,'invalidRequest','AI transport settings are outside supported limits.');await this.store.update(v=>{v.preferences.aiTransport={timeoutSeconds:t.timeoutSeconds,maxConcurrentRequests:t.maxConcurrentRequests,maxResponseBytes:t.maxResponseBytes};});this.ai.setTransport(t);this.ai.onChange(this.ai.status());}
     if(data.projectRoot!==undefined)assert(![...this.sessions.values()].some(s=>['starting','ready'].includes(s.state)),'projectBusy','Close active projects before changing project storage.');
     assert(typeof data.projectRoot==='string'||data.projectRoot===undefined,'invalidRequest','Choose a storage path.');const next=data.projectRoot===undefined?this.root:resolve(data.projectRoot);
     assert(typeof data.projectRoot==='string'||data.projectRoot===undefined,'invalidRequest','Choose a project storage directory.');
@@ -134,11 +135,12 @@ export class SessionManager {
   async inspectProject(productId,path,run){const product=this.products.get(productId);assert(product,'unsupportedCapability','Select a compatible installed product.');const client=new ProductClient(product.entry,{productId,timeoutMs:30000}),id=randomUUID();try{await client.call('initialize',this.initialize(),id);const detected=await client.call('project.detect',{path},id);return await run({client,id,detected,product});}finally{await client.stop();}}
   async manageProject(data){
     if(data.action==='add-local'){
-      const source=await realpath(data.sourcePath);if(!inside(this.root,source))return this.importProject({...data,action:'import',kind:'local'});
+      const source=await realpath(data.sourcePath);if(!inside(this.root,source))return this.importProject({...data,sourcePath:(await lstat(source)).isFile()?dirname(source):source,action:'import',kind:'local'});
       const path=await authorizedPath(this.root,source,{directory:(await lstat(source)).isDirectory()});return this.inspectProject(data.productId,path,async({detected})=>{const file=await authorizedPath(this.root,detected.path),entry={productId:data.productId,projectId:detected.projectId,name:detected.name,path:file,savedRevision:detected.projectRevision};await this.store.remember(entry);return entry;});
     }
     const entry=this.store.value.recents.find(p=>p.projectId===data.projectId&&p.productId===data.productId);assert(entry&&inside(this.root,entry.path),'invalidRequest','Select a project in the current storage.');
     const active=[...this.sessions.values()].find(s=>s.state==='ready'&&s.productId===entry.productId&&s.status.projectId===entry.projectId);
+    if(data.action==='open-folder'){await this.folderOpener(dirname(await authorizedPath(this.root,entry.path)));return {opened:true};}
     if(data.action==='rename'){
       assert(typeof data.name==='string'&&data.name.trim()&&data.name.length<=128,'invalidRequest','Enter a project name of 1–128 characters.');let saved;
       if(active){const result=await active.client.call('project.rename',{name:data.name.trim(),expectedRevision:data.expectedRevision,operationId:data.operationId},active.id);active.status=result.status;saved={...entry,name:result.status.name,savedRevision:result.status.savedRevision};}

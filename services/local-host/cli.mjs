@@ -13,7 +13,7 @@ for(let i=0;i<args.length;i++){
   else throw Error('Usage: npm start -- --product <installation/product.json> --projects-root <directory> [--port 4320]');
 }
 const host=await startHost({root,manifests,port,stateRoot});
-console.log('Axiom Platform 0.1.3 — local session. Browser URL:');
+console.log('Axiom Platform 0.1.4 — local session. Browser URL:');
 console.log(host.url);
 if(open)try{await openBrowser(host.url);}catch(error){console.error('The browser could not be opened automatically: '+error.message);console.error('Open the URL above manually.');}
 let closing=false;

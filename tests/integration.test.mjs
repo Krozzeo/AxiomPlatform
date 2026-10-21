@@ -37,7 +37,7 @@ test('real engine: create, edit, cancel close, reject stale save, save, close, r
   assert.deepEqual(await readFile(path),before);
   const cancelled=await change({action:'close',sessionId:created.sessionId,expectedRevision:edited.status.revision,decision:'cancel'});
   assert.equal(cancelled.state,'ready');assert.equal(cancelled.cancelled,true);assert.equal(cancelled.status.dirty,true);
-  await assert.rejects(change({action:'open',productId:'axiom.game-engine',path:created.path}),e=>e.code==='projectBusy');
+  assert.equal((await change({action:'open',productId:'axiom.game-engine',path:created.path})).sessionId,created.sessionId);
   const save={action:'save',sessionId:created.sessionId,expectedRevision:edited.status.revision,operationId:randomUUID()};
   const saved=await request(save);assert.equal(saved.status.dirty,false);await request(save);
   assert.equal(JSON.parse(await readFile(path)).revision,created.status.savedRevision+1);

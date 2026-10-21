@@ -1,0 +1,1 @@
+html,body{margin:0;height:100%;background:#111923;color:#e5edf5;font:16px system-ui}iframe{position:fixed;border:0;width:100%;height:100%}#connection{position:fixed;inset:0;display:grid;place-content:center;text-align:center;background:#101722eb;z-index:2}#connection[hidden]{display:none}iframe[inert]{filter:blur(3px);pointer-events:none}

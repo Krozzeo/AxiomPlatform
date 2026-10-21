@@ -42,6 +42,6 @@ test('P2 account epochs reject stale requests and revoked accounts broadcast dis
 test('P2 Windows folder picker sends paths as data and cancellation has no effect',async()=>{
   let seen;
   const selected=await pickFolder({initial:'C:\\Project $(not-code)',platform:'win32',run:async(...args)=>{seen=args;return {stdout:'C:\\Chosen\n'};}});
-  assert.equal(selected.path,'C:\\Chosen');assert.equal(seen[2].env.AXIOM_PICKER_INITIAL,'C:\\Project $(not-code)');assert.equal(seen[2].windowsHide,true);assert.equal(seen[1].some(s=>s.includes('not-code')),false);
+  assert.equal(selected.path,'C:\\Chosen');assert.equal(seen[2].env.AXIOM_DIALOG_INITIAL,'C:\\Project $(not-code)');assert.equal(seen[2].windowsHide,true);assert.equal(seen[1].some(s=>s.includes('not-code')),false);
   assert.deepEqual(await pickFolder({platform:'win32',run:async()=>{throw {code:1};}}),{path:null});
 });
