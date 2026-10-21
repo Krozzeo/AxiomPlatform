@@ -1,10 +1,10 @@
 # Axiom Platform — Documento maestro
 
-Fecha: 2026-10-21. Estado: decisiones de P0 adoptadas por el propietario; implementación de Platform pendiente. Nombre canónico: **Axiom**, nunca Axion en identificadores nuevos.
+Fecha: 2026-10-21. Estado: P0/P1 integradas y P2 implementada en ramas para revisión; P3–P5 pendientes. Nombre canónico: **Axiom**, nunca Axion en identificadores nuevos.
 
 ## Actualización P1
 
-P1 tiene implementación funcional en ramas, verificada localmente con el motor real y navegador Null. [Informe](reports/P1_REPORT.md) y [guía](P1_GUIDE.md). Las descripciones P0 siguientes son antecedentes de la planificación; main/CI de la entrega se revisan por separado.
+P1 fue integrada tras CI aprobado y aceptación manual del usuario. [Informe histórico](reports/P1_REPORT.md) y [guía P1](P1_GUIDE.md). Su evidencia no acredita automáticamente P2.
 
 ## Actualización P2
 
@@ -48,13 +48,13 @@ Game Engine conserva la implementación propia funcional de la API objetivo de U
 
 P0 es documentación coherente, trazable al código existente y lista para iniciar P1. P1 demuestra un recorrido vertical con el motor existente; P2 extrae servicios; P3 separa AI; P4 estabiliza interfaz compartida y distribución; P5 verifica la arquitectura con un segundo consumidor pequeño. No hay fechas o estimaciones de cobertura inventadas. [Gates](ROADMAP.md).
 
-## Estado comprobado y supuestos
+## Antecedentes de inspección P0 y supuestos originales
 
-El motor actual combina editor de navegador, Rust/Wasm, WebGPU/Null, C# y daemon Node de producción; el daemon Rust tiene alcance menor. El Hub ya enumera productos futuros no disponibles. Los servicios de Hub, GitHub y AI se inicializan junto a SceneWorkspace: no están desacoplados todavía.
+En la base de P0, el motor combinaba editor de navegador, Rust/Wasm, WebGPU/Null, C# y daemon Node de producción; el daemon Rust tenía alcance menor. Su Hub enumeraba productos futuros no disponibles y los servicios de Hub, GitHub y AI se inicializaban junto a SceneWorkspace. P1/P2 desacoplan host, catálogo y transporte/cuenta GitHub; AI queda para P3.
 
 Se usa como base de inspección el commit del motor `871a72f6d2c720e99e0a8d1598c0f35af69c4d78`. Su árbol coincide con el candidato que aprobó CI 329; esa evidencia histórica no acredita futuros commits ni todas las repeticiones de CI. La validación manual de GitHub nativo y el fallo intermitente de Inspector siguen siendo pendientes separados.
 
-Supuestos por comprobar en P1: el adaptador puede abrir el motor sin migrar sus documentos; la negociación de capacidades basta para el primer recorrido; la separación permite conservar arranque directo. Cada supuesto tiene prueba y recuperación en el plan de migración.
+Los supuestos originales de P1 (apertura sin migrar documentos, negociación del primer recorrido y arranque directo conservado) fueron comprobados por esa entrega. P2 y las etapas siguientes mantienen pruebas y recuperación independientes.
 
 ## Pendiente de CI descubierto al documentar P0
 

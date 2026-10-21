@@ -16,10 +16,10 @@ Operación manual completa y herramientas semánticas para agentes; funcionamien
 
 ## Repositorios y licencia
 
-Este repositorio contiene la planificación de Platform y alojará sus servicios, Hub y SDK. El motor conserva escenas, scripting compatible con Unity, físicas, shaders, renderizado y exportación. Sus milestones M19–M40 continúan separadas de P0–P5.
+Este repositorio contiene la planificación, servicios, Hub y SDK de Platform. El motor conserva escenas, scripting compatible con Unity, físicas, shaders, renderizado y exportación. Sus milestones M19–M40 continúan separadas de P0–P5.
 
 [MIT](LICENSE), por decisión del propietario. La monetización y el modelo comercial permanecen pendientes. La licencia de este repositorio no sustituye licencias de dependencias o material de terceros.
 
 ## Trabajar con esta entrega
 
-Leer el documento maestro, el handoff y la guía P1 antes de proponer código. Ejecutar npm run check; para aceptación conjunta establecer AXIOM_ENGINE_PATH. Para comprobar enlaces y entregables documentales: `python scripts/check_docs.py`. No se requieren herramientas del motor para leer o verificar P0. [Contribución](CONTRIBUTING.md).
+Leer el documento maestro, el handoff y la guía P2 antes de proponer código. Ejecutar npm run check; para aceptación conjunta establecer AXIOM_ENGINE_PATH. Para comprobar enlaces y entregables documentales: `python scripts/check_docs.py`. No se requieren herramientas del motor para leer o verificar P0. [Contribución](CONTRIBUTING.md).

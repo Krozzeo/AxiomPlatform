@@ -21,4 +21,4 @@ P1.1: fijar manifiesto/esquemas y seleccionar el primer recorrido. P1.2: registr
 
 ## Seguimiento
 
-P0 se acredita con [aceptación documental](P0_ACCEPTANCE.md). Los demás gates tienen estado pendiente hasta informe con SHAs, plataformas, comandos/recorridos, resultados y límites. Porcentajes funcionales de Platform todavía no se han medido; seis etapas no equivalen a seis partes de esfuerzo iguales.
+P0 se acredita con [aceptación documental](P0_ACCEPTANCE.md), P1 con su informe y aceptación manual posterior, y P2 con pruebas locales e informe para revisión de CI/aceptación nativa. P3–P5 siguen pendientes. Cada cierre requiere SHAs, plataformas, comandos/recorridos, resultados y límites. Porcentajes funcionales de Platform todavía no se han medido; seis etapas no equivalen a seis partes de esfuerzo iguales.
