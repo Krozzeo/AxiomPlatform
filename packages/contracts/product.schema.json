@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Krozzeo/AxiomPlatform/contracts/0.1/product.schema.json",
+  "title": "Axiom Platform P1 product descriptor",
+  "type": "object",
+  "required": ["manifestVersion","protocolVersion","productId","displayName","productVersion","platformApiRange","projectFormats","capabilities","launch"],
+  "properties": {
+    "manifestVersion": {"const": 1},
+    "protocolVersion": {"const": 1},
+    "productId": {"type": "string", "pattern": "^axiom\\.[a-z][a-z0-9.-]{0,63}$"},
+    "displayName": {"type": "string", "minLength": 1, "maxLength": 100},
+    "productVersion": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "platformApiRange": {"const": ">=0.1.0 <0.2.0"},
+    "projectFormats": {"type":"array","minItems":1,"items":{"type":"object","required":["id","versions"],"properties":{"id":{"type":"string"},"versions":{"type":"array","items":{"type":"integer"}}}}},
+    "capabilities": {"type":"array","items":{"type":"string"}},
+    "launch": {"type":"object","required":["adapter","entry"],"properties":{"adapter":{"const":"official-local"},"entry":{"type":"string","pattern":"\\.mjs$"}}}
+  }
+}

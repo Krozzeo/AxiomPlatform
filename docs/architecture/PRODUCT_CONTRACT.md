@@ -1,6 +1,8 @@
 # Contrato preliminar de producto — SDK de Platform
 
-Estado: especificación de P0, versión de diseño 0. No hay esquema ejecutable o SDK publicado. P1 implementará y validará una primera versión; los nombres del ejemplo pueden ajustarse mediante ADR sin migrar proyectos actuales en P0.
+Actualización: P1 implementa API 0.1.0 / protocolo 1, descriptor ejecutable y cliente IPC; [ADR-P0002](../adr/0002-p1-host-and-product-ipc.md). El formato real del motor sigue schemaVersion 1. El texto siguiente conserva el diseño de P0 como antecedente.
+
+Estado original: especificación de P0, versión de diseño 0. No hay esquema ejecutable o SDK publicado. P1 implementará y validará una primera versión; los nombres del ejemplo pueden ajustarse mediante ADR sin migrar proyectos actuales en P0.
 
 ## Descriptor y proyecto
 
