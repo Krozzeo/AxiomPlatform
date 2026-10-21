@@ -1,6 +1,6 @@
 # Informe P3 — AI y cambios
 
-2026-10-21. Ramas feat/p3-ai-and-changes y feat/p3-platform-ai, sobre P2 (228e1be/d6aad38). Proveedor público 017e54168f87ea5a0d5b97adfbb2314673bc298d, dependencia HTTPS fijada con integridad en el motor. CI conjunto fija consumidor f7c5105bbd2042f1057eb9943a02f61c79ec4fa6. No se integró P2 ni P3 en main. #55 permanece pendiente; el usuario pidió continuar P3 con ese estado visible.
+2026-10-21. Ramas feat/p3-ai-and-changes y feat/p3-platform-ai, sobre P2 (228e1be/d6aad38). Proveedor público 017e54168f87ea5a0d5b97adfbb2314673bc298d, dependencia HTTPS fijada con integridad en el motor. CI conjunto fija consumidor 9697b5829baa60c0cde48d80b5eea35457f17670. No se integró P2 ni P3 en main. #55 permanece pendiente; el usuario pidió continuar P3 con ese estado visible.
 
 ## Entregado
 
@@ -13,7 +13,7 @@
 
 Platform: 21/21 pruebas, sin omitidas con AXIOM_ENGINE_PATH. Incluye tres integraciones con procesos reales: edición manual y AI/aprobación/diff/Apply/reapertura/dos proyectos; cancelación con respuesta tardía y proveedor 429; revisión obsoleta/divergencia de MAIN/propuesta editada sin sobrescritura. Pruebas genéricas cubren errores/2 MiB/redacción, no ejecutar turnos cancelados, ledger por proyecto/reinicio/cierre tardío, registro y journal. Los 13 tests previos de P1/P2 se conservan.
 
-Engine: npm run check 444/444 sin fallos/omitidas. Los 94 tests enfocados de asistente, work orders y propuestas pasan, incluyendo reanudación sin repetir efectos, aprobación, presupuestos, aceptación y rollback. Publicación del paquete final y CI se verifican independientemente.
+Engine: npm run check 445/445 sin fallos/omitidas. Los 95 tests enfocados de asistente, work orders y propuestas pasan, incluyendo reanudación sin repetir efectos, aprobación, presupuestos, aceptación y rollback. El paquete final público está instalado; la prueba adicional acredita guardar límites sin elegir modelo ni generar solicitudes al reabrir. CI se verifica independientemente.
 
 Navegador P3: crear/editar/guardar desde UI, conectar mediante host y limpiar campo de clave, plan con confirmación, propuesta aislada, Review y Apply humano que persiste X=2; Hub informa 250 tokens del fixture; sin pageErrors. Evidencias .axiom/p3-browser/report.json, review.png y platform.png (generadas, no fuente). P1/P2 se ejecutan como regresión conjunta al entregar.
 

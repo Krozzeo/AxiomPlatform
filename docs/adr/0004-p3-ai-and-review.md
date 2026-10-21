@@ -14,6 +14,6 @@ El proveedor se instala por HTTPS con commit/integridad, publicado antes del con
 
 ## Evidencia y límites
 
-21 tests Platform y 444 Engine, con aprobación/revisión/cancelación/errores/conflictos y exactamente una ejecución al reanudar cubiertos. Navegadores P1/P2/P3, HTTP AI controlado, Null. No se usaron credenciales reales ni se atribuye calidad de modelo a estas pruebas. Los checks remotos y #55 siguen independientes. [Guía y recorridos](../P3_GUIDE.md).
+21 tests Platform y 445 Engine, con aprobación/revisión/cancelación/errores/conflictos y exactamente una ejecución al reanudar cubiertos. Navegadores P1/P2/P3, HTTP AI controlado, Null. No se usaron credenciales reales ni se atribuye calidad de modelo a estas pruebas. Los checks remotos y #55 siguen independientes. [Guía y recorridos](../P3_GUIDE.md).
 
 Contrato del proveedor contrastado con [documentación oficial de Responses](https://developers.openai.com/api/docs/guides/migrate-to-responses): store:false, output tipado y conservación de resultados/llamadas por call_id. No hay migración de modelos, streaming o cambio de endpoint en P3.

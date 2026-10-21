@@ -12,7 +12,7 @@ El host elimina OPENAI_API_KEY del entorno de sus hijos. Claves introducidas en 
 
 ## Evidencia y límites
 
-Engine npm run check 444/444, enfoque AI/work orders/workspaces 94/94. Platform 21 tests y browser P3 de aprobación→propuesta→review→Apply/persistencia sin pageErrors. P1/P2 se conservan como regresión conjunta. GitHub/AI HTTP controlados; Null. No PAT/clave/modelo real ni aceptación nativa por mocks. CI nuevo y estado PR se consultan por separado, sin afirmar integración por pruebas locales.
+Engine npm run check 445/445, enfoque AI/work orders/workspaces 95/95. Platform 21 tests y browser P3 de aprobación→propuesta→review→Apply/persistencia sin pageErrors. P1/P2 se conservan como regresión conjunta. GitHub/AI HTTP controlados; Null. No PAT/clave/modelo real ni aceptación nativa por mocks. CI nuevo y estado PR se consultan por separado, sin afirmar integración por pruebas locales.
 
 ## Próximo trabajo
 
