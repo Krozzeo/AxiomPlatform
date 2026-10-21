@@ -5,7 +5,7 @@ import {readFile} from 'node:fs/promises';
 export class AiAccount {
   constructor({provider=new OpenAiProvider({key:process.env.OPENAI_API_KEY??''}),onChange=()=>{},usagePath}={}){this.provider=provider;this.epoch=0;this.onChange=onChange;this.requests=new Map();this.usage={};this.usagePath=usagePath;this.flight=Promise.resolve();}
   async initialize(){if(this.usagePath)try{const value=JSON.parse(await readFile(this.usagePath,'utf8'));if(value.version!==1||!value.scopes||Object.values(value.scopes).some(s=>!['inputTokens','outputTokens','totalTokens','unreportedRequests'].every(k=>Number.isSafeInteger(s[k])&&s[k]>=0)))throw aiError('Invalid AI usage ledger');this.usage=value.scopes;}catch(e){if(e.code!=='ENOENT')throw e;}return this;}
-  status(){return {hasCredential:!!this.provider.key,epoch:this.epoch};}
+  status(){return {hasCredential:!!this.provider.key,epoch:this.epoch,model:this.model??null,busy:this.requests.size>0};}
   changed(){this.epoch++;this.onChange(this.status());}
   disconnect(){this.provider.key='';for(const item of this.requests.values())item.controller.abort();this.changed();return this.status();}
   cancelOwner(owner){for(const item of this.requests.values())if(item.owner===owner)item.controller.abort();}

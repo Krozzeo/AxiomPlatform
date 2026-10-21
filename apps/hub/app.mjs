@@ -1,103 +1,70 @@
-const $=id=>document.getElementById(id);
-const supplied=new URLSearchParams(location.hash.slice(1)).get('token');
-let token=supplied;
-try{if(supplied)sessionStorage.setItem('axiom.platform.session',supplied);else token=sessionStorage.getItem('axiom.platform.session');}catch{ /* The one-time URL still works without browser storage. */ }
+import {iconButton,replaceOptions,setTheme} from './ui.mjs';
+const $=id=>document.getElementById(id),supplied=new URLSearchParams(location.hash.slice(1)).get('token');let token=supplied;
+try{if(supplied)sessionStorage.setItem('axiom.platform.session',supplied);else token=sessionStorage.getItem('axiom.platform.session');}catch{}
 history.replaceState(null,'',location.pathname);
-let catalog,working=false,closeSession,repositories=[],accountEpoch=-1;
-let actionQueue=Promise.resolve();
-async function api(path,data){
-  const response=await fetch(path,{method:data?'POST':'GET',headers:{Authorization:'Bearer '+token,...(data?{'Content-Type':'application/json'}:{})},...(data?{body:JSON.stringify(data)}:{})});
-  const value=await response.json();if(!response.ok)throw Error(value.message??'No se pudo completar la operación.');return value;
-}
-function action(fn,silent=false){
-  if(silent&&working)return Promise.resolve();
-  const task=actionQueue.then(()=>performAction(fn,silent));actionQueue=task.catch(()=>{});return task;
-}
-async function performAction(fn,silent=false){
-  working=true;if(!silent){$('error').hidden=true;$('notice').hidden=true;}
-  if(!silent)for(const b of document.querySelectorAll('button'))b.disabled=true;
-  try{await fn();await refresh();}catch(error){$('error').textContent=error.message;$('error').hidden=false;}
-  finally{working=false;for(const b of document.querySelectorAll('button'))b.disabled=false;updateControls();}
-}
+let catalog,route=location.pathname,repositories=[],accountEpoch=-1,working=false,queue=Promise.resolve(),selectedProject,selectedSession,deletionPlan,picker,projectRenderKey;
+async function api(path,data,{signal}={}){const response=await fetch(path,{method:data?'POST':'GET',headers:{Authorization:'Bearer '+token,...(data?{'Content-Type':'application/json'}:{})},...(data?{body:JSON.stringify(data)}:{}),signal:signal??AbortSignal.timeout(90000)});const value=await response.json();if(!response.ok)throw Error(value.message??'The operation could not be completed.');return value;}
 const mutate=data=>api('/v1/sessions',{...data,operationId:crypto.randomUUID()});
-function button(label,fn,kind='secondary'){const b=document.createElement('button');b.textContent=label;b.className=kind;b.onclick=()=>void action(fn);return b;}
-function render(){
-  $('ai-status').textContent=catalog.ai?.hasCredential?'Credencial disponible durante esta sesión.':'Sin credencial de sesión.';
-  const usage=Object.values(catalog.ai?.usage??{}),total=usage.reduce((n,s)=>n+s.totalTokens,0),unknown=usage.reduce((n,s)=>n+s.unreportedRequests,0);
-  $('ai-usage').textContent=total+' tokens informados'+(unknown?' · '+unknown+' solicitudes con consumo no confirmado':'')+'. El consumo informado no es una estimación de precio.';
-  $('root').textContent=catalog.projectRoot;$('sessions').replaceChildren();$('empty').hidden=catalog.sessions.length>0;
-  if(document.activeElement!==$('storage'))$('storage').value=catalog.projectRoot;
-  $('recent-projects').replaceChildren();$('recent-empty').hidden=catalog.recents.length>0;
-  for(const project of catalog.recents){
-    const card=document.createElement('article'),info=document.createElement('div'),title=document.createElement('h3'),path=document.createElement('p');card.dataset.projectId=project.projectId;
-    title.textContent=project.name;path.textContent=project.path;info.append(title,path);card.append(info);
-    const active=catalog.sessions.find(s=>s.status?.projectId===project.projectId&&s.state==='ready');
-    if(active){const a=document.createElement('a');a.textContent='Abrir editor';a.className='editor-link';a.href=active.editorUrl;a.target='_blank';a.rel='noopener noreferrer';card.append(a);}
-    else card.append(button('Abrir',()=>mutate({action:'open',productId:project.productId,path:project.path})));$('recent-projects').append(card);
-  }
-  const connected=catalog.github?.connected===true;
-  $('github-connect-form').hidden=connected;$('github-connected').hidden=!connected;
-  $('github-account-name').textContent=connected?'Conectado como '+catalog.github.account.login:'';
-  $('github-toggle').textContent=connected?'GitHub · '+catalog.github.account.login:'GitHub · Sin conexión';
-  for(const session of catalog.sessions){
-    const card=document.createElement('article');card.dataset.sessionId=session.sessionId;
-    const info=document.createElement('div'),title=document.createElement('h3'),description=document.createElement('p'),path=document.createElement('p');
-    title.textContent=session.status?.name??'Sesión del producto';
-    description.textContent=session.state==='ready'?(session.status?.busy?'Tarea en curso':session.status?.dirty?'Cambios sin guardar':'Guardado'):session.state==='closed'?'Sesión cerrada':session.error?.message??'Iniciando…';
-    path.textContent=session.path??session.productId;info.append(title,description,path);card.append(info);
-    if(session.state==='ready'){
-      const nav=document.createElement('nav'),link=document.createElement('a');link.className='editor-link';link.textContent='Abrir editor';link.href=session.editorUrl;link.target='_blank';link.rel='noopener noreferrer';nav.append(link);
-      nav.append(button('Guardar',async()=>{const current=await api('/v1/sessions',{action:'status',sessionId:session.sessionId});await mutate({action:'save',sessionId:session.sessionId,expectedRevision:current.status.revision});}));
-      nav.append(button('Cerrar',async()=>{closeSession=await api('/v1/sessions',{action:'status',sessionId:session.sessionId});$('close-description').textContent=closeSession.status.dirty?'Hay cambios pendientes en este proyecto.':'El proyecto está guardado.';$('close-dialog').showModal();},'quiet'));card.append(nav);
-    }
-    $('sessions').append(card);
-  }
+function error(value){const text=value.name==='AbortError'?'The request was cancelled.':value.message;$('error').textContent=text;$('error').hidden=false;const dialog=document.querySelector('dialog[open]');if(dialog){let p=dialog.querySelector('.dialog-error');if(!p){p=document.createElement('p');p.className='dialog-error';p.setAttribute('role','alert');dialog.append(p);}p.textContent=text;}}
+function clearErrors(){$('error').hidden=true;for(const p of document.querySelectorAll('.dialog-error'))p.remove();}
+function action(fn,button,silent=false){const task=queue.then(async()=>{working=true;if(!silent)clearErrors();if(button){button.disabled=true;button.setAttribute('aria-busy','true');}try{await fn();if(fn!==refresh)await refresh();}catch(e){error(e);}finally{working=false;if(button){button.disabled=false;button.removeAttribute('aria-busy');}if(catalog)renderControls();}});queue=task.catch(()=>{});return task;}
+function notice(text){$('notice').textContent=text;$('notice').hidden=false;}
+function dialog(id){clearErrors();$(id).showModal();}
+function navigate(path,replace=false){for(const d of document.querySelectorAll('dialog[open]'))d.close();route=path;if(replace)history.replaceState(null,'',path);else history.pushState(null,'',path);paintRoute();}
+function paintRoute(){const settings=route.startsWith('/settings');$('hub-sidebar').hidden=settings;$('settings-sidebar').hidden=!settings;const pages={'/':'projects-page','/installations':'installations-page','/settings/general':'general-settings','/settings/appearance':'appearance-settings','/settings/github':'github-settings','/settings/ai':'ai-settings'},active=pages[route]??'general-settings';for(const id of Object.values(pages))$(id).hidden=id!==active;for(const a of document.querySelectorAll('[data-route]')){if(a.dataset.route===route)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');}document.title=(settings?'Settings · ':'')+'Axiom Platform';}
+for(const a of document.querySelectorAll('[data-route]'))a.addEventListener('click',e=>{e.preventDefault();navigate(a.dataset.route);});window.addEventListener('popstate',()=>{route=location.pathname;paintRoute();});
+$('settings-link').onclick=()=>navigate('/settings/general');$('github-toggle').onclick=()=>navigate('/settings/github');$('ai-toggle').onclick=()=>navigate('/settings/ai');$('link-github').onclick=()=>navigate('/settings/github');
+for(const b of document.querySelectorAll('[data-close]'))b.onclick=()=>$(b.dataset.close).close();
+function active(entry){return catalog.sessions.find(s=>s.state==='ready'&&s.productId===entry.productId&&s.status?.projectId===entry.projectId);}
+function projectAction(actionName,entry){return mutate({action:actionName,productId:entry.productId,projectId:entry.projectId});}
+function renderProjects(){
+ const search=$('search').value.trim().toLowerCase(),rows=catalog.recents.filter(p=>(p.name+' '+p.path).toLowerCase().includes(search));rows.sort(catalog.preferences.sortBy==='name'?(a,b)=>a.name.localeCompare(b.name):(a,b)=>(b.lastOpenedAt??'').localeCompare(a.lastOpenedAt??''));
+ const renderKey=JSON.stringify([rows,catalog.sessions,catalog.products]);if(renderKey===projectRenderKey)return;projectRenderKey=renderKey;
+ $('project-rows').replaceChildren();$('recent-empty').hidden=rows.length>0;$('project-table').hidden=!rows.length;$('project-count').textContent=rows.length+' project'+(rows.length===1?'':'s');
+ for(const entry of rows){const session=active(entry),product=catalog.products.find(p=>p.productId===entry.productId),row=document.createElement('tr');row.dataset.projectId=entry.projectId;if(session)row.dataset.sessionId=session.sessionId;
+  const project=document.createElement('td'),name=document.createElement('button'),path=document.createElement('div');name.className='project-title';name.textContent=entry.name;name.onclick=()=>open(entry);path.className='project-path';path.textContent=entry.path;path.title=entry.path;project.append(name,path);row.append(project);
+  const kind=document.createElement('td');kind.textContent=product?.displayName??entry.productId;row.append(kind);const version=document.createElement('td'),chip=document.createElement('span');chip.className='version-chip';chip.textContent=session?.productVersion??product?.productVersion??entry.productVersion??'Unavailable';version.append(chip);row.append(version);
+  const state=document.createElement('td'),badge=document.createElement('span');badge.className='session-badge';badge.dataset.state=session?(session.status.dirty?'dirty':'active'):'closed';badge.textContent=session?(session.status.busy?'Task running':session.status.dirty?'Unsaved changes':'Active · saved'):'Closed';state.append(badge);row.append(state);
+  const date=document.createElement('td');date.textContent=entry.lastOpenedAt?new Intl.DateTimeFormat('en',{dateStyle:'medium'}).format(new Date(entry.lastOpenedAt)):'—';date.title=entry.lastOpenedAt??'';row.append(date);
+  const cell=document.createElement('td'),buttons=document.createElement('div');buttons.className='row-actions';
+  buttons.append(iconButton('Open '+entry.name,'open',()=>open(entry),{disabled:!session&&!product}));
+  buttons.append(iconButton('Edit '+entry.name,'edit',()=>{selectedProject=entry;$('rename-name').value=entry.name;dialog('rename-dialog');},{disabled:session?.status.busy||session?.status.dirty}));
+  buttons.append(iconButton('Save '+entry.name,'save',()=>void action(async()=>{const current=await api('/v1/sessions',{action:'status',sessionId:session.sessionId});await mutate({action:'save',sessionId:session.sessionId,expectedRevision:current.status.revision});}),{disabled:!session||session.status.busy}));
+  buttons.append(iconButton('Close '+entry.name,'close',()=>void action(async()=>{selectedSession=await api('/v1/sessions',{action:'status',sessionId:session.sessionId});$('close-description').textContent=entry.name+(selectedSession.status.dirty?' has unsaved changes.':' is saved.');dialog('close-dialog');}),{disabled:!session}));
+  buttons.append(iconButton('Remove '+entry.name+' from list','remove',()=>{selectedProject=entry;$('remove-description').textContent=entry.name;dialog('remove-dialog');},{disabled:!!session}));
+  buttons.append(iconButton('Delete '+entry.name+' files','delete',()=>void action(async()=>{selectedProject=entry;deletionPlan=await projectAction('delete-review',entry);$('delete-path').textContent=deletionPlan.folder;$('delete-description').textContent=entry.name+' · '+deletionPlan.files+' items · '+(deletionPlan.bytes/1024/1024).toFixed(1)+' MB';$('delete-name').value='';dialog('delete-dialog');}),{disabled:!!session,danger:true}));cell.append(buttons);row.append(cell);$('project-rows').append(row);
+ }
 }
-function updateControls(){
-  const connected=catalog?.github?.connected===true;
-  for(const id of ['repositories-refresh','account-refresh','account-disconnect','find-projects'])$(id).disabled=!connected;
-  $('github-import-submit').disabled=!connected||!$('source-project').value;
+function open(entry){const s=active(entry);if(s){window.open(s.editorUrl,'_blank','noopener');return;}const tab=window.open('about:blank','_blank');if(tab)tab.opener=null;void action(async()=>{try{const session=await mutate({action:'open',productId:entry.productId,path:entry.path});if(tab)tab.location=session.editorUrl;else notice('Project opened. Use its Open icon to open the editor.');}catch(e){tab?.close();throw e;}});}
+function renderInstallations(){$('installations-list').replaceChildren();for(const item of catalog.installations){const card=document.createElement('article');card.className='installation-card';card.dataset.installationId=item.id;const info=document.createElement('div'),title=document.createElement('h2'),status=document.createElement('span'),path=document.createElement('p'),problem=document.createElement('p');title.textContent=item.displayName+' '+item.version;status.className='badge';status.textContent=item.pending?'Update scheduled':item.active?'Active':item.previous?'Previous version':'Available';title.append(status);path.textContent=item.path;info.append(title,path);if(item.error){problem.textContent=item.error;problem.className='danger';info.append(problem);}const actions=document.createElement('div');actions.className='installation-actions';const activate=document.createElement('button');activate.textContent=item.active?'Active':item.pending?'Scheduled':'Activate';activate.disabled=item.active||item.pending||!!item.error;activate.onclick=()=>void action(()=>api('/v1/installations',{action:'activate',installationId:item.id}),activate);actions.append(activate);if(item.previous&&!item.active){const rollback=document.createElement('button');rollback.textContent='Roll back';rollback.onclick=()=>void action(()=>api('/v1/installations',{action:'rollback',productId:item.productId}),rollback);actions.append(rollback);}card.append(info,actions);$('installations-list').append(card);}}
+function renderControls(){const gh=!!catalog.github?.connected;$('github-connect-form').hidden=gh;$('github-connected').hidden=!gh;$('github-account-name').textContent=gh?'Connected as '+catalog.github.account.login:'';$('repository-count').textContent=repositories.length+' repositories available';$('github-toggle').classList.toggle('disconnected',!gh);$('github-dot').hidden=!gh;const needsRepo=catalog.sessions.some(s=>s.state==='ready'&&(!s.status.github?.repository||!s.status.github?.accountMatches));$('github-dot').dataset.state=needsRepo?'unconfigured':'linked';$('github-toggle').title=gh?(needsRepo?'GitHub connected · project repository setup needed':'GitHub connected'):'GitHub disconnected';
+ $('github-import-disconnected').hidden=gh;$('github-import-form').hidden=!gh;for(const id of ['account-refresh','account-disconnect','repositories-refresh','find-projects'])$(id).disabled=!gh;$('github-import-submit').disabled=!gh||!$('source-project').value;
+ $('ai-icon').src='/icons/'+(catalog.ai?.busy?'compiling':catalog.ai?.hasCredential?'ai':'ai-off')+'.svg';$('ai-status').textContent=catalog.ai?.hasCredential?'API credential connected for this session.':'No AI credential is connected.';$('ai-disconnect').disabled=!catalog.ai?.hasCredential;const usage=Object.values(catalog.ai?.usage??{}),total=usage.reduce((n,s)=>n+s.totalTokens,0),unknown=usage.reduce((n,s)=>n+s.unreportedRequests,0);$('ai-usage').textContent=total.toLocaleString('en')+' reported tokens'+(unknown?' · '+unknown+' requests with unconfirmed usage':'');
 }
-async function loadRepositories(){
-  if(!catalog.github?.connected){repositories=[];$('source-repository').replaceChildren();return;}
-  const previous=$('source-repository').value;repositories=await api('/v1/github',{action:'repositories'});$('source-repository').replaceChildren();
-  for(const repo of repositories){const option=document.createElement('option');option.value=repo.name;option.textContent=repo.name;$('source-repository').append(option);}
-  if(repositories.some(r=>r.name===previous))$('source-repository').value=previous;
-  $('source-project').replaceChildren();
-}
-async function refresh(){
-  catalog=await api('/v1/catalog');
-  if(accountEpoch!==catalog.github.epoch){accountEpoch=catalog.github.epoch;await loadRepositories();}
-  for(const session of catalog.sessions.filter(s=>s.state==='ready')){
-    try{const value=await api('/v1/sessions',{action:'status',sessionId:session.sessionId});Object.assign(session,value);}catch(error){session.state='failed';session.error={message:error.message};}
-  }
-  render();
-}
-$('create-form').onsubmit=event=>{event.preventDefault();void action(()=>mutate({action:'create',productId:$('product').value,name:$('name').value.trim()}));};
-$('open-form').onsubmit=event=>{event.preventDefault();void action(()=>mutate({action:'open',productId:$('product').value,path:$('path').value.trim()}));};
-$('refresh').onclick=()=>void action(refresh);
-$('github-toggle').onclick=()=>{$('github-account').open=!$('github-account').open;if($('github-account').open)$('github-account').scrollIntoView({block:'nearest',behavior:'smooth'});};
-for(const b of document.querySelectorAll('[data-browse]'))b.onclick=()=>void action(async()=>{
-  const input=$(b.dataset.browse),selected=await api('/v1/folders/pick',{initial:input.value||catalog.projectRoot});
-  if(!selected.path)return;input.value=selected.path;
-  if(input.id==='storage')await api('/v1/settings',{projectRoot:selected.path});
-});
-$('storage').onchange=()=>{const projectRoot=$('storage').value.trim();void action(()=>api('/v1/settings',{projectRoot}));};
-$('product').onchange=()=>void action(()=>api('/v1/settings',{defaultProduct:$('product').value}));
-$('import-form').onsubmit=event=>{event.preventDefault();void action(async()=>{const result=await mutate({action:'import',kind:'local',productId:$('product').value,sourcePath:$('import-path').value.trim()});$('notice').textContent=result.alreadyRegistered?'Este proyecto ya está en tu catálogo.':'Proyecto importado. El original se conservó.';$('notice').hidden=false;});};
-$('github-connect-form').onsubmit=event=>{event.preventDefault();void action(async()=>{const secret=$('github-token').value;$('github-token').value='';await api('/v1/github',{action:'connect',token:secret});});};
-$('account-disconnect').onclick=()=>void action(()=>api('/v1/github',{action:'disconnect'}));
-for(const id of ['account-refresh','repositories-refresh'])$(id).onclick=()=>void action(loadRepositories);
-$('source-repository').onchange=()=>{$('source-branch').value=repositories.find(r=>r.name===$('source-repository').value)?.branch??'main';$('source-project').replaceChildren();updateControls();};
-$('source-branch').onchange=()=>{$('source-project').replaceChildren();updateControls();};
-const source=()=>({productId:$('product').value,repository:$('source-repository').value,branch:$('source-branch').value.trim()});
-$('find-projects').onclick=()=>void action(async()=>{const result=await mutate({action:'github-projects',...source()});$('source-project').replaceChildren();for(const item of result.items){const option=document.createElement('option');option.value=item.path;option.textContent=item.path;$('source-project').append(option);}updateControls();});
-$('source-project').onchange=updateControls;
-$('github-import-form').onsubmit=event=>{event.preventDefault();void action(async()=>{await mutate({action:'import',kind:'github',...source(),path:$('source-project').value});$('notice').textContent='Proyecto agregado desde GitHub. El repositorio original no se modificó.';$('notice').hidden=false;});};
-$('close-dialog').addEventListener('close',()=>{
-  const decision=$('close-dialog').returnValue||'cancel';
-  if(closeSession)void action(()=>mutate({action:'close',sessionId:closeSession.sessionId,expectedRevision:closeSession.status.revision,decision}));
-});
-try{catalog=await api('/v1/catalog');for(const p of catalog.products){const option=document.createElement('option');option.value=p.productId;option.textContent=p.displayName+' · '+p.productVersion;$('product').append(option);}if(catalog.preferences.defaultProduct)$('product').value=catalog.preferences.defaultProduct;await refresh();updateControls();}
-catch(error){$('error').textContent=error.message;$('error').hidden=false;}
-setInterval(()=>{if(!working&&!$('close-dialog').open)void action(refresh,true);},3000);
+function render(){setTheme(catalog.preferences.theme??'dark');if(document.activeElement!==$('storage')&&!$('storage').dataset.editing)$('storage').value=catalog.projectRoot;replaceOptions($('product'),catalog.products.map(p=>({value:p.productId,label:p.displayName+' · '+p.productVersion})),catalog.preferences.defaultProduct);replaceOptions($('default-product'),catalog.products.map(p=>({value:p.productId,label:p.displayName})),catalog.preferences.defaultProduct);$('project-sort').value=catalog.preferences.sortBy??'recent';$('theme').value=catalog.preferences.theme??'dark';renderProjects();renderInstallations();renderControls();paintRoute();}
+async function loadRepositories(){if(!catalog.github?.connected){repositories=[];replaceOptions($('source-repository'),[]);return;}repositories=await api('/v1/github',{action:'repositories'});replaceOptions($('source-repository'),repositories.map(r=>({value:r.name,label:r.name})));$('source-branch').value=repositories.find(r=>r.name===$('source-repository').value)?.branch??'main';$('source-project').replaceChildren();}
+async function refresh(){catalog=await api('/v1/catalog');if(accountEpoch!==catalog.github.epoch){accountEpoch=catalog.github.epoch;try{await loadRepositories();}catch(e){catalog=await api('/v1/catalog');error(e);}}await Promise.all(catalog.sessions.filter(s=>s.state==='ready').map(async s=>{try{Object.assign(s,await api('/v1/sessions',{action:'status',sessionId:s.sessionId}));}catch(e){s.state='failed';s.error={message:e.message};}}));render();}
+function preferences(data){return action(()=>api('/v1/settings',data));}
+$('new-project-button').onclick=()=>dialog('create-dialog');$('add-project-button').onclick=()=>{setTab('local');dialog('add-dialog');};$('add-installation-button').onclick=()=>dialog('installation-dialog');$('search').oninput=renderProjects;$('refresh').onclick=e=>void action(refresh,e.currentTarget);
+$('project-sort').onchange=e=>void preferences({sortBy:e.target.value});$('theme').onchange=e=>void preferences({theme:e.target.value});$('default-product').onchange=e=>void preferences({defaultProduct:e.target.value});$('product').onchange=()=>{};
+$('storage').oninput=()=>{$('storage').dataset.editing='true';};$('storage').onchange=()=>{const projectRoot=$('storage').value.trim();void action(async()=>{try{await api('/v1/settings',{projectRoot});}finally{delete $('storage').dataset.editing;}});};
+$('create-form').onsubmit=e=>{e.preventDefault();const name=$('name').value.trim(),productId=$('product').value,tab=window.open('about:blank','_blank');if(tab)tab.opener=null;void action(async()=>{try{const result=await mutate({action:'create',name,productId});$('create-dialog').close();if(tab)tab.location=result.editorUrl;else notice('Project created. Use its Open icon to open the editor.');}catch(err){tab?.close();throw err;}},e.submitter);};
+$('rename-form').onsubmit=e=>{e.preventDefault();const entry=selectedProject,name=$('rename-name').value.trim();void action(async()=>{const s=active(entry),status=s?await api('/v1/sessions',{action:'status',sessionId:s.sessionId}):null;await mutate({action:'rename',productId:entry.productId,projectId:entry.projectId,name,expectedRevision:status?.status.revision});$('rename-dialog').close();},e.submitter);};
+for(const button of document.querySelectorAll('[data-decision]'))button.onclick=()=>{if(button.dataset.decision==='cancel'){$('close-dialog').close();return;}void action(async()=>{await mutate({action:'close',sessionId:selectedSession.sessionId,expectedRevision:selectedSession.status.revision,decision:button.dataset.decision});$('close-dialog').close();},button);};
+$('confirm-remove').onclick=e=>void action(async()=>{await projectAction('remove',selectedProject);$('remove-dialog').close();},e.currentTarget);
+$('delete-form').onsubmit=e=>{e.preventDefault();const entry=selectedProject,confirmName=$('delete-name').value;void action(async()=>{await mutate({action:'delete',productId:entry.productId,projectId:entry.projectId,planId:deletionPlan.planId,confirmName});$('delete-dialog').close();notice('Project files deleted.');},e.submitter);};
+function setTab(kind){$('import-form').hidden=kind!=='local';$('github-import').hidden=kind!=='github';$('local-tab').classList.toggle('selected',kind==='local');$('github-tab').classList.toggle('selected',kind==='github');}$('local-tab').onclick=()=>setTab('local');$('github-tab').onclick=()=>setTab('github');
+$('import-form').onsubmit=e=>{e.preventDefault();const sourcePath=$('import-path').value.trim(),productId=$('product').value;void action(async()=>{await mutate({action:'add-local',productId,sourcePath});$('add-dialog').close();notice('Project added. Original files were preserved.');},e.submitter);};
+$('github-connect-form').onsubmit=e=>{e.preventDefault();const secret=$('github-token').value;$('github-token').value='';void action(()=>api('/v1/github',{action:'connect',token:secret}),e.submitter);};$('account-disconnect').onclick=e=>void action(()=>api('/v1/github',{action:'disconnect'}),e.currentTarget);for(const id of ['account-refresh','repositories-refresh'])$(id).onclick=e=>void action(loadRepositories,e.currentTarget);
+$('source-repository').onchange=()=>{$('source-branch').value=repositories.find(r=>r.name===$('source-repository').value)?.branch??'main';$('source-project').replaceChildren();renderControls();};$('source-branch').onchange=()=>{$('source-project').replaceChildren();renderControls();};$('source-project').onchange=renderControls;const source=()=>({productId:$('product').value,repository:$('source-repository').value,branch:$('source-branch').value.trim()});
+$('find-projects').onclick=e=>void action(async()=>{const result=await mutate({action:'github-projects',...source()});replaceOptions($('source-project'),result.items.map(p=>({value:p.id,label:p.name})));},e.currentTarget);
+$('github-import-form').onsubmit=e=>{e.preventDefault();const selected=source(),projectId=$('source-project').value;void action(async()=>{await mutate({action:'import',kind:'github',...selected,projectId});$('add-dialog').close();notice('Project imported from GitHub.');},e.submitter);};
+async function models(){const apiKey=$('ai-key').value;$('ai-key').value='';const value=await api('/v1/ai',{action:'models',...(apiKey?{apiKey}:{})});replaceOptions($('ai-model'),value.models.map(model=>({value:model,label:model+(value.untestedModels.includes(model)?' (untested)':'')})),catalog.preferences.aiModel);}
+$('ai-models').onclick=e=>void action(models,e.currentTarget);$('ai-key').onchange=()=>{if($('ai-key').value)void action(models,$('ai-models'));};$('ai-connect-form').onsubmit=e=>{e.preventDefault();const apiKey=$('ai-key').value,model=$('ai-model').value;$('ai-key').value='';void action(async()=>{await api('/v1/ai',{action:'connect',model,...(apiKey?{apiKey}:{})});notice('AI connection tested. Configure each project’s model from its editor.');},e.submitter);};$('ai-disconnect').onclick=e=>void action(()=>api('/v1/ai',{action:'disconnect'}),e.currentTarget);
+$('installation-form').onsubmit=e=>{e.preventDefault();const path=$('installation-path').value.trim();void action(async()=>{await api('/v1/installations',{action:'add',path});$('installation-dialog').close();notice('Installation added. Activate it when ready.');},e.submitter);};
+for(const button of document.querySelectorAll('[data-browse]'))button.onclick=async()=>{
+ if(picker)return;clearErrors();const input=$(button.dataset.browse),controller=new AbortController();picker=controller;button.disabled=true;button.setAttribute('aria-busy','true');$('folder-progress').hidden=false;document.querySelector('dialog[open]')?.prepend($('folder-progress'));
+ try{const selected=await api('/v1/folders/pick',{initial:input.value||catalog.projectRoot},{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(130000)])});if(selected.path){input.value=selected.path;if(input.id==='storage'){input.dataset.editing='true';await action(async()=>{try{await api('/v1/settings',{projectRoot:selected.path});}finally{delete input.dataset.editing;}});}}}catch(e){if(!controller.signal.aborted)error(e);}finally{picker=null;button.disabled=false;button.removeAttribute('aria-busy');$('folder-progress').hidden=true;document.querySelector('main').prepend($('folder-progress'));}
+};$('cancel-folder').onclick=()=>picker?.abort();
+document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.key.toLowerCase()==='n'){e.preventDefault();if(!document.querySelector('dialog[open]'))dialog('create-dialog');}if(e.key==='/'&&!e.ctrlKey&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();navigate('/');$('search').focus();}});
+await refresh().catch(error);setInterval(()=>{if(!working&&!picker)void action(refresh,undefined,true);},2500);

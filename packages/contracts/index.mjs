@@ -1,4 +1,4 @@
-export const PLATFORM_VERSION = '0.1.2';
+export const PLATFORM_VERSION = '0.1.3';
 export const PROTOCOL_VERSION = 1;
 export const CAPABILITIES = ['project.detect','project.create','project.open','project.status','project.save','project.close'];
 export const METHODS = ['initialize', ...CAPABILITIES];

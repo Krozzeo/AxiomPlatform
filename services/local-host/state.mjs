@@ -13,7 +13,8 @@ export class PlatformState{
       const v=state.value;
       if(v.version!==1||!Array.isArray(v.recents)||v.recents.length>128||!Array.isArray(v.manifests)||!v.preferences||typeof v.preferences!=='object')throw failure('incompatibleVersion','Unsupported or invalid Platform settings.');
       if(defaults.root)v.projectRoot=resolve(defaults.root);if(defaults.manifests?.length)v.manifests=defaults.manifests.map(p=>resolve(p));
-      if(typeof v.projectRoot!=='string'||!v.manifests.length)throw failure('invalidRequest','Choose project storage and register a product for this first launch.');
+      if(v.installations!==undefined&&(!Array.isArray(v.installations)||v.installations.length>64))throw failure('invalidRequest','Invalid installation registry.');
+      if(typeof v.projectRoot!=='string'||!v.manifests.length&&!v.installations?.length)throw failure('invalidRequest','Choose project storage and register a product for this first launch.');
       await mkdir(v.projectRoot,{recursive:true});v.projectRoot=await realpath(v.projectRoot);
       for(const entry of v.recents)if(typeof entry?.path!=='string'||typeof entry.projectId!=='string'||typeof entry.productId!=='string')throw failure('invalidRequest','Invalid recent-project entry.');
       await atomicJson(state.path,v);return state;

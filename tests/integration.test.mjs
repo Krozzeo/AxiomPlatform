@@ -25,7 +25,7 @@ async function command(session,type,data={}){
   const r=await fetch(url.origin+'/v1/commands',{method:'POST',headers:{Origin:url.origin,Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({protocolVersion:1,messageId:randomUUID(),correlationId:randomUUID(),traceId:randomUUID(),actor:{kind:'human',id:'integration'},kind:'command',payload:{type,data}})});
   const reply=await r.json();if(!r.ok||reply.kind==='error')throw Object.assign(Error(reply.payload?.cause??reply.cause??JSON.stringify(reply)),{code:reply.payload?.code??reply.code});return reply.payload.data;
 }
-test('real engine: create, edit, cancel close, reject stale save, save, close, reopen and standalone',options,async t=>{
+test('real engine: create, edit, cancel close, reject stale save, save, close, reopen and direct product startup',options,async t=>{
   const {root,host,request,change}=await fixture(t);
   const create={action:'create',productId:'axiom.game-engine',name:'P1 acceptance',operationId:randomUUID()};
   const created=await request(create);assert.equal(created.state,'ready');assert.equal(created.status.dirty,false);
@@ -40,11 +40,11 @@ test('real engine: create, edit, cancel close, reject stale save, save, close, r
   await assert.rejects(change({action:'open',productId:'axiom.game-engine',path:created.path}),e=>e.code==='projectBusy');
   const save={action:'save',sessionId:created.sessionId,expectedRevision:edited.status.revision,operationId:randomUUID()};
   const saved=await request(save);assert.equal(saved.status.dirty,false);await request(save);
-  assert.equal(JSON.parse(await readFile(path)).revision,1);
+  assert.equal(JSON.parse(await readFile(path)).revision,created.status.savedRevision+1);
   await assert.rejects(command(created,'project.close',{id:saved.status.projectId,expectedSceneRevision:saved.status.revision}),/Platform/);
   await change({action:'close',sessionId:created.sessionId,expectedRevision:saved.status.revision,decision:'save'});
   const reopened=await change({action:'open',productId:'axiom.game-engine',path:created.path});
-  assert.equal(reopened.status.projectId,created.status.projectId);assert.equal((await command(reopened,'scene.get')).project.scene.entities[0].name,'Saved from editor');
+  assert.equal(reopened.status.projectId,created.status.projectId);assert.ok((await command(reopened,'scene.get')).project.scene.entities.some(e=>e.name==='Saved from editor'));
   const {startServer}=await import(pathToFileURL(join(engine,'daemon/bootstrap/server.mjs')));
   await assert.rejects(startServer({projectRoot:dirname(path)}),/active or interrupted Platform/);
   await change({action:'close',sessionId:reopened.sessionId,expectedRevision:reopened.status.revision,decision:'discard'});
