@@ -1,0 +1,37 @@
+export const githubError=(message,code='AX_GITHUB_0001')=>Object.assign(new Error(message),{code});
+export function repositoryName(value){if(typeof value!=='string'||!/^[-\w.]{1,100}\/[-\w.]{1,100}$/.test(value)||value.split('/').some(v=>v==='.'||v==='..'))throw githubError('Choose an owner/repository');return value;}
+export function branchName(value){if(typeof value!=='string'||!value||value.length>200||/^[/.]|[/.]$|[\s~^:?*\[\\\x00-\x1f]|\.\.|@\{|\/\/|\.lock(?:\/|$)/.test(value)||value==='@')throw githubError('Choose a valid publication branch');return value;}
+export class GitHubClient {
+ constructor({fetchImpl=fetch,timeoutMs=20000}={}){this.fetch=fetchImpl;this.timeoutMs=timeoutMs;this.token=null;}
+ disconnect(){this.token=null;}
+ async request(path,{method='GET',body,missing=false}={}){
+  if(!this.token)throw githubError('Connect your GitHub account first','AX_GITHUB_0002');
+  let response;try{response=await this.fetch('https://api.github.com'+path,{method,redirect:'error',signal:AbortSignal.timeout(this.timeoutMs),headers:{Authorization:'Bearer '+this.token,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});}catch{throw githubError('GitHub did not confirm the request. Check publication status before retrying.','AX_GITHUB_0003');}
+  if(missing&&response.status===404)return null;
+  if(response.status===401)this.disconnect();
+  if([401,403].includes(response.status))throw githubError(response.status===401?'GitHub connection expired. Reconnect.':'GitHub denied this operation. Check repository permissions or rate limits.','AX_GITHUB_0002');
+  if(response.status===422&&method==='POST'&&path==='/user/repos')throw githubError('Repository creation was rejected: the name may already exist or be invalid. Choose a unique name.');
+  if(!response.ok)throw githubError([409,422].includes(response.status)?'The remote changed or rejected this operation. Refresh its status.':'GitHub request failed (HTTP '+response.status+').');
+  const text=await response.text();if(text.length>(path.includes('/git/blobs/')?24:8)*1024*1024)throw githubError('GitHub response exceeds the supported budget');try{return text?JSON.parse(text):null;}catch{throw githubError('GitHub response could not be confirmed','AX_GITHUB_0003');}
+ }
+ async connect(token){if(typeof token!=='string'||token.length<10||token.length>512||/\s/.test(token))throw githubError('Enter a GitHub access token');this.token=token;try{const user=await this.request('/user');if(!Number.isSafeInteger(user.id)||typeof user.login!=='string')throw githubError('GitHub account could not be verified');return {id:user.id,login:user.login};}catch(error){this.disconnect();throw error;}}
+ async repositories(){const items=await this.request('/user/repos?per_page=100&sort=updated&affiliation=owner,collaborator,organization_member');return items.map(r=>({name:r.full_name,private:!!r.private,branch:r.default_branch,canPush:r.permissions?.push===true}));}
+ async create(name,privateRepository=true){if(typeof name!=='string'||!/^[-\w.]{1,100}$/.test(name)||name==='.'||name==='..'||typeof privateRepository!=='boolean')throw githubError('Enter a repository name and visibility');let r;try{r=await this.request('/user/repos',{method:'POST',body:{name,private:privateRepository,auto_init:true,description:'Axiom project'}});}catch(error){if(error.code==='AX_GITHUB_0002'&&this.token)throw githubError('GitHub denied repository creation. The token needs Administration write or Repository creation write and access to newly created repositories.','AX_GITHUB_0002');throw error;}if(!r?.full_name||!r.default_branch)throw githubError('GitHub did not confirm the new repository. Refresh repositories before retrying.','AX_GITHUB_0003');return {name:r.full_name,branch:r.default_branch,url:r.html_url};}
+ async repository(name){const r=await this.request('/repos/'+repositoryName(name));if(r.archived||r.disabled||!r.permissions?.push)throw githubError('Choose a writable, active repository');return {name:r.full_name,branch:r.default_branch,url:r.html_url};}
+ async head(name,branch){const r=await this.request('/repos/'+repositoryName(name)+'/git/ref/heads/'+branchName(branch).split('/').map(encodeURIComponent).join('/'),{missing:true});if(!r)return null;if(!/^[a-f0-9]{40}$/.test(r.object?.sha))throw githubError('GitHub returned an invalid branch head');return r.object.sha;}
+ async createBranch(name,branch,sha){return this.request('/repos/'+repositoryName(name)+'/git/refs',{method:'POST',body:{ref:'refs/heads/'+branchName(branch),sha}});}
+ async tree(name,ref){const tree=await this.request('/repos/'+repositoryName(name)+'/git/trees/'+ref+'?recursive=1');if(tree.truncated||!Array.isArray(tree.tree))throw githubError('Remote file listing is incomplete; choose a smaller repository');return tree.tree;}
+ async manifest(name,prefix,ref){const r=await this.request('/repos/'+repositoryName(name)+'/contents/'+prefix+'publication.json?ref='+encodeURIComponent(ref),{missing:true});if(!r)return null;if(r.type!=='file'||r.encoding!=='base64'||r.size>1024*1024)throw githubError('Remote publication manifest is invalid');try{return JSON.parse(Buffer.from(r.content.replace(/\s/g,''),'base64').toString('utf8'));}catch{throw githubError('Remote publication manifest is invalid');}}
+ async commit({repository,branch,expectedHead,additions,deletions,publicationId,snapshotHash,message}){
+  const result=await this.request('/graphql',{method:'POST',body:{query:'mutation AxiomPublication($input:CreateCommitOnBranchInput!){createCommitOnBranch(input:$input){commit{oid url}}}',variables:{input:{branch:{repositoryNameWithOwner:repository,branchName:branch},expectedHeadOid:expectedHead,message:{headline:message,body:'Axiom-Publish: '+publicationId+'\nAxiom-Snapshot: '+snapshotHash},fileChanges:{additions:additions.map(f=>({path:f.path,contents:f.bytes.toString('base64')})),deletions:deletions.map(path=>({path}))}}}}});
+  const commit=result?.data?.createCommitOnBranch?.commit;if(commit?.oid&&/^[a-f0-9]{40}$/.test(commit.oid))return {sha:commit.oid,url:'https://github.com/'+repository+'/commit/'+commit.oid};
+  // A GraphQL response can contain errors or partial data. Reconcile the journal rather than guessing whether it committed.
+  throw githubError('GitHub has not confirmed this publication. Check its status before retrying.','AX_GITHUB_0003');
+ }
+ async findPublication(repository,branch,publicationId,snapshotHash,prefix){
+  const [owner,name]=repositoryName(repository).split('/');const r=await this.request('/graphql',{method:'POST',body:{query:'query AxiomRecovery($owner:String!,$name:String!,$ref:String!){repository(owner:$owner,name:$name){ref(qualifiedName:$ref){target{... on Commit{history(first:50){nodes{oid message}}}}}}}',variables:{owner,name,ref:'refs/heads/'+branchName(branch)}}});
+  if(r.errors)throw githubError('Unable to verify publication history','AX_GITHUB_0003');
+  const commit=r.data?.repository?.ref?.target?.history?.nodes?.find(c=>c.message.includes('Axiom-Publish: '+publicationId+'\n')&&c.message.includes('Axiom-Snapshot: '+snapshotHash));if(!commit)return null;
+  const manifest=await this.manifest(repository,prefix,commit.oid);if(manifest?.snapshotHash!==snapshotHash||manifest?.publicationId!==publicationId)throw githubError('Publication history and project manifest disagree');return {sha:commit.oid,url:'https://github.com/'+repository+'/commit/'+commit.oid};
+ }
+}

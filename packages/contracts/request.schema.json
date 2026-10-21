@@ -2,16 +2,68 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Axiom Platform IPC request v1",
   "type": "object",
-  "required": ["protocolVersion","requestId","correlationId","sessionId","productId","actor","method","params"],
+  "required": [
+    "protocolVersion",
+    "requestId",
+    "correlationId",
+    "sessionId",
+    "productId",
+    "actor",
+    "method",
+    "params"
+  ],
   "properties": {
-    "protocolVersion": {"const":1},
-    "requestId": {"type":"string"},
-    "correlationId": {"type":"string"},
-    "sessionId": {"type":"string"},
-    "productId": {"type":"string"},
-    "projectId": {"type":["string","null"]},
-    "actor": {"type":"object","required":["kind","id"],"properties":{"kind":{"const":"human"},"id":{"type":"string"}}},
-    "method": {"enum":["initialize","project.detect","project.create","project.open","project.status","project.save","project.close"]},
-    "params": {"type":"object"}
+    "protocolVersion": {
+      "const": 1
+    },
+    "requestId": {
+      "type": "string"
+    },
+    "correlationId": {
+      "type": "string"
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "productId": {
+      "type": "string"
+    },
+    "projectId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "actor": {
+      "type": "object",
+      "required": [
+        "kind",
+        "id"
+      ],
+      "properties": {
+        "kind": {
+          "const": "human"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "method": {
+      "enum": [
+        "initialize",
+        "project.detect",
+        "project.create",
+        "project.open",
+        "project.status",
+        "project.save",
+        "project.close",
+        "project.import",
+        "project.github.list"
+      ]
+    },
+    "params": {
+      "type": "object"
+    }
   }
 }

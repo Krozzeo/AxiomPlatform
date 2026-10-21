@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict';
+import {mkdtemp,mkdir,rm,readFile,writeFile} from 'node:fs/promises';
+import {join,resolve} from 'node:path';
+import {tmpdir} from 'node:os';
+import {pathToFileURL} from 'node:url';
+import {startHost} from '../services/local-host/server.mjs';
+import {GitHubClient} from '../services/integrations/github/client.mjs';
+import {GitHubHTTPFixture} from './fixtures/github-http.mjs';
+if(!process.env.AXIOM_ENGINE_PATH)throw Error('AXIOM_ENGINE_PATH is required.');
+const engine=resolve(process.env.AXIOM_ENGINE_PATH),{chromium}=await import(pathToFileURL(join(engine,'node_modules/playwright/index.mjs'))),{ProjectStore}=await import(pathToFileURL(join(engine,'daemon/bootstrap/project-store.mjs')));
+const base=await mkdtemp(join(tmpdir(),'axiom-p2-browser-')),root=join(base,'projects'),stateRoot=join(base,'settings'),source=join(base,'original'),evidence=resolve('.axiom/p2-browser');
+await mkdir(evidence,{recursive:true});let host,browser,page;const report={criteria:[],pageErrors:[],github:'controlled HTTP transport; no live account',picker:'controlled native-dialog result'};
+try{
+  const original=(await new ProjectStore(source).run('project.create',{name:'Proyecto original'})).project,file=join(source,original.id.slice(10)+'.json'),bytes=await readFile(file);
+  const remoteProject=(await new ProjectStore(join(base,'remote-source')).run('project.create',{name:'Proyecto remoto'})).project,remote=new GitHubHTTPFixture();
+  remote.repo('fixture-player/source').files.set('projects/'+remoteProject.id.slice(10)+'.json',Buffer.from(JSON.stringify(remoteProject)));
+  let choice=source;
+  host=await startHost({root,stateRoot,manifests:[join(engine,'platform/product.json')],githubClient:new GitHubClient({fetchImpl:remote.fetch}),folderPicker:async()=>({path:choice})});
+  browser=await chromium.launch({headless:true});page=await browser.newPage({viewport:{width:1500,height:1200}});page.setDefaultTimeout(30000);page.on('pageerror',e=>report.pageErrors.push(e.message));
+  await page.goto(host.url);await page.locator('#product option').waitFor({state:'attached'});
+  await page.locator('#add-project > summary').click();await page.getByRole('button',{name:'Explorar proyecto para importar',exact:true}).click();
+  await page.waitForFunction(value=>document.querySelector('#import-path').value===value,source);
+  await page.getByRole('button',{name:'Importar copia local',exact:true}).click();await page.locator('#recent-projects article').filter({hasText:'Proyecto original'}).waitFor();
+  assert.deepEqual(await readFile(file),bytes);report.criteria.push('Native-folder result fills source; import preserves original bytes and populates persistent catalog');
+  await page.locator('#github-account > summary').click();await page.locator('#github-token').fill('fake-browser-session-token');await page.getByRole('button',{name:'Conectar GitHub',exact:true}).click();
+  await page.locator('#github-account-name').filter({hasText:'fixture-player'}).waitFor();assert.equal(await page.locator('#github-connect-form').isVisible(),false);assert.equal(await page.locator('#github-token').inputValue(),'');
+  await page.locator('#github-import > summary').click();await page.locator('#source-repository option').waitFor({state:'attached'});await page.getByRole('button',{name:'Buscar proyectos',exact:true}).click();
+  await page.locator('#source-project option').waitFor({state:'attached'});await page.getByRole('button',{name:'Importar desde GitHub',exact:true}).click();await page.locator('#recent-projects article').filter({hasText:'Proyecto remoto'}).waitFor();assert.equal(remote.calls,0);
+  report.criteria.push('Account connects for session, clears token input, refreshes repositories and imports a second project without writing GitHub');
+  choice=null;await page.locator('#settings > summary').click();const previous=await page.locator('#storage').inputValue();await page.getByRole('button',{name:'Explorar almacenamiento',exact:true}).click();assert.equal(await page.locator('#storage').inputValue(),previous);
+  const next=join(base,'new-storage');await page.locator('#storage').fill(next);await page.locator('#storage').press('Tab');await page.waitForFunction(v=>document.querySelector('#root').textContent===v,next);
+  await host.close();host=await startHost({stateRoot,githubClient:new GitHubClient({fetchImpl:remote.fetch}),folderPicker:async()=>({path:null})});
+  await page.goto(host.url);await page.waitForFunction(v=>document.querySelector('#root').textContent===v,next);await page.locator('#settings > summary').click();await page.locator('#storage').fill(root);await page.locator('#storage').press('Tab');
+  await page.locator('#recent-projects article').filter({hasText:'Proyecto remoto'}).waitFor();assert.equal(await page.locator('#recent-projects article').count(),2);assert.match(await page.locator('#github-toggle').textContent(),/Sin conexión/);
+  await page.locator('#recent-projects article').filter({hasText:'Proyecto original'}).getByRole('button',{name:'Abrir',exact:true}).click();await page.locator('#sessions article').getByRole('link',{name:'Abrir editor'}).waitFor();
+  report.criteria.push('Picker cancellation preserves storage; changed root and catalog survive backend restart; credentials do not persist; recent project reopens');
+  await page.screenshot({path:join(evidence,'platform-p2.png'),fullPage:true});assert.deepEqual(report.pageErrors,[]);report.passed=true;
+}catch(error){report.failure=error.message;if(page)await page.screenshot({path:join(evidence,'failure.png'),fullPage:true}).catch(()=>{});throw error;}
+finally{await writeFile(join(evidence,'report.json'),JSON.stringify(report,null,2));await browser?.close();await host?.close();await rm(base,{recursive:true,force:true});}
+console.log(JSON.stringify(report));
