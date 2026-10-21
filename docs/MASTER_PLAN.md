@@ -25,7 +25,7 @@ A person opens Platform, creates/adds a project, opens the compatible product, e
 
 P1: descriptor/IPC host, real product lifecycle and direct startup. P2: persistent catalog/preferences, authorized storage/import and shared GitHub account/transport. P3: shared AI/runtime/usage/tool/review contracts, with product application and recovery. P4: unified project/session Hub, separate Settings, reusable UI primitives, relocatable Windows launcher, installation registration/deferred activation/rollback, guarded rename/removal/deletion and seeded Game Engine projects. See [P4](P4_GUIDE.md) and [roadmap](ROADMAP.md).
 
-This is a prepared local distribution, not a signed online product marketplace or automatic Internet updater. P5 will validate the contracts with one small second-domain consumer; its exact scope must be agreed before implementation.
+This is a prepared local distribution, not a signed online product marketplace or automatic Internet updater. P5 validates the contracts through the owner-approved minimal Axiom Math Lab. Calculation documents, a bounded evaluator and reviewed AI proposals are independent of Game Engine. See [P5 scope](adr/0006-p5-second-consumer-and-editor-shell.md).
 
 ## Product roadmap remains independent
 

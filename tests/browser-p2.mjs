@@ -18,7 +18,7 @@ try{
   host=await startHost({root,stateRoot,manifests:[join(engine,'platform/product.json')],githubClient:new GitHubClient({fetchImpl:remote.fetch}),folderPicker:async()=>({path:choice})});
   browser=await chromium.launch({headless:true});page=await browser.newPage({viewport:{width:1500,height:1200}});page.setDefaultTimeout(30000);page.on('pageerror',e=>report.pageErrors.push(e.message));
   await page.goto(host.url);await page.locator('#product option').waitFor({state:'attached'});
-  await page.locator('#add-project-button').click();await page.locator('[data-browse=import-path]').click();
+  await page.locator('#add-project-button').click();await page.getByRole('button',{name:'Choose project folder',exact:true}).click();
   await page.waitForFunction(value=>document.querySelector('#import-path').value===value,source);
   await page.locator('#import-form').getByRole('button',{name:'Add project',exact:true}).click();await page.locator('#project-rows tr').filter({hasText:'Original project'}).waitFor();
   assert.deepEqual(await readFile(file),bytes);report.criteria.push('Native-folder result fills source; import preserves original bytes and populates persistent catalog');

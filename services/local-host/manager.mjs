@@ -135,7 +135,7 @@ export class SessionManager {
   async inspectProject(productId,path,run){const product=this.products.get(productId);assert(product,'unsupportedCapability','Select a compatible installed product.');const client=new ProductClient(product.entry,{productId,timeoutMs:30000}),id=randomUUID();try{await client.call('initialize',this.initialize(),id);const detected=await client.call('project.detect',{path},id);return await run({client,id,detected,product});}finally{await client.stop();}}
   async manageProject(data){
     if(data.action==='add-local'){
-      const source=await realpath(data.sourcePath);if(!inside(this.root,source))return this.importProject({...data,sourcePath:(await lstat(source)).isFile()?dirname(source):source,action:'import',kind:'local'});
+      const source=await realpath(data.sourcePath);if(!inside(this.root,source))return this.importProject({...data,sourcePath:source,action:'import',kind:'local'});
       const path=await authorizedPath(this.root,source,{directory:(await lstat(source)).isDirectory()});return this.inspectProject(data.productId,path,async({detected})=>{const file=await authorizedPath(this.root,detected.path),entry={productId:data.productId,projectId:detected.projectId,name:detected.name,path:file,savedRevision:detected.projectRevision};await this.store.remember(entry);return entry;});
     }
     const entry=this.store.value.recents.find(p=>p.projectId===data.projectId&&p.productId===data.productId);assert(entry&&inside(this.root,entry.path),'invalidRequest','Select a project in the current storage.');

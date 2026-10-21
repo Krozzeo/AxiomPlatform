@@ -30,3 +30,5 @@ Original inventory: Engine `871a72f`. P1 extracted host/lifecycle through a prod
 | ADRs/reports/archive | Product history; Platform links baselines without rewriting results | Permanent |
 
 New code with one-domain meaning belongs to that product. Mixed infrastructure/domain code gets a port before extraction. No circular imports or permanent source-copy integration.
+
+P5 Math Lab owns calculation documents, parser/evaluation, notebook UI, project model and proposed-cell validation/Apply. Platform owns stable editor leases/shell, generic OS dialogs/recycle, notification history and shared AI transport settings. Math Lab imports only public Platform SDK exports.

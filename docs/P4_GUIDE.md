@@ -1,6 +1,8 @@
+> P5 supersedes the project deletion, account feedback and editor-tab behavior described here. Use [the current P5 guide](P5_GUIDE.md).
+
 # P4 — startup, Hub and acceptance
 
-Current candidate: Platform 0.1.3 / Game Engine 0.0.53 / scripting SDK 8. P1 is integrated; P2/P3/P4 require their own PR checks and acceptance. These instructions describe the current candidate, not a claim that main contains it.
+Historical P4 candidate: Platform 0.1.3 / Game Engine 0.0.53 / scripting SDK 8. P1 is integrated; P2/P3/P4 require their own PR checks and acceptance. These instructions describe the current candidate, not a claim that main contains it.
 
 ## Start on Windows
 

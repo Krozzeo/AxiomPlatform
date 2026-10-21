@@ -9,3 +9,5 @@
 - Evidence: [P1](reports/P1_REPORT.md), [P2](reports/P2_REPORT.md), [P3](reports/P3_REPORT.md), [P4](reports/P4_REPORT.md).
 
 Maintained documentation is English. Original-language pre-P4 snapshots in docs/archive/original-language are reference text for traceability, not current instructions. Existing test results keep their historical scope. Browser evidence and local caches are generated under .axiom and excluded from source.
+
+- [P5 guide](P5_GUIDE.md), [report](reports/P5_REPORT.md) and [second consumer/editor ADR](adr/0006-p5-second-consumer-and-editor-shell.md).
