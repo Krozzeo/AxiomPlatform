@@ -4,6 +4,7 @@ Fecha: 2026-10-21. P0 define arquitectura y planificación; no acredita implemen
 
 | Necesidad | Documento |
 | --- | --- |
+| Servicios comunes P2 | [Guía](P2_GUIDE.md), [informe](reports/P2_REPORT.md) y [decisión](adr/0003-p2-shared-services.md) |
 | Ejecutar P1 | [Guía](P1_GUIDE.md) |
 | Resultado P1 | [Informe](reports/P1_REPORT.md) |
 | Contrato implementado P1 | [ADR-P0002](adr/0002-p1-host-and-product-ipc.md) |

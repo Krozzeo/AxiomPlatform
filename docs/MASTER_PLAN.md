@@ -6,6 +6,10 @@ Fecha: 2026-10-21. Estado: decisiones de P0 adoptadas por el propietario; implem
 
 P1 tiene implementación funcional en ramas, verificada localmente con el motor real y navegador Null. [Informe](reports/P1_REPORT.md) y [guía](P1_GUIDE.md). Las descripciones P0 siguientes son antecedentes de la planificación; main/CI de la entrega se revisan por separado.
 
+## Actualización P2
+
+P1 fue aceptada manualmente y se integró con CI. P2 implementa catálogo/servicios compartidos en ramas para revisión; [informe](reports/P2_REPORT.md). La decisión comercial sigue aplazada. Los estados P0/P1 anteriores se conservan como historia.
+
 ## Propósito
 
 Crear una familia de aplicaciones especializadas de juegos e ingeniería, utilizables manualmente desde el navegador y diseñadas para que agentes AI operen mediante herramientas semánticas verificables. Platform ofrece el entorno y los servicios comunes. Game Engine es el primer producto real; un CAD paramétrico, un entorno matemático y una aplicación de animación son posibilidades futuras, sin fecha o alcance funcional aprobado.

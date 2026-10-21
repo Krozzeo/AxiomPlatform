@@ -1,6 +1,6 @@
 # Roadmap Axiom Platform — P0 a P5
 
-Seis milestones propias. P0 documental entregada; P1 implementada y verificada localmente en ramas, con CI/revisión independientes; P2–P5 pendientes. [Informe P1](reports/P1_REPORT.md). Sin fechas prometidas. Se cierran por evidencia, no por archivos creados. Game Engine conserva M19–M40, incluyendo Unity, shaders y físicas GPU.
+Seis milestones propias. P0/P1 integradas, con aceptación manual del usuario y CI aprobado; P2 implementada y verificada localmente en ramas para revisión; P3–P5 pendientes. [Informe P2](reports/P2_REPORT.md). [Informe P1](reports/P1_REPORT.md). Sin fechas prometidas. Se cierran por evidencia, no por archivos creados. Game Engine conserva M19–M40, incluyendo Unity, shaders y físicas GPU.
 
 | Milestone | Entrega exacta | Dependencia | Gate de cierre |
 | --- | --- | --- | --- |

@@ -36,7 +36,7 @@ test('P2 real catalog/root survive restart; local import preserves source and na
   assert.equal(f.host().manager.catalog().recents.length,1);
   const again=await f.session({action:'import',kind:'local',productId:'axiom.game-engine',sourcePath:source});assert.equal(again.alreadyRegistered,true);assert.equal(f.host().manager.catalog().recents.length,1);
   assert.deepEqual(await f.post('/v1/folders/pick',{}),{path:null});assert.equal(f.host().manager.root,f.root);
-  const opened=await f.session({action:'open',productId:'axiom.game-engine',path:imported.path});
+  const opened=await f.session({action:'open',productId:'axiom.game-engine',path:dirname(imported.path)});
   await assert.rejects(f.post('/v1/settings',{projectRoot:join(f.base,'next')}),e=>e.code==='projectBusy');
   await f.session({action:'close',sessionId:opened.sessionId,expectedRevision:opened.status.revision,decision:'save'});
   const next=join(f.base,'next');await f.post('/v1/settings',{projectRoot:next});await f.restart();assert.equal(f.host().manager.root,next);

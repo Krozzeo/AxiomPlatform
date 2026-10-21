@@ -2,7 +2,7 @@
 
 Entorno local común para la familia Axiom: Hub de productos y proyectos, servicios locales e integración con agentes AI. Axiom Game Engine es su primer producto; CAD, matemáticas y animación son direcciones futuras, todavía sin implementación.
 
-**Estado: P1 funcional en rama para revisión.** Host local, Hub y adaptador del motor con creación/apertura, guardado y cierre. [Arranque y prueba](docs/P1_GUIDE.md) · [Evidencias y límites](docs/reports/P1_REPORT.md). No es todavía un instalador; P2–P5 siguen pendientes. La especificación original de P0 permanece como antecedente.
+**Estado: P1 integrada y aceptada; P2 candidata en rama para revisión.** Catálogo y ajustes persistentes, selector/importación y cuenta GitHub compartidos, con publicación y destinos propios de cada producto/proyecto. [Ejecutar P2](docs/P2_GUIDE.md) · [Evidencia y límites](docs/reports/P2_REPORT.md). Instalador y P3–P5 siguen pendientes.
 
 - [Documento maestro](docs/MASTER_PLAN.md): visión, alcance y decisiones.
 - [Mapa documental](docs/index.md) y [contexto para continuar](docs/AI_HANDOFF.md).

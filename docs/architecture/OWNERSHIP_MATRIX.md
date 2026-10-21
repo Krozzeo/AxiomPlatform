@@ -1,6 +1,6 @@
 # Matriz de propiedad y extracción
 
-Base inspeccionada: AxiomGameEngine `871a72f`. Ninguna fila representa un traslado ya realizado. **P** = extraer a Platform; **G** = conservar en Game Engine; **D** = dividir mediante contrato; **L** = evaluar más adelante. P1 detalla símbolos e imports de su tanda antes de moverlos.
+Base inspeccionada: AxiomGameEngine `871a72f`. Inventario original de P0. Actualización P2: transporte GitHub, picker y Documentos ya se extraen al proveedor y son reexportados por el motor en ramas P2; catálogo/ajustes del host son persistentes. Publicación/validación sigue en el producto. Las demás filas conservan su planificación. **P** = extraer a Platform; **G** = conservar en Game Engine; **D** = dividir mediante contrato; **L** = evaluar más adelante. P1 detalla símbolos e imports de su tanda antes de moverlos.
 
 | Componente actual del motor | Tipo | Propiedad futura y operación | Etapa y evidencia requerida |
 | --- | --- | --- | --- |
