@@ -24,6 +24,8 @@ El navegador usa Chromium headless y renderer Null. No es aceptación GPU ni pru
 
 ## Límites y pendientes
 
+El primer CI de Platform aprobó contratos Linux e integración/browser real. Windows detectó comparación de una raíz abreviada con su ruta canónica. Se normaliza también la raíz antes de comprobar el destino real y se añade una raíz autorizada por alias al mismo test, conservando traversal y enlace de escape. La siguiente ejecución verifica la corrección; no se relaja el límite de acceso.
+
 Las pruebas locales no certifican CI remoto. P0 del motor sigue en PR separado; la rama P1 se basa en él y no se fusiona a main automáticamente. #47/#51, GPU, rendimiento denso, GitHub nativo manual y modelo real permanecen pendientes. P1 no resuelve esos antecedentes.
 
 Registro/catálogo de sesión en memoria, entrada de ruta manual, instalación de desarrollador y sin actualizador. Máximo 8 procesos activos; recibos acotados a 256 operaciones. Un cierre forzado puede dejar lease y perder cambios sin guardar: recuperación manual documentada, sin borrar bloqueo automáticamente. No abrir la misma carpeta con un motor anterior a P1. Modelo comercial sigue aplazado; MIT vigente.

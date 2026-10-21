@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,writeFile,mkdir,rm,symlink} from 'node:fs/promises';
+import {mkdtemp,writeFile,mkdir,rm,symlink,realpath} from 'node:fs/promises';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {validateManifest,CAPABILITIES} from '../packages/contracts/index.mjs';
@@ -17,9 +17,11 @@ test('descriptor rejects incompatible protocol/API and incomplete capabilities b
 test('project paths reject traversal and linked targets outside the authorized root',async t=>{
   const root=await temp(t),granted=join(root,'projects');await mkdir(granted);await writeFile(join(root,'private.json'),'{}');
   await assert.rejects(authorizedPath(granted,'../private.json'),e=>e.code==='permissionDenied');
-  await writeFile(join(granted,'valid.json'),'{}');assert.equal(await authorizedPath(granted,'valid.json'),join(granted,'valid.json'));
+  await writeFile(join(granted,'valid.json'),'{}');assert.equal(await authorizedPath(granted,'valid.json'),await realpath(join(granted,'valid.json')));
   try{await symlink(root,join(granted,'escape'),process.platform==='win32'?'junction':'dir');}catch(error){if(error.code==='EPERM'){t.diagnostic('OS denies test symlink creation; traversal assertion still ran.');return;}throw error;}
   await assert.rejects(authorizedPath(granted,'escape/private.json'),e=>e.code==='permissionDenied');
+  const alias=join(root,'authorized-alias');await symlink(granted,alias,process.platform==='win32'?'junction':'dir');
+  assert.equal(await authorizedPath(alias,'valid.json'),await realpath(join(granted,'valid.json')));
 });
 test('registration rejects adapter paths escaping the explicit installation',async t=>{
   const root=await temp(t),installation=join(root,'install');await mkdir(installation);await writeFile(join(root,'adapter.mjs'),'');
