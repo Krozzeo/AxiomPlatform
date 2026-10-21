@@ -1,0 +1,8 @@
+.axiom/
+node_modules/
+dist/
+target/
+*.log
+.env
+.env.*
+!.env.example
