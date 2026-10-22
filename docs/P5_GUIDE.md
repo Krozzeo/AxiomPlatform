@@ -1,3 +1,5 @@
+> Historical candidate guide. Use [MVP0.1.5 guide](MVP_GUIDE.md) and [closure ADR](adr/0007-mvp-closure.md) for the current account/model workflow and export ownership.
+
 # P5 — Math Lab and Hub acceptance
 
 Candidate: Platform0.1.4, Game Engine0.0.54 / scripting SDK8, Math Lab0.1.0. IPC1 and both native format versions remain1. These are review branches, not a claim of integration into main. [Scope ADR](adr/0006-p5-second-consumer-and-editor-shell.md), [report](reports/P5_REPORT.md).

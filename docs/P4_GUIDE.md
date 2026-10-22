@@ -1,3 +1,5 @@
+> Historical candidate guide. Use [MVP0.1.5 guide](MVP_GUIDE.md) and [closure ADR](adr/0007-mvp-closure.md) for the current account/model workflow and export ownership.
+
 > P5 supersedes the project deletion, account feedback and editor-tab behavior described here. Use [the current P5 guide](P5_GUIDE.md).
 
 # P4 — startup, Hub and acceptance

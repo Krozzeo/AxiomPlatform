@@ -1,0 +1,20 @@
+# MVP0.1.5 — startup and final acceptance
+
+Extract the entire ZIP anywhere writable. Keep AxiomPlatform, AxiomEngine and AxiomMathLab together. Close old Platform consoles; double-click **Start Axiom.cmd**. The launcher checks dependencies, installs missing official local runtimes/locked packages, opens the browser and retains startup errors. Keep its console open. Missing dependencies require Internet; the built editor needs no Rust for ordinary startup.
+
+1. Create a Math Lab project and a Game Engine project. Math starts with calculations; the game scene contains Cube, Directional Light and Camera. Use both at once.
+2. Single click selects a row. Click empty Hub space to deselect it. Active sessions stay blue even when not selected; selection is stronger. Double-click opens; repeated Open and Hub reload must preserve the existing editor tab.
+3. Click the folder icon: the project's actual directory must open in Windows Explorer. Missing/denied folders must produce a notice, not silent success.
+4. Close a session: Cancel keeps it; Save closes and preserves authored data; Discard explicitly drops unsaved work. Its editor blocks while disconnected. Reopen from Hub to reconnect the same tab.
+5. Check the new bell and gear in dark and light Settings. Generate an ordinary action error: it appears as a six-second toast/history entry. Hover marks read; opening history marks read; expiration alone does not. Connectivity banners persist until recovery.
+6. Settings → AI Agent → connect with your own key. Connect and test uses gpt-4.1-nano, independently of configured preferences. After success the key/test form disappears; Refresh/Disconnect remain. Keys stay in host memory.
+7. In the separate Default model configuration, choose a model from your account, change Reasoning Effort when supported and click Test selected model. Changing selectors saves preferences but makes no generation request. Testing and connection probes can be billable. A model-denied error must not force reconnection of an otherwise valid account.
+8. Reload the Hub: model/effort persist and remain editable. Disconnect/reconnect: preferences remain; the model test is session-specific. Nonreasoning models use Provider default. New/unknown model capabilities must be verified using the test button.
+9. In Math Lab leave Project model empty to inherit Platform defaults; the Using label shows the effective model/effort. Or enter a project override and choose its Reasoning Effort. Test project model checks the effective settings separately. Save/reopen preserves the override. Prepare proposal must leave MAIN unchanged; Review then human Apply commits it. Cancel, stale reviews and failed writes preserve MAIN.
+10. Try modern folder/file selection and Math Export document/Save. Cancel leaves values/files unchanged. Remove from list preserves files; reviewed Delete/Confirm moves a closed disposable project to the Recycle Bin, with no typed-name or permanent-delete fallback.
+
+Automation: set AXIOM_ENGINE_PATH and AXIOM_MATH_PATH to product folders. Platform `npm run check` and `npm run test:browser:mvp`; regression suites `test:browser`, `test:browser:p2`, `test:browser:p3`, `test:browser:p4`, `test:browser:p5`. Math Lab `npm run check`. Chromium must be installed from Engine using the same PLAYWRIGHT_BROWSERS_PATH as tests. Opt-in AXIOM_TEST_NATIVE_RECYCLE=1 creates/recycles only a disposable fixture. Never empty the user's Recycle Bin.
+
+[Closure record and limits](MVP_CLOSURE.md). Real model/account acceptance is separate from the simulated providers in automation. Game export belongs to Game Engine's roadmap, remains missing, and is not a Platform MVP feature.
+
+Technical references: [OpenAI account probe model](https://developers.openai.com/api/docs/models/gpt-4.1-nano), [model-dependent reasoning](https://developers.openai.com/api/docs/guides/reasoning), [Windows process associations](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/start-process?view=powershell-5.1).

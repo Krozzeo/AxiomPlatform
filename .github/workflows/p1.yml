@@ -35,12 +35,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: Krozzeo/AxiomGameEngine
-          ref: fd7ce96ef08782a535b7fe43ad71473f522de633
+          ref: bd48498201d39c7652bde37086b2d03dd9cae600
           path: game-engine
       - uses: actions/checkout@v4
         with:
           repository: Krozzeo/AxiomMathLab
-          ref: 444cdf0551c8125ae3a6932dc85b4048eca2dc02
+          ref: 276d68b178119d15277ef75de359ff28de28e8d7
           path: math-lab
       - uses: actions/setup-node@v4
         with:
@@ -81,6 +81,10 @@ jobs:
         env:
           AXIOM_ENGINE_PATH: ../game-engine
           AXIOM_MATH_PATH: ../math-lab
+      - run: npm run test:browser:mvp
+        env:
+          AXIOM_ENGINE_PATH: ../game-engine
+          AXIOM_MATH_PATH: ../math-lab
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -91,4 +95,5 @@ jobs:
             platform/.axiom/p3-browser
             platform/.axiom/p4-browser
             platform/.axiom/p5-browser
+            platform/.axiom/mvp-browser
           include-hidden-files: true

@@ -36,3 +36,7 @@ Game Engine retains the functional implementation of the selected Unity API, gra
 P0 inspected Engine `871a72f6d2c720e99e0a8d1598c0f35af69c4d78`. The consolidation candidate passed CI 329, but a later run of that base failed M17 (44/46), recorded in Engine #51. P1 subsequently integrated after CI and user acceptance. P2/P3 are not integrated by starting P4. Inspector #47, M17 #51, drag cleanup #55, dense physics performance, real-account/native-dialog acceptance and real-model quality/cost must retain separate evidence. [Current handoff](AI_HANDOFF.md).
 
 Browser/daemon Node, Rust/Wasm, WebGPU/Null and C# remain the stack. The Rust daemon has a narrower scope than the production Node daemon; this separation does not silently replace it. Never describe a historical green run as acceptance of a later commit.
+
+## MVP closure
+
+MVP0.1.5 completes the P0–P5 feature scope. ADR-P0007 moves the earlier standalone exported-game gate to Game Engine build/export planning, preserving it as unimplemented product work. Platform supplies host lifecycle/distribution contracts; it does not implement each product's exporter. Real account/model/hardware checks remain explicitly separate. [Closure](MVP_CLOSURE.md).
