@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.6 / Startup recovery — 2026-10-21
+## 0.1.6 / Startup recovery â€” 2026-10-21
 
 Recover settings locks left by terminated Platform processes, including legacy P4/P5 PID-only locks. Preserve active or indeterminate owners and reject malformed/linked locks. Serialize recovery across processes and use per-acquisition tokens so an old close cannot remove a replacement owner. Shared profile settings explain why a stale lock also blocked older extracted builds. No settings reset or project deletion. Added crash, legacy compatibility, live owner, concurrent process and ownership regression tests.
 
