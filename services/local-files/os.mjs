@@ -5,7 +5,7 @@ import {randomUUID} from 'node:crypto';
 import {pickNativePath} from './dialogs.mjs';
 export async function openFolder(path,{platform=process.platform,start=spawn}={}){
  const folder=await realpath(path);if(!(await lstat(folder)).isDirectory())throw Error('Choose a project folder');
- await new Promise((yes,no)=>{const child=start(platform==='win32'?'explorer.exe':platform==='darwin'?'open':'xdg-open',[folder],{windowsHide:true,shell:false,stdio:'ignore'});child.once('error',no);child.once('spawn',()=>{child.unref();yes();});});return {opened:true};
+ await new Promise((yes,no)=>{const child=start(platform==='win32'?'explorer.exe':platform==='darwin'?'open':'xdg-open',[folder],{windowsHide:false,shell:false,stdio:'ignore'});child.once('error',no);child.once('spawn',()=>{child.unref();yes();});});return {opened:true};
 }
 export async function saveDownload({name,text},{pick=pickNativePath}={}){
  if(typeof name!=='string'||name!==basename(name)||name.length>128||typeof text!=='string'||Buffer.byteLength(text)>1024*1024)throw Object.assign(Error('Export exceeds the supported file budget'),{code:'invalidRequest'});

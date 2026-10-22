@@ -1,3 +1,4 @@
+import {selection} from '../ai/settings.mjs';
 import {Installations} from './installations.mjs';
 import {ProjectDeletion} from './deletion.mjs';
 import {readFile, realpath, mkdir, mkdtemp, rm, lstat} from 'node:fs/promises';
@@ -107,6 +108,7 @@ export class SessionManager {
   accountChanged(state){for(const s of this.sessions.values())s.client?.notify({kind:'service.account',state});}
   configure(data){const task=this.pending.then(()=>this.applySettings(data));this.pending=task.catch(()=>{});return task;}
   async applySettings(data){
+    if(data.aiDefaults!==undefined){const next=selection(data.aiDefaults);await this.store.update(v=>{v.preferences.aiDefaults=next;});this.ai.defaults=next;this.ai.modelTest=null;this.ai.onChange(this.ai.status());}
     if(data.aiTransport!==undefined){const t=data.aiTransport;assert(t&&Number.isInteger(t.timeoutSeconds)&&t.timeoutSeconds>=15&&t.timeoutSeconds<=300&&Number.isInteger(t.maxConcurrentRequests)&&t.maxConcurrentRequests>=1&&t.maxConcurrentRequests<=8&&Number.isInteger(t.maxResponseBytes)&&t.maxResponseBytes>=262144&&t.maxResponseBytes<=2097152,'invalidRequest','AI transport settings are outside supported limits.');await this.store.update(v=>{v.preferences.aiTransport={timeoutSeconds:t.timeoutSeconds,maxConcurrentRequests:t.maxConcurrentRequests,maxResponseBytes:t.maxResponseBytes};});this.ai.setTransport(t);this.ai.onChange(this.ai.status());}
     if(data.projectRoot!==undefined)assert(![...this.sessions.values()].some(s=>['starting','ready'].includes(s.state)),'projectBusy','Close active projects before changing project storage.');
     assert(typeof data.projectRoot==='string'||data.projectRoot===undefined,'invalidRequest','Choose a storage path.');const next=data.projectRoot===undefined?this.root:resolve(data.projectRoot);

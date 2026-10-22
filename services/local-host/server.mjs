@@ -1,3 +1,4 @@
+import {CONNECTION_MODEL,defaultSelection,selection,probe,effortsFor} from '../ai/settings.mjs';
 import {Notifications} from './notifications.mjs';
 import {EditorLeases} from './editor-leases.mjs';
 import {openFolder,saveDownload} from '../local-files/os.mjs';
@@ -27,7 +28,7 @@ export async function startHost({root,manifests,port=0,timeoutMs,stateRoot,githu
   let manager;
   const account=new GitHubAccount({client:githubClient,onChange:state=>manager?.accountChanged(state)});
   let ai;try{ai=await new AiAccount({provider:aiProvider,transport:store.value.preferences.aiTransport,usagePath:join(store.root,'ai-usage.json'),onChange:state=>manager?.aiChanged(state)}).initialize();manager=await SessionManager.create({root:store.value.projectRoot,manifests:store.value.manifests,timeoutMs,store,account,ai,allowUnavailable:!manifests?.length});}catch(error){await store.close();throw error;}
-  manager.recycle=recycle;manager.deletion.recycle=recycle;manager.folderOpener=folderOpener;const notifications=await new Notifications(join(store.root,'notifications.json')).load(),editors=new EditorLeases(manager);
+  ai.defaults=selection(store.value.preferences.aiDefaults??{...defaultSelection,...(store.value.preferences.aiModel?{model:store.value.preferences.aiModel}:{})});manager.recycle=recycle;manager.deletion.recycle=recycle;manager.folderOpener=folderOpener;const notifications=await new Notifications(join(store.root,'notifications.json')).load(),editors=new EditorLeases(manager);
   const token=randomBytes(32).toString('base64url');let origin,closing,picker;
   const reply=(res,status,value)=>{res.writeHead(status,{...headers,'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(value));};
   const assets=new Map([['/',['index.html','text/html']],['/editor.html',['editor.html','text/html']],['/editor.css',['editor.css','text/css']],['/editor.mjs',['editor.mjs','text/javascript']],['/notifications.mjs',['notifications.mjs','text/javascript']],['/app.mjs',['app.mjs','text/javascript']],['/styles.css',['styles.css','text/css']],['/ui.mjs',['ui.mjs','text/javascript']],['/platform-ui.mjs',['../../packages/sdk/ui.mjs','text/javascript']]]);
@@ -56,12 +57,19 @@ export async function startHost({root,manifests,port=0,timeoutMs,stateRoot,githu
           if(url.pathname==='/v1/installations')return reply(res,200,await manager.installations(data));
           if(url.pathname==='/v1/ai'){
             if(data.action==='disconnect')return reply(res,200,ai.disconnect());
-            if(!['models','connect'].includes(data.action))return reply(res,400,{code:'invalidRequest',message:'Unknown AI account action.'});
-            if(data.action==='connect'&&!isAssistantModel(data.model))return reply(res,400,{code:'invalidRequest',message:'Choose a compatible model.'});
-            const result=await ai.invoke('platform-settings','platform-settings', 'request',{requestId:randomUUID(),epoch:ai.epoch,path:data.action==='models'?'/models':'/responses',key:data.apiKey,...(data.action==='connect'?{body:{model:data.model,store:false,input:[{role:'user',content:'Reply with OK. This is a connection test.'}],tools:[],tool_choice:'none',max_output_tokens:512}}:{})});
-            if(data.action==='models'){const models=[...new Set((result.response.data??[]).map(i=>i.id).filter(isAssistantModel))].sort();return reply(res,200,{models,untestedModels:models.filter(id=>!isVerifiedAssistantModel(id))});}
-            if(result.response.status!=='completed'||!textOf(result.response))throw Object.assign(Error('The model did not finish its connection test.'),{code:'AX_AI_0001'});
-            await store.update(v=>{v.preferences.aiModel=data.model;});ai.model=data.model;ai.changed();return reply(res,200,ai.status());
+            if(data.action==='configure'){
+              const next=selection(data);await manager.configure({aiDefaults:next});return reply(res,200,{...ai.status(),test:null});
+            }
+            if(data.action==='test-model'){
+              if(!ai.status().connected)throw Object.assign(Error('Connect the OpenAI account before testing a model.'),{code:'AX_AI_0001'});
+              const selected=selection(data),test=await probe(ai,selected);if(JSON.stringify(selected)===JSON.stringify(ai.defaults))ai.modelTest=test;return reply(res,200,{test});
+            }
+            if(data.action==='connect'){
+              await probe(ai,{model:CONNECTION_MODEL,reasoning:'default'},{apiKey:data.apiKey,connection:true});return reply(res,200,ai.status());
+            }
+            if(data.action!=='models')return reply(res,400,{code:'invalidRequest',message:'Unknown AI account action.'});
+            const result=await ai.invoke('platform-settings','platform-settings','request',{requestId:randomUUID(),epoch:ai.epoch,path:'/models',key:data.apiKey});
+            const models=[...new Set((result.response.data??[]).map(i=>i.id).filter(isAssistantModel))].sort();return reply(res,200,{models,untestedModels:models.filter(id=>!isVerifiedAssistantModel(id)),efforts:Object.fromEntries(models.map(id=>[id,effortsFor(id)]))});
           }
           if(url.pathname==='/v1/github'){
             if(!['status','connect','disconnect','repositories'].includes(data.action))return reply(res,400,{code:'invalidRequest',message:'Unknown GitHub account action.'});

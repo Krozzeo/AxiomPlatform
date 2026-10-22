@@ -1,6 +1,6 @@
 {
   "name": "axiom-platform",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -15,7 +15,8 @@
     "test:browser:p2": "node tests/browser-p2.mjs",
     "test:browser:p3": "node tests/browser-p3.mjs",
     "test:browser:p4": "node tests/browser-p4.mjs",
-    "test:browser:p5": "node tests/browser-p5.mjs"
+    "test:browser:p5": "node tests/browser-p5.mjs",
+    "test:browser:mvp": "node tests/browser-mvp.mjs"
   },
   "exports": {
     "./github": "./services/integrations/github/client.mjs",
@@ -33,6 +34,7 @@
     "./ui": "./packages/sdk/ui.mjs",
     "./lease": "./packages/sdk/project-lease.mjs",
     "./dialogs": "./services/local-files/dialogs.mjs",
-    "./os": "./services/local-files/os.mjs"
+    "./os": "./services/local-files/os.mjs",
+    "./ai/settings": "./services/ai/settings.mjs"
   }
 }
