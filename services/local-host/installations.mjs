@@ -14,7 +14,7 @@ export class Installations {
  static async load(store,manifests,{allowUnavailable=false}={}){
   const self=new Installations(store),saved=store.value.installations??[],selected={...store.value.selectedInstallations},previous={...store.value.previousInstallations},pending={...store.value.pendingInstallations};
   for(const item of saved){try{const next=await inspectInstallation(item.path);assert(next.id===item.id,'incompatibleVersion','Installation files changed. Register this folder again.');self.items.set(item.id,next);}catch(e){self.items.set(item.id,{...item,error:e.message});}}
-  for(const source of manifests){try{const item=await inspectInstallation(source),fresh=!self.items.has(item.id);self.items.set(item.id,item);if(!selected[item.productId]||fresh){if(selected[item.productId]&&selected[item.productId]!==item.id)previous[item.productId]=selected[item.productId];selected[item.productId]=item.id;}}catch(e){if(!allowUnavailable)throw e;}}
+  for(const source of manifests){try{const item=await inspectInstallation(source);self.items.set(item.id,item);if(!selected[item.productId]){if(selected[item.productId]&&selected[item.productId]!==item.id)previous[item.productId]=selected[item.productId];selected[item.productId]=item.id;}}catch(e){if(!allowUnavailable)throw e;}}
   self.selected=selected;self.previous=previous;self.pending=pending;await self.persist();return self;
  }
  async persist(){const products=new Map();for(const [productId,id] of Object.entries(this.selected)){const item=this.items.get(id);if(item&&!item.error)products.set(productId,item);}

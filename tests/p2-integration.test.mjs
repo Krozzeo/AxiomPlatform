@@ -51,7 +51,7 @@ test('P2 shared account reaches two real editors; destinations/preferences survi
   await game(a,'configure',{id:a.status.projectId,repository:'fixture-player/first',branch:'main'});
   await game(a,'preferences',{id:a.status.projectId,autoMilestones:false,allowAgent:false});
   await game(b,'configure',{id:b.status.projectId,repository:'fixture-player/second',branch:'main'});
-  await game(a,'disconnect');assert.equal((await game(b,'status',null,'GET')).connected,false);
+  await assert.rejects(game(a,'disconnect'),/Platform Settings/);await f.post('/v1/github',{action:'disconnect'});assert.equal((await game(b,'status',null,'GET')).connected,false);
   await f.post('/v1/github',{action:'connect',token:'reconnected-fake-token'});assert.equal((await game(b,'status',null,'GET')).connected,true);
   await f.session({action:'close',sessionId:a.sessionId,expectedRevision:a.status.revision,decision:'save'});
   assert.equal((await game(b,'status',null,'GET')).connected,true);
@@ -62,7 +62,7 @@ test('P2 shared account reaches two real editors; destinations/preferences survi
   await f.post('/v1/github',{action:'connect',token:'new-fake-secret'});
   const reopened=await f.session({action:'open',productId:'axiom.game-engine',path:join(f.root,a.path)}),status=await game(reopened,'status',null,'GET');
   assert.equal(status.repository,'fixture-player/first');assert.equal(status.autoMilestones,false);assert.equal(status.allowAgent,false);
-  await game(reopened,'disconnect');assert.equal(f.host().account.status().connected,false);
+  await f.post('/v1/github',{action:'disconnect'});assert.equal(f.host().account.status().connected,false);
 });
 test('P2 real publication recovers an unconfirmed commit once and rejects divergence; remote import uses product validation',opts,async t=>{
   const f=await fixture(t);f.remote.repo('fixture-player/game');await f.post('/v1/github',{action:'connect',token:'controlled-github-token'});

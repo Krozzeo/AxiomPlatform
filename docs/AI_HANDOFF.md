@@ -1,3 +1,13 @@
+# Current handoff — Platform0.1.7 product services
+
+Owner-approved post-MVP expansion, jointly with Engine0.0.56. P0–P5 remains closed. Platform0.1.6 recovery was merged to main at5fb826792fa58032c932174634bafb3d5f14bc0b. This branch adds [product release/account/diagnostic contracts](PRODUCT_RELEASES.md): exclusive host account authority, product model inheritance/overrides, official stable GitHub manifests, bounded/hash-verified staged installs, persistent product storage, deferred activation/rollback and sanitized report export. Host version derives from package metadata. First launch can open an empty Hub and add products later; Windows startup still prepares Node/.NET for the family.
+
+Engine0.0.56 remains a separate review consumer with native format1/SDK8. Consumers' existing immutable public SDK source pins remain valid; host service extensions do not require repinning every product. New releases require a prepared ZIP and axiom-release.json; old tags/source archives are not offered as installations. Publication/CI/merge state belongs in exact delivery evidence, never inferred from a locally built package. Engine M19–M40 and missing standalone game export remain separate. No credentials/private paths/project contents are exported by diagnostics.
+
+## Historical MVP handoff
+
+The following snapshot records the completed original MVP; current versions/features are above.
+
 # Current handoff — Platform MVP0.1.5
 
 Owner authorized final corrections and MVP development closure. P0–P5 functional infrastructure is implemented; Platform PR6 and Math PR1 are integrated into main through normal checks; the release manifest/tag records the final documentation/package baseline. Current sources/release manifest and CI for that SHA are authoritative. Do not rewrite protected recovery refs or infer live-account/hardware acceptance from controlled fixtures.

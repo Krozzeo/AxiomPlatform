@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.7 / Product integration services —2026-10-22
+
+Post-MVP owner-approved expansion: products cannot replace/disconnect shared accounts; effective project AI inheritance and testing remain separate. Official public GitHub prepared-release discovery, pending-update badge, persistent Platform-update banner, compatible version picker, bounded hash-verified staging and side-by-side installation reuse deferred activation/rollback. Added persistent Product Storage, sanitized diagnostic export and an empty first-launch Hub. Startup retains selected installations rather than reverting to an older bundled version; settings validate before committing preferences. UI/CLI host version derives from package metadata. [Contract and limits](docs/PRODUCT_RELEASES.md).
+
 ## 0.1.6 / Startup recovery — 2026-10-21
 
 Recover settings locks left by terminated Platform processes, including legacy P4/P5 PID-only locks. Preserve active or indeterminate owners and reject malformed/linked locks. Serialize recovery across processes and use per-acquisition tokens so an old close cannot remove a replacement owner. Shared profile settings explain why a stale lock also blocked older extracted builds. No settings reset or project deletion. Added crash, legacy compatibility, live owner, concurrent process and ownership regression tests.

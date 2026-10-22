@@ -1,6 +1,6 @@
 # Axiom Platform
 
-**MVP0.1.6.** A local browser workspace for the Axiom family: project/product Hub, authorized local services and shared AI integration. Axiom Game Engine and independent Axiom Math Lab are the reference products. The P0–P5 feature scope is implemented; [closure evidence and remaining operational checks](docs/MVP_CLOSURE.md) distinguish development completion from live-account/hardware acceptance.
+**Platform0.1.7 / completed MVP plus product services.** A local browser workspace for the Axiom family: project/product Hub, authorized local services and shared AI integration. Axiom Game Engine and independent Axiom Math Lab are the reference products. The P0–P5 feature scope is implemented; [closure evidence and remaining operational checks](docs/MVP_CLOSURE.md) distinguish development completion from live-account/hardware acceptance.
 
 Extract the complete prepared bundle and double-click **Start Axiom.cmd**. It prepares missing dependencies and opens your browser; errors remain visible in the console. Keep all three folders together. [Startup and final test guide](docs/MVP_GUIDE.md).
 
@@ -16,3 +16,5 @@ OpenAI account connection and model/reasoning preferences are separate. Session 
 Development/UI/current docs are English. [Contributing](CONTRIBUTING.md). Run `npm run check` with both product paths for joint tests, `npm run test:browser:mvp` for final UI acceptance and `python scripts/check_docs.py` for documentation. See the guide for regression/browser prerequisites.
 
 [MIT](LICENSE); third-party licenses remain applicable. Commercial decisions remain deferred. Future work is maintenance or separately scoped expansion, not additional hidden MVP phases.
+
+[Product release/account/storage/diagnostic contract](docs/PRODUCT_RELEASES.md): public prepared GitHub releases feed Installations and update indications without editing Platform for each product revision. Product account changes are refused; projects inherit Hub defaults or use explicit overrides.

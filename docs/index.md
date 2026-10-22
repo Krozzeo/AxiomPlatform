@@ -13,3 +13,5 @@ Maintained documentation is English. Original-language pre-P4 snapshots in docs/
 - [P5 guide](P5_GUIDE.md), [report](reports/P5_REPORT.md) and [second consumer/editor ADR](adr/0006-p5-second-consumer-and-editor-shell.md).
 
 - [MVP0.1.5 closure](MVP_CLOSURE.md), [final guide](MVP_GUIDE.md), [scope/ownership ADR](adr/0007-mvp-closure.md).
+
+- [Post-MVP product releases, account authority, storage and diagnostics](PRODUCT_RELEASES.md).
