@@ -35,6 +35,7 @@
     "./lease": "./packages/sdk/project-lease.mjs",
     "./dialogs": "./services/local-files/dialogs.mjs",
     "./os": "./services/local-files/os.mjs",
-    "./ai/settings": "./services/ai/settings.mjs"
+    "./ai/settings": "./services/ai/settings.mjs",
+    "./loopback": "./packages/sdk/loopback.mjs"
   }
 }

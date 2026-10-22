@@ -1,3 +1,4 @@
+import {listenLoopback} from '../../packages/sdk/loopback.mjs';
 import {CONNECTION_MODEL,defaultSelection,selection,probe,effortsFor} from '../ai/settings.mjs';
 import {Notifications} from './notifications.mjs';
 import {EditorLeases} from './editor-leases.mjs';
@@ -62,7 +63,7 @@ export async function startHost({root,manifests,port=0,timeoutMs,stateRoot,githu
             }
             if(data.action==='test-model'){
               if(!ai.status().connected)throw Object.assign(Error('Connect the OpenAI account before testing a model.'),{code:'AX_AI_0001'});
-              const selected=selection(data),test=await probe(ai,selected);if(JSON.stringify(selected)===JSON.stringify(ai.defaults))ai.modelTest=test;return reply(res,200,{test});
+              const selected=selection(data);if(JSON.stringify(selected)===JSON.stringify(ai.defaults)){ai.modelTest=null;ai.onChange(ai.status());}const test=await probe(ai,selected);if(JSON.stringify(selected)===JSON.stringify(ai.defaults))ai.modelTest=test;return reply(res,200,{test});
             }
             if(data.action==='connect'){
               await probe(ai,{model:CONNECTION_MODEL,reasoning:'default'},{apiKey:data.apiKey,connection:true});return reply(res,200,ai.status());
@@ -85,7 +86,7 @@ export async function startHost({root,manifests,port=0,timeoutMs,stateRoot,githu
       return reply(res,404,{code:'invalidRequest',message:'Not found.'});
     }catch(error){const known=CODES.includes(error.code)||/^AX_(?:GITHUB|AI)_\d{4}$/.test(error.code??'');reply(res,known?409:500,{code:known?error.code:'operationFailed',message:known?error.message:'Platform could not complete the operation. Check the local project and product installation.'});}
   });
-  try{await new Promise((yes,no)=>{server.once('error',no);server.listen(port,'127.0.0.1',yes);});}
+  try{await listenLoopback(server,port);}
   catch(error){await manager.shutdown();await store.close();throw error;}
   origin=`http://127.0.0.1:${server.address().port}`;manager.platformOrigin=origin;
   return {origin,token,url:`${origin}/#token=${token}`,manager,account,ai,close:()=>closing??=(async()=>{
