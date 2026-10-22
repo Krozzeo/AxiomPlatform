@@ -14,7 +14,7 @@ The official sources are public Krozzeo/AxiomPlatform, Krozzeo/AxiomGameEngine a
 
 The manifest schema is1: productId, version, platformApiRange and artifacts. Each artifact declares platform (`win32`, `linux`, `darwin`), architecture (`x64`, `arm64`), ZIP asset name, exact bytes and SHA256. Product/manifest/tag/repository/asset ownership must agree. Platform API0.1/protocol1 is currently supported. No compatible artifact means unavailable on this machine, not silently installable. Current automated prepared publishing targets Windows x64 only.
 
-`Installations` displays a red count for products with a newer compatible downloadable release than every available local installation (or an uninstalled product). Merely running an older active session while a newer version is already installed does not demand another download. **Add installation** lists published versions and also accepts a prepared local folder. Platform's own update appears in a separate persistent banner linked to its release/download page; self replacement is manual.
+`Installations` displays a red count per installed product when a newer compatible published or locally registered version is available than its active version. A scheduled activation remains pending until sessions close; already installed versions can be activated without another download. Uninstalled products appear in the catalog but do not count as pending updates. **Add installation** lists published versions and also accepts a prepared local folder. Platform's own update appears in a separate persistent banner linked to its release/download page; self replacement is manual.
 
 ## Installation transaction
 
