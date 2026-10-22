@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.6 / Startup recovery � 2026-10-21
+
+Recover settings locks left by terminated Platform processes, including legacy P4/P5 PID-only locks. Preserve active or indeterminate owners and reject malformed/linked locks. Serialize recovery across processes and use per-acquisition tokens so an old close cannot remove a replacement owner. Shared profile settings explain why a stale lock also blocked older extracted builds. No settings reset or project deletion. Added crash, legacy compatibility, live owner, concurrent process and ownership regression tests.
+
 ## 0.1.5 / Platform MVP — 2026-10-21
 
 P0–P5 feature scope integrated into main through PR6, including the previously stacked P2–P5 work. Independent account connection now uses a fixed small probe; model/Reasoning Effort remain editable and separately testable after connection. Defaults save without credentials and products retain overrides. Added reference-style gear icons, visible bell in both themes, empty-space deselection, distinct blue active rows and canonical Windows Shell folder opening with surfaced errors. Automatic high-range loopback ports avoid browser-blocked service ports observed in Windows regression.

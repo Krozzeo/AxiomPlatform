@@ -1,13 +1,14 @@
-import {readFile,mkdir,open,rm,realpath,lstat} from 'node:fs/promises';
+import {readFile,mkdir,realpath,lstat} from 'node:fs/promises';
 import {join,resolve} from 'node:path';
 import {atomicJson} from '../local-files/files.mjs';
 import {failure} from '../../packages/contracts/index.mjs';
+import {acquireProfileLock} from './profile-lock.mjs';
 export class PlatformState{
   constructor(root){this.root=resolve(root);this.path=join(this.root,'platform.json');this.pending=Promise.resolve();}
   static async load(root,defaults={}){
     const state=new PlatformState(root);await mkdir(state.root,{recursive:true});
     if((await lstat(state.root)).isSymbolicLink())throw failure('permissionDenied','Settings directory cannot be a symbolic link.');
-    try{state.lock=await open(join(state.root,'platform.lock'),'wx',0o600);await state.lock.writeFile(String(process.pid));}catch(error){if(error.code==='EEXIST')throw failure('projectBusy','Platform is already using these settings, or a previous run left a lock.');throw error;}
+    state.lock=await acquireProfileLock(state.root);
     try{
       try{state.value=JSON.parse(await readFile(state.path,'utf8'));}catch(error){if(error.code!=='ENOENT')throw failure('invalidRequest','Platform settings cannot be read. Restore the settings file rather than resetting it.');state.value={version:1,projectRoot:defaults.root,manifests:defaults.manifests??[],recents:[],preferences:{}};}
       const v=state.value;
@@ -22,5 +23,5 @@ export class PlatformState{
   }
   update(change){const task=this.pending.then(async()=>{const value=structuredClone(this.value);await change(value);await atomicJson(this.path,value);this.value=value;return value;});this.pending=task.catch(()=>{});return task;}
   remember(entry){return this.update(v=>{const previous=v.recents.find(p=>p.projectId===entry.projectId&&p.productId===entry.productId);if(previous&&previous.path.toLowerCase()!==entry.path.toLowerCase())throw failure('projectBusy','This project identity already exists in the catalog. Use its registered copy.');v.recents=[{...previous,...entry,lastOpenedAt:new Date().toISOString()},...v.recents.filter(p=>p!==previous)].slice(0,128);});}
-  async close(){await this.pending;await this.lock?.close();this.lock=null;await rm(join(this.root,'platform.lock'),{force:true});}
+  async close(){await this.pending;await this.lock?.close();this.lock=null;}
 }
