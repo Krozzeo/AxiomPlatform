@@ -1,6 +1,6 @@
 # Current handoff — Platform MVP0.1.5
 
-Owner authorized final corrections and MVP development closure. P0–P5 functional infrastructure is implemented; integration/release occurs through normal GitHub checks. Current sources/release manifest and CI for that SHA are authoritative. Do not rewrite protected recovery refs or infer live-account/hardware acceptance from controlled fixtures.
+Owner authorized final corrections and MVP development closure. P0–P5 functional infrastructure is implemented; Platform PR6 and Math PR1 are integrated into main through normal checks; the release manifest/tag records the final documentation/package baseline. Current sources/release manifest and CI for that SHA are authoritative. Do not rewrite protected recovery refs or infer live-account/hardware acceptance from controlled fixtures.
 
 Platform0.1.5 / API0.1 / IPC1; Engine0.0.55 / scripting SDK8 / native game format1; Math Lab0.1.1 / calculation format1. Consumers pin public provider f2131275ffed2d132383322959631484e8fc8ad5 through HTTPS/integrity. Platform's final host/release commit is recorded separately. Current final fixes: external-SVG bell/gear contrast, empty-space deselection, distinct blue active rows, Windows Shell folder opening with surfaced errors, independent fixed account probe versus editable/testable model/Reasoning Effort, compatible product inheritance/overrides and safe high-range automatic ports.
 

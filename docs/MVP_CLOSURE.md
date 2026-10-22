@@ -23,3 +23,9 @@ The prepared ZIP includes built editor assets, all three source folders, a doubl
 Standalone game export remains missing in Game Engine and is retained in its build/export roadmap. ADR-P0007 transfers its ownership from the earlier Platform P4 gate; it does not mark game export implemented. Engine Unity/shader/compute/GPU M19–M40 and older product issues remain independent. Math Lab remains a bounded real-calculation proof of concept, not symbolic algebra, matrices, plotting or a full MATLAB replacement.
 
 See [the current test guide](MVP_GUIDE.md), [closure ADR](adr/0007-mvp-closure.md), [roadmap](ROADMAP.md) and [historical P5 report](reports/P5_REPORT.md).
+
+## Integration record
+
+Feature integration: Platform PR6 merged normally at aedc49760618c37a95def3d094eaa2e554b6c51e after acceptance13 (39708672331) and Documentation15 (39708672317) passed on tested feature head b11080743ccce9ad037744c008a857d8d5450e9d. The feature trees are identical. Math PR1 merged at0f5be5130051257e0a5cb1ae2b7b4044186afce2 after acceptance7 (39708221758), preserving its tested tree276d68b178119d15277ef75de359ff28de28e8d7. Engine consumer bd48498201d39c7652bde37086b2d03dd9cae600 remains independently reviewed in PR58; local447 passes are not represented as a green product-wide remote CI.
+
+Final local acceptance:40/40 Platform (including explicit disposable Windows recycle),7/7 Math plus boundary,447/447 Engine; browser P1–P5 and final MVP flow have no pageErrors. Prepared extraction uses real source-pinned products and built assets; final package/file hashes belong in VERSIONS.json and its validation sidecar. Release-documentation commits do not change the tested runtime code.
