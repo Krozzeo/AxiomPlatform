@@ -1,34 +1,11 @@
-# ADR-P0001 — Fundación de Axiom Platform
+# ADR-P0001 — Axiom Platform foundation
 
-Fecha: 2026-10-21. Estado: aceptado por el propietario para planificación; implementación pendiente.
+2026-10-21. Accepted by owner for planning; subsequently implemented in staged P1–P4 candidates.
 
-## Contexto
+The existing Engine mixes shared infrastructure and game behavior. The owner approved a family of local browser applications with full manual operation and semantic AI tools, separated gradually into two repositories.
 
-El motor existente combina servicios reutilizables y dominio de juegos. El propietario quiere una familia de aplicaciones locales en navegador, manuales y operables por AI, y aprobó una separación gradual en dos repositorios.
+Choose Axiom Platform for Hub/services/SDK and Axiom Game Engine for its domain/adapter. Keep independent versions, direct technical startup, standalone exported games, layered configuration, session credentials, explicit effect scope and specialized formats. Use P0–P5 for extraction while retaining Engine M19–M40. The later owner instruction adopts MIT for both and renames AxiomEngine to AxiomGameEngine; this supersedes no-license/earlier licensing proposals without rewriting old releases/notices. Commercial decisions remain deferred.
 
-## Decisión
+Alternatives considered: one monorepo, product forks/copies, a universal kernel before consumers, immediate full extraction or repository-per-library. Two repos and contracts minimize speculative coupling and enable gradual review at the cost of compatibility/joint tests. Platform cannot import game classes. P0 did not rewrite daemons or formats.
 
-Nombre Axiom. Platform posee Hub/servicios/SDK; Game Engine posee su dominio y adaptador. Dependencia hacia contratos, productos con versiones independientes, arranque directo técnico y runtime exportado autónomo. Configuración por niveles, credenciales de sesión por defecto, publicación y cambios con alcance explícito, formatos especializados e intercambio declarado. Extracción P0–P5; el motor conserva M19–M40.
-
-El propietario reemplazó la propuesta inicial de repositorio sin licencia por **MIT para ambos repositorios** y pidió renombrar AxiomEngine a AxiomGameEngine. Esta instrucción posterior es la vigente. Las licencias anteriores y de terceros no se eliminan del historial. El modelo comercial sigue abierto.
-
-## Alternativas
-
-Monorepo de todos los productos; fork/copias del motor por aplicación; núcleo universal previo a productos; extracción total inmediata; varios repositorios por biblioteca. Se prefiere dos repositorios y contratos por menor coste inicial, revisión gradual y autonomía de producto.
-
-## Consecuencias
-
-Habrá mantenimiento de compatibilidad y pruebas conjuntas. No se podrá depender de clases internas del motor desde Platform. La primera implementación prioriza un recorrido real y reversible. No se reescribe el daemon ni se reemplazan formatos en P0.
-
-## Pendientes deliberados y responsable de resolverlos
-
-| Pendiente | Cuándo / cómo |
-| --- | --- |
-| Monetización, soporte y servicios comerciales | Propietario, fuera del gate técnico de P0 |
-| API exacta, esquema ejecutable, proceso/puerto y paquete inicial | P1, ADR técnico y pruebas del primer recorrido |
-| Persistencia segura entre sesiones | P2, opt-in y capacidad del SO verificada |
-| Formato de instalador, integridad y actualización | P4, ADR y prueba de distribución |
-| Segundo consumidor concreto | Antes de P5, alcance pequeño aprobado |
-| APIs de terceros/marketplace y nube propia | Nuevo alcance futuro, no requisito de P1–P4 |
-
-Estos pendientes tienen lugar de resolución; no invalidan el contrato conceptual ni simulan decisiones técnicas ya verificadas.
+Deferred: commercial model/support (owner); exact SDK/IPC (P1, now implemented); secure persistent credentials (requires separate opt-in OS facility, current memory-only); packaging/integrity/updates (P4); small second consumer (scope before P5); third-party marketplace/cloud (new scope). Explicitly deferred decisions do not fabricate implemented capabilities.

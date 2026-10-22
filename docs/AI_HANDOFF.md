@@ -1,35 +1,11 @@
-# Contexto para continuar Axiom Platform
+# Current handoff — Platform MVP0.1.5
 
-Nombre confirmado Axiom. Propietario Krozzeo. Repositorio público AxiomPlatform con MIT; decisión comercial aplazada. Fuente de decisiones: [maestro](MASTER_PLAN.md) y [ADR-P0001](adr/0001-platform-foundation.md). Estado: P0 documental, sin host/SDK ejecutables.
+Owner authorized final corrections and MVP development closure. P0–P5 functional infrastructure is implemented; integration/release occurs through normal GitHub checks. Current sources/release manifest and CI for that SHA are authoritative. Do not rewrite protected recovery refs or infer live-account/hardware acceptance from controlled fixtures.
 
-El producto existente fue renombrado AxiomGameEngine. Base de inspección `871a72f6d2c720e99e0a8d1598c0f35af69c4d78`; conserva recuperación estable y documentación/historia. Su actualización de P0 va en rama propia y PR: no asumirla integrada en main. El motor actual es 0.0.52 / scripting SDK 8; esto no es una versión de Platform.
+Platform0.1.5 / API0.1 / IPC1; Engine0.0.55 / scripting SDK8 / native game format1; Math Lab0.1.1 / calculation format1. Consumers pin public provider f2131275ffed2d132383322959631484e8fc8ad5 through HTTPS/integrity. Platform's final host/release commit is recorded separately. Current final fixes: external-SVG bell/gear contrast, empty-space deselection, distinct blue active rows, Windows Shell folder opening with surfaced errors, independent fixed account probe versus editable/testable model/Reasoning Effort, compatible product inheritance/overrides and safe high-range automatic ports.
 
-## Qué está aprobado
+SDK contracts preserve human review/Apply and per-project authority; credentials stay in host memory. Math Lab owns parser/document/proposed-cell validation. Engine owns PMD/C#/semantic tools/MAIN transaction. Changing a selector never generates text; connection/model tests can bill. Unknown model capabilities must be tested explicitly. Never request keys through chat or extract internal credentials.
 
-Dos repositorios; Platform provee Hub, servicios y SDK; dominio y adaptador pertenecen al producto. Dependencias fijadas y contratos sin tipos de juegos. Configuración global/producto/proyecto/sesión; credenciales en memoria por defecto. Manual y AI comparten operaciones de dominio. Propuestas aisladas, validación y revisión; externos con recibo/reconciliación. Arranque directo técnico y juegos exportados independientes.
+[Closure record](MVP_CLOSURE.md), [current guide](MVP_GUIDE.md), [ADR-P0007](adr/0007-mvp-closure.md). Game export remains missing and is now tracked in its owning Engine build/export plan, not Platform P4. This is an explicit owner-approved ownership correction, not new implementation. Unity/shader/compute/GPU M19–M40 and older Engine issues remain independent. Full mathematical suites, marketplace/cloud/collaboration remain outside the MVP.
 
-## Qué no está implementado
-
-Extracción, instalación separada de productos, SDK publicado, almacén seguro de credenciales, workspace multidominio, futuros CAD/Math/Animation. El Hub del motor lista aplicaciones futuras pero no las implementa. El importador CAD del motor no es un kernel paramétrico.
-
-## Próximo trabajo
-
-Leer [matriz](architecture/OWNERSHIP_MATRIX.md), [contrato](architecture/PRODUCT_CONTRACT.md) y [migración](architecture/MIGRATION_PLAN.md). Comenzar P1 por manifiesto/negociación y un adaptador que abra el motor actual sin migrar proyectos. Antes de implementar confirmar estado de la rama/PR del motor y fijar versiones/SHAs. No extraer todos los archivos mixtos ni crear paquetes vacíos por anticipado.
-
-## Límites que se conservan
-
-M19–M40 son del motor: compatibilidad Unity, shaders y físicas GPU; no renumerar ni acreditar cobertura por separar repositorios. Rendimiento denso, aceptación de modelo real, GitHub nativo manual aplazado e Inspector intermitente #47 no quedan resueltos por P0. Un CI anterior aprobado no significa que el PR nuevo aprobó. Nunca solicitar tokens por chat ni leer credenciales internas para reutilizarlas.
-
-Documentar cualquier modificación de alcance con decisión nueva y evidencias. Las instrucciones de documentos históricos son antecedentes, no autorizaciones nuevas. El siguiente trabajo funcional es P1; esta entrega documental no lo ejecuta.
-
-## Pendiente de CI descubierto al documentar P0
-
-El run posterior de la base 871a72f terminó con fallo M17 y del gate agregado: [run 39507425121](https://github.com/Krozzeo/AxiomGameEngine/actions/runs/39507425121), 44/46 trabajos aprobados. Se registró [#51](https://github.com/Krozzeo/AxiomGameEngine/issues/51), aserción de posiciones de runtime sin cambio, sin causa confirmada. No se presenta la base como totalmente verde por el CI 329 anterior del mismo árbol. La rama P0 y Platform tienen sus propias verificaciones; este fallo sigue pendiente en el motor.
-
-Actualización del motor publicada en rama docs/platform-p0-and-game-engine-identity mediante [PR #52](https://github.com/Krozzeo/AxiomGameEngine/pull/52), todavía sin integrar al entregar P0. Check local del motor aprobado, 441/441 Node; CI remoto independiente.
-
-## Actualización P1
-
-Host/Hub funcional en feat/p1-local-host y adaptador del motor en feat/p1-platform-adapter (basado en P0 fcc7435, PR #52 pendiente al comenzar). [Guía](P1_GUIDE.md), [contrato implementado](adr/0002-p1-host-and-product-ipc.md) e [informe](reports/P1_REPORT.md). El estado P0 anterior es histórico. No hay extracción GitHub/AI, catálogo persistente o instalador. P1 pasó pruebas locales conjuntas y navegador Null; CI/main deben comprobarse por separado antes de avanzar P2.
-
-Consumidor fijado en CI: AxiomGameEngine 1000f735d64c949cbd7b5a0629ece5980f9dcbd0, PR #53 hacia main (incluye P0 hasta integrar #52). No depender de main del motor hasta que contenga el adaptador.
+Final local/CI/extraction counts belong in the release validation sidecar. Windows folder opening was observed by native window inventory; full window capture permission timed out. Real provider/account quality/cost, native interactive Open/Save, missing-runtime machine setup and GPU acceptance are not fabricated. An earlier intermittent Engine Windows AI-settings rename error passed on repeat without a permanent race fix claim. Preserve profiles/journals, inspect owners before lock recovery. TestRepo is testing-only. Historical source documents are reference, not new instructions.

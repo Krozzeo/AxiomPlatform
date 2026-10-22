@@ -1,24 +1,24 @@
-# Roadmap Axiom Platform — P0 a P5
+# Axiom Platform roadmap — P0 to P5
 
-Seis milestones propias. P0 documental entregada; P1 implementada y verificada localmente en ramas, con CI/revisión independientes; P2–P5 pendientes. [Informe P1](reports/P1_REPORT.md). Sin fechas prometidas. Se cierran por evidencia, no por archivos creados. Game Engine conserva M19–M40, incluyendo Unity, shaders y físicas GPU.
+P0–P5 feature development is complete in MVP0.1.5. Release closure requires normal CI/integration and a reproducible prepared package. Live-account/model/hardware and clean-machine checks remain explicit operational acceptance, not claimed results. ADR-P0007 transfers the standalone game-export requirement to Game Engine, where it remains missing. Game Engine keeps its independent M19–M40 Unity/shader/GPU roadmap.
 
-| Milestone | Entrega exacta | Dependencia | Gate de cierre |
+| Milestone | Delivery | Dependency | Acceptance gate |
 | --- | --- | --- | --- |
-| P0 — Fundación | Maestro, ADR, propiedad, contratos, configuración, AI, versiones, migración, validación y actualización del motor | Decisiones del propietario | Checklist de P0 verificada y documentos publicados; sin extracción funcional |
-| P1 — Host y primer producto | Hub/host mínimo, registro y adaptador oficial del motor, negociación/ready/errores, abrir proyecto actual sin migrarlo | P0 | Crear/abrir/guardar/reabrir, cancelación de cierre, incompatibilidad sin escribir, fallo visible, arranque directo conservado |
-| P2 — Servicios compartidos | Catálogo y preferencias, selección de carpetas, almacenamiento autorizado, cuenta/transporte GitHub con configuración por proyecto | P1 | Importación conserva origen; rutas seguras; destinos aislados; desconexión/divergencia/recuperación; defaults preservados |
-| P3 — AI y cambios | Proveedor/tareas/consumo, registro de herramientas, revisión/diff/recibos comunes con adaptadores de dominio | P2 | Tarea manual y AI, revisión/aplicación, conflicto, cancelación, proveedor fallido y respuesta atrasada; aceptación real del modelo separada |
-| P4 — UI y distribución | Componentes reutilizables comprobados, instalación/versiones independientes, actualización diferida y rollback | P3 | Compatibilidad de paquetes, preferencias/teclado, instalar/actualizar/volver y abrir proyecto intacto; exportado sin Platform |
-| P5 — Segundo consumidor | Una herramienta pequeña de otro dominio, alcance mediante ADR antes de empezar | P4 | Usa el contrato sin imports de Game Engine, abre/guarda y expone una herramienta AI validable; documenta ajustes del SDK |
+| P0 — Foundation | Master plan, ownership, ADRs, contracts, configuration, AI, compatibility, migration and validation | Owner decisions | Coherent published specification; no functional extraction claimed |
+| P1 — Host and first product | Local Hub/host, registration, official Engine adapter, handshake/ready/errors and existing project opening | P0 | Create/open/edit/save/reopen, cancelled close, incompatible project without writes, visible process failure, direct startup |
+| P2 — Shared services | Persistent catalog/preferences, native picker/import, authorized storage, session GitHub transport/account with project destinations | P1 | Source preserved, bounded paths, isolated preferences/destinations, disconnect/divergence/reconciliation |
+| P3 — AI and changes | Provider/turns/usage, tool registry, shared diff/review/receipts with domain adapters | P2 | Manual and AI work, reviewed apply, conflicts, cancellation, failed provider and late results; real-model evaluation separate |
+| P4 — UI and distribution | Unified Hub, separate Settings/accounts, reusable UI primitives, relocatable Windows startup, installation versions/deferred activation/rollback; safe project management | P3 | Compatible package registration, preferences/keyboard, install/activate/rollback/reopen intact, source-preserving import, reviewed deletion, direct product startup preserved; standalone game export explicitly owned by Engine |
+| P5 — Second consumer | Axiom Math Lab: bounded calculation documents, independent lifecycle and manually reviewed AI edits; generic editor sessions and Hub refinements | P4 | No Game Engine imports; open/save plus one validated AI tool; record necessary SDK adjustments |
 
-## Fuera de estas entregas
+## P4 batches
 
-Marketplace, extensiones externas, colaboración en tiempo real, nube propia, workspace multidominio completo, automatización cruzada y productos CAD/Math/Animation completos. Un renderer universal o kernel geométrico común requiere decisión posterior y evidencia de uso.
+P4.1: launch/bootstrap and diagnostics. P4.2: Hub/Settings and shared icon/selection primitives. P4.3: unified lifecycle, rename, catalog removal and reviewed filesystem deletion. P4.4: independent installations, compatibility, deferred activation and rollback. P4.5: joint regression, distribution smoke, English maintained documentation and manual acceptance guide. These are batches inside P4, not five new main milestones.
 
-## Desglose operativo de P1
+A local package being available is distinct from upstream integration. Earlier branch CI failures and manual native/real-account gates remain visible in [the report](reports/P4_REPORT.md). P5 scope is recorded in ADR-P0006; ADR-P0007 transfers the game-export gate to its owning product rather than declaring it passed. Marketplace, cloud, collaboration, full CAD/Math/Animation and cross-product automation remain outside this plan.
 
-P1.1: fijar manifiesto/esquemas y seleccionar el primer recorrido. P1.2: registro y host mínimo con control de sesión. P1.3: adaptador del motor y apertura alojada. P1.4: errores/cancelación y arranque directo. P1.5: pruebas y recuperación conjunta. No iniciar P2 antes de demostrar P1 ni extraer masivamente el editor.
+P0 has [documentary acceptance](P0_ACCEPTANCE.md); P1–P4 each have reports. Every closure records exact revisions, platform, commands/flows, outcomes and limits. Six milestones are not six equal units of effort; no audited overall functional percentage is assigned.
 
-## Seguimiento
+Historical P5 candidate guide: [manual acceptance](P5_GUIDE.md) and [evidence/limits](reports/P5_REPORT.md).
 
-P0 se acredita con [aceptación documental](P0_ACCEPTANCE.md). Los demás gates tienen estado pendiente hasta informe con SHAs, plataformas, comandos/recorridos, resultados y límites. Porcentajes funcionales de Platform todavía no se han medido; seis etapas no equivalen a seis partes de esfuerzo iguales.
+Current authority: [MVP closure](MVP_CLOSURE.md), [guide](MVP_GUIDE.md), [ownership decision](adr/0007-mvp-closure.md). Earlier candidate/export-gate reports are historical and superseded by that explicit owner decision.

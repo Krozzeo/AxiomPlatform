@@ -5,13 +5,19 @@ import {PROTOCOL_VERSION, failure} from '../contracts/index.mjs';
 
 // Only an explicitly registered installation supplies this executable; projects never do.
 export class ProductClient {
-  constructor(entry, {timeoutMs = 30000, onExit = () => {}, productId} = {}) {
+  constructor(entry, {timeoutMs = 30000, onExit = () => {}, productId, onService} = {}) {
     this.timeoutMs = timeoutMs;
     this.pending = new Map();
     this.dead = false;
     this.productId=productId;
-    this.child = fork(entry, [], {stdio: ['ignore','ignore','ignore','ipc'], windowsHide: true});
+    const env={...process.env};delete env.OPENAI_API_KEY;
+    this.child = fork(entry, [], {stdio: ['ignore','ignore','ignore','ipc'], windowsHide: true,env});
     this.child.on('message', value => {
+      if(value?.kind==='service.request'){
+        if(value.sessionId!==this.sessionId||!onService)return;
+        void Promise.resolve().then(()=>onService(value)).then(result=>this.notify({kind:'service.reply',requestId:value.requestId,sessionId:this.sessionId,ok:true,result}),error=>this.notify({kind:'service.reply',requestId:value.requestId,sessionId:this.sessionId,ok:false,error:{code:error.code??'operationFailed',message:error.code?error.message:'Shared service operation failed.'}}));
+        return;
+      }
       const pending = this.pending.get(value?.requestId);
       if (!pending || value.protocolVersion !== PROTOCOL_VERSION || value.sessionId !== pending.sessionId || (this.productId&&value.productId!==this.productId) || value.correlationId!==value.requestId) return;
       clearTimeout(pending.timer); this.pending.delete(value.requestId);
@@ -27,6 +33,7 @@ export class ProductClient {
     this.child.once('error', fail); this.child.once('exit', fail);
   }
   call(method, params, sessionId) {
+    this.sessionId=sessionId;
     if (this.dead) return Promise.reject(failure('operationFailed','Product process is unavailable.'));
     return new Promise((resolve, reject) => {
       const requestId = randomUUID();
@@ -41,6 +48,7 @@ export class ProductClient {
       });
     });
   }
+  notify(message){if(!this.dead&&this.child.connected)this.child.send(message,()=>{});}
   async stop() {
     if (this.dead) return;
     const exited = once(this.child, 'exit').catch(() => {});

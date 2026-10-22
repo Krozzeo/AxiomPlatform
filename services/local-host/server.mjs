@@ -1,20 +1,38 @@
+import {listenLoopback} from '../../packages/sdk/loopback.mjs';
+import {CONNECTION_MODEL,defaultSelection,selection,probe,effortsFor} from '../ai/settings.mjs';
+import {Notifications} from './notifications.mjs';
+import {EditorLeases} from './editor-leases.mjs';
+import {openFolder,saveDownload} from '../local-files/os.mjs';
+import {recycleNative,pickNativePath} from '../local-files/dialogs.mjs';
+import {randomUUID} from 'node:crypto';
+import {isAssistantModel,isVerifiedAssistantModel} from '../ai/models.mjs';
+import {textOf} from '../ai/contracts.mjs';
 import {createServer} from 'node:http';
 import {randomBytes} from 'node:crypto';
 import {readFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import {SessionManager} from './manager.mjs';
 import {CODES} from '../../packages/contracts/index.mjs';
+import {PlatformState} from './state.mjs';
+import {GitHubAccount} from '../integrations/github/account.mjs';
+import {AiAccount} from '../ai/account.mjs';
+import {pickFolder} from '../local-files/folders.mjs';
+import {join,resolve} from 'node:path';
 
 const headers={
-  'Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'",
-  'Cross-Origin-Opener-Policy':'same-origin', 'Cross-Origin-Resource-Policy':'same-origin',
+  'Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-src http://127.0.0.1:*; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'",
+  'Cross-Origin-Opener-Policy':'same-origin', 'Cross-Origin-Embedder-Policy':'require-corp', 'Cross-Origin-Resource-Policy':'same-origin',
   'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Cache-Control':'no-store'
 };
-export async function startHost({root,manifests,port=0,timeoutMs}={}) {
-  const manager=await SessionManager.create({root,manifests,timeoutMs});
-  const token=randomBytes(32).toString('base64url');let origin,closing;
+export async function startHost({root,manifests,port=0,timeoutMs,stateRoot,githubClient,aiProvider,folderPicker=pickFolder,filePicker=pickNativePath,recycle=recycleNative,folderOpener=openFolder,downloadSaver=saveDownload}={}) {
+  const store=await PlatformState.load(stateRoot??join(resolve(root),'.axiom-platform'),{root,manifests});
+  let manager;
+  const account=new GitHubAccount({client:githubClient,onChange:state=>manager?.accountChanged(state)});
+  let ai;try{ai=await new AiAccount({provider:aiProvider,transport:store.value.preferences.aiTransport,usagePath:join(store.root,'ai-usage.json'),onChange:state=>manager?.aiChanged(state)}).initialize();manager=await SessionManager.create({root:store.value.projectRoot,manifests:store.value.manifests,timeoutMs,store,account,ai,allowUnavailable:!manifests?.length});}catch(error){await store.close();throw error;}
+  ai.defaults=selection(store.value.preferences.aiDefaults??{...defaultSelection,...(store.value.preferences.aiModel?{model:store.value.preferences.aiModel}:{})});manager.recycle=recycle;manager.deletion.recycle=recycle;manager.folderOpener=folderOpener;const notifications=await new Notifications(join(store.root,'notifications.json')).load(),editors=new EditorLeases(manager);
+  const token=randomBytes(32).toString('base64url');let origin,closing,picker;
   const reply=(res,status,value)=>{res.writeHead(status,{...headers,'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(value));};
-  const assets=new Map([['/',['index.html','text/html']],['/app.mjs',['app.mjs','text/javascript']],['/styles.css',['styles.css','text/css']]]);
+  const assets=new Map([['/',['index.html','text/html']],['/editor.html',['editor.html','text/html']],['/editor.css',['editor.css','text/css']],['/editor.mjs',['editor.mjs','text/javascript']],['/notifications.mjs',['notifications.mjs','text/javascript']],['/app.mjs',['app.mjs','text/javascript']],['/styles.css',['styles.css','text/css']],['/ui.mjs',['ui.mjs','text/javascript']],['/platform-ui.mjs',['../../packages/sdk/ui.mjs','text/javascript']]]);
   const server=createServer(async(req,res)=>{
     try {
       const url=new URL(req.url,'http://127.0.0.1');
@@ -23,23 +41,56 @@ export async function startHost({root,manifests,port=0,timeoutMs}={}) {
         const same=req.headers.origin ? req.headers.origin===origin : req.headers['sec-fetch-site']==='same-origin';
         if(!same)return reply(res,403,{code:'permissionDenied',message:'Origin is not authorized.'});
         if(req.headers.authorization!==`Bearer ${token}`)return reply(res,401,{code:'permissionDenied',message:'The Platform session is not authenticated.'});
+        if(req.method==='GET'&&url.pathname==='/v1/notifications')return reply(res,200,notifications.items);
         if(req.method==='GET'&&url.pathname==='/v1/catalog')return reply(res,200,manager.catalog());
-        if(req.method==='POST'&&url.pathname==='/v1/sessions'){
+        if(req.method==='POST'&&['/v1/editor','/v1/notifications','/v1/download','/v1/sessions','/v1/settings','/v1/folders/pick','/v1/github','/v1/ai','/v1/installations'].includes(url.pathname)){
           const chunks=[];let bytes=0;
           for await(const part of req){bytes+=part.length;if(bytes>16384)return reply(res,413,{code:'invalidRequest',message:'Request exceeds 16 KiB.'});chunks.push(part);}
           let data;try{data=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{return reply(res,400,{code:'invalidRequest',message:'Malformed JSON.'});}
+          if(url.pathname==='/v1/editor')return reply(res,200,editors.claim(data));
+          if(url.pathname==='/v1/notifications')return reply(res,200,await notifications.run(data));
+          if(url.pathname==='/v1/download')return reply(res,200,await downloadSaver(data));
+          if(url.pathname==='/v1/settings')return reply(res,200,await manager.configure(data));
+          if(url.pathname==='/v1/folders/pick'){
+            if(picker)return reply(res,409,{code:'projectBusy',message:'A folder chooser is already open.'});const controller=new AbortController();picker=controller;res.on('close',()=>{if(!res.writableEnded)controller.abort();});
+            try{return reply(res,200,await (data.mode==='file'?filePicker:folderPicker)({initial:data.initial??manager.root,mode:data.mode==='file'?'file':'folder',signal:controller.signal}));}finally{picker=null;}
+          }
+          if(url.pathname==='/v1/installations')return reply(res,200,await manager.installations(data));
+          if(url.pathname==='/v1/ai'){
+            if(data.action==='disconnect')return reply(res,200,ai.disconnect());
+            if(data.action==='configure'){
+              const next=selection(data);await manager.configure({aiDefaults:next});return reply(res,200,{...ai.status(),test:null});
+            }
+            if(data.action==='test-model'){
+              if(!ai.status().connected)throw Object.assign(Error('Connect the OpenAI account before testing a model.'),{code:'AX_AI_0001'});
+              const selected=selection(data);if(JSON.stringify(selected)===JSON.stringify(ai.defaults)){ai.modelTest=null;ai.onChange(ai.status());}const test=await probe(ai,selected);if(JSON.stringify(selected)===JSON.stringify(ai.defaults))ai.modelTest=test;return reply(res,200,{test});
+            }
+            if(data.action==='connect'){
+              await probe(ai,{model:CONNECTION_MODEL,reasoning:'default'},{apiKey:data.apiKey,connection:true});return reply(res,200,ai.status());
+            }
+            if(data.action!=='models')return reply(res,400,{code:'invalidRequest',message:'Unknown AI account action.'});
+            const result=await ai.invoke('platform-settings','platform-settings','request',{requestId:randomUUID(),epoch:ai.epoch,path:'/models',key:data.apiKey});
+            const models=[...new Set((result.response.data??[]).map(i=>i.id).filter(isAssistantModel))].sort();return reply(res,200,{models,untestedModels:models.filter(id=>!isVerifiedAssistantModel(id)),efforts:Object.fromEntries(models.map(id=>[id,effortsFor(id)]))});
+          }
+          if(url.pathname==='/v1/github'){
+            if(!['status','connect','disconnect','repositories'].includes(data.action))return reply(res,400,{code:'invalidRequest',message:'Unknown GitHub account action.'});
+            return reply(res,200,await account.invoke(data.action,data));
+          }
           return reply(res,200,await manager.execute(data));
         }
         return reply(res,404,{code:'invalidRequest',message:'Unknown Platform route.'});
       }
-      const asset=assets.get(url.pathname);
+      const asset=url.pathname.startsWith('/editor/')?assets.get('/editor.html'):url.pathname.startsWith('/settings')||url.pathname==='/installations'?assets.get('/'):assets.get(url.pathname);
+      if(req.method==='GET'&&/^\/icons\/[a-z0-9-]+\.(svg|png)$/.test(url.pathname)){const content=await readFile(new URL('../../apps/hub'+url.pathname,import.meta.url));res.writeHead(200,{...headers,'Content-Type':url.pathname.endsWith('.svg')?'image/svg+xml':'image/png'});return res.end(content);}
       if(req.method==='GET'&&asset){const content=await readFile(new URL('../../apps/hub/'+asset[0],import.meta.url));res.writeHead(200,{...headers,'Content-Type':asset[1]+'; charset=utf-8'});return res.end(content);}
       return reply(res,404,{code:'invalidRequest',message:'Not found.'});
-    }catch(error){const known=CODES.includes(error.code);reply(res,known?409:500,{code:known?error.code:'operationFailed',message:known?error.message:'Platform could not complete the operation. Check the local project and product installation.'});}
+    }catch(error){const known=CODES.includes(error.code)||/^AX_(?:GITHUB|AI)_\d{4}$/.test(error.code??'');reply(res,known?409:500,{code:known?error.code:'operationFailed',message:known?error.message:'Platform could not complete the operation. Check the local project and product installation.'});}
   });
-  await new Promise((yes,no)=>{server.once('error',no);server.listen(port,'127.0.0.1',yes);});
-  origin=`http://127.0.0.1:${server.address().port}`;
-  return {origin,token,url:`${origin}/#token=${token}`,manager,close:()=>closing??=(async()=>{
-    const done=new Promise(yes=>server.close(yes));server.closeAllConnections();await manager.shutdown();await done;
+  try{await listenLoopback(server,port);}
+  catch(error){await manager.shutdown();await store.close();throw error;}
+  origin=`http://127.0.0.1:${server.address().port}`;manager.platformOrigin=origin;
+  return {origin,token,url:`${origin}/#token=${token}`,manager,account,ai,close:()=>closing??=(async()=>{
+    const done=new Promise(yes=>server.close(yes));server.closeAllConnections();try{picker?.abort();await manager.shutdown();await account.disconnect();await ai.close();await done;}finally{await store.close();}
   })()};
 }
+

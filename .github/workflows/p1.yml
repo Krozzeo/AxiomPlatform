@@ -1,4 +1,4 @@
-name: P1 acceptance
+name: Platform acceptance
 
 on:
   pull_request:
@@ -35,8 +35,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: Krozzeo/AxiomGameEngine
-          ref: 1000f735d64c949cbd7b5a0629ece5980f9dcbd0
+          ref: bd48498201d39c7652bde37086b2d03dd9cae600
           path: game-engine
+      - uses: actions/checkout@v4
+        with:
+          repository: Krozzeo/AxiomMathLab
+          ref: 276d68b178119d15277ef75de359ff28de28e8d7
+          path: math-lab
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -48,15 +53,47 @@ jobs:
         working-directory: game-engine
       - run: npx playwright install --with-deps chromium
         working-directory: game-engine
+      - run: npm ci --no-audit --no-fund
+        working-directory: math-lab
+      - run: npm run check
+        working-directory: math-lab
       - run: npm run check
         env:
           AXIOM_ENGINE_PATH: ../game-engine
+          AXIOM_MATH_PATH: ../math-lab
       - run: npm run test:browser
         env:
           AXIOM_ENGINE_PATH: ../game-engine
+          AXIOM_MATH_PATH: ../math-lab
+      - run: npm run test:browser:p2
+        env:
+          AXIOM_ENGINE_PATH: ../game-engine
+          AXIOM_MATH_PATH: ../math-lab
+      - run: npm run test:browser:p3
+        env:
+          AXIOM_ENGINE_PATH: ../game-engine
+          AXIOM_MATH_PATH: ../math-lab
+      - run: npm run test:browser:p4
+        env:
+          AXIOM_ENGINE_PATH: ../game-engine
+          AXIOM_MATH_PATH: ../math-lab
+      - run: npm run test:browser:p5
+        env:
+          AXIOM_ENGINE_PATH: ../game-engine
+          AXIOM_MATH_PATH: ../math-lab
+      - run: npm run test:browser:mvp
+        env:
+          AXIOM_ENGINE_PATH: ../game-engine
+          AXIOM_MATH_PATH: ../math-lab
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: p1-browser-evidence
-          path: platform/.axiom/p1-browser
+          name: platform-browser-evidence
+          path: |
+            platform/.axiom/p1-browser
+            platform/.axiom/p2-browser
+            platform/.axiom/p3-browser
+            platform/.axiom/p4-browser
+            platform/.axiom/p5-browser
+            platform/.axiom/mvp-browser
           include-hidden-files: true

@@ -1,25 +1,18 @@
 # Axiom Platform
 
-Entorno local común para la familia Axiom: Hub de productos y proyectos, servicios locales e integración con agentes AI. Axiom Game Engine es su primer producto; CAD, matemáticas y animación son direcciones futuras, todavía sin implementación.
+**MVP0.1.5.** A local browser workspace for the Axiom family: project/product Hub, authorized local services and shared AI integration. Axiom Game Engine and independent Axiom Math Lab are the reference products. The P0–P5 feature scope is implemented; [closure evidence and remaining operational checks](docs/MVP_CLOSURE.md) distinguish development completion from live-account/hardware acceptance.
 
-**Estado: P1 funcional en rama para revisión.** Host local, Hub y adaptador del motor con creación/apertura, guardado y cierre. [Arranque y prueba](docs/P1_GUIDE.md) · [Evidencias y límites](docs/reports/P1_REPORT.md). No es todavía un instalador; P2–P5 siguen pendientes. La especificación original de P0 permanece como antecedente.
+Extract the complete prepared bundle and double-click **Start Axiom.cmd**. It prepares missing dependencies and opens your browser; errors remain visible in the console. Keep all three folders together. [Startup and final test guide](docs/MVP_GUIDE.md).
 
-- [Documento maestro](docs/MASTER_PLAN.md): visión, alcance y decisiones.
-- [Mapa documental](docs/index.md) y [contexto para continuar](docs/AI_HANDOFF.md).
-- [Roadmap P0–P5](docs/ROADMAP.md) y [aceptación de P0](docs/P0_ACCEPTANCE.md).
-- [Arquitectura](docs/architecture/ARCHITECTURE.md), [propiedad de componentes](docs/architecture/OWNERSHIP_MATRIX.md) y [migración](docs/architecture/MIGRATION_PLAN.md).
-- [Axiom Game Engine](https://github.com/Krozzeo/AxiomGameEngine): producto existente y primer consumidor.
+- [Master plan](docs/MASTER_PLAN.md), [P0–P5 roadmap](docs/ROADMAP.md), [handoff](docs/AI_HANDOFF.md), [documentation map](docs/index.md).
+- [Architecture](docs/architecture/ARCHITECTURE.md), [ownership](docs/architecture/OWNERSHIP_MATRIX.md), [compatibility](docs/architecture/RELEASE_AND_COMPATIBILITY.md).
+- [MVP closure decision](docs/adr/0007-mvp-closure.md).
+- [Game Engine](https://github.com/Krozzeo/AxiomGameEngine) and [Math Lab](https://github.com/Krozzeo/AxiomMathLab).
 
-## Principios
+Platform owns infrastructure/contracts, not product semantics. Engine keeps scenes, Unity-compatible scripting, rendering/shaders/physics/audio/animation and standalone game export. Its M19–M40 roadmap is unchanged. The still-missing game exporter is explicitly product-owned rather than an unfinished Platform MVP gate. Math Lab owns bounded calculation documents and reviewed AI edits, not a full mathematical suite.
 
-Operación manual completa y herramientas semánticas para agentes; funcionamiento local; productos especializados; contratos explícitos y versiones compatibles; extracción gradual desde necesidades comprobadas; recuperación antes de migraciones incompatibles. Los juegos exportados funcionan sin Platform.
+OpenAI account connection and model/reasoning preferences are separate. Session keys are never persisted; defaults and project overrides remain independent. All AI Apply/publication decisions remain human-owned. Modern Windows dialogs, recoverable deletion, notifications and one reconnecting editor per project are included.
 
-## Repositorios y licencia
+Development/UI/current docs are English. [Contributing](CONTRIBUTING.md). Run `npm run check` with both product paths for joint tests, `npm run test:browser:mvp` for final UI acceptance and `python scripts/check_docs.py` for documentation. See the guide for regression/browser prerequisites.
 
-Este repositorio contiene la planificación de Platform y alojará sus servicios, Hub y SDK. El motor conserva escenas, scripting compatible con Unity, físicas, shaders, renderizado y exportación. Sus milestones M19–M40 continúan separadas de P0–P5.
-
-[MIT](LICENSE), por decisión del propietario. La monetización y el modelo comercial permanecen pendientes. La licencia de este repositorio no sustituye licencias de dependencias o material de terceros.
-
-## Trabajar con esta entrega
-
-Leer el documento maestro, el handoff y la guía P1 antes de proponer código. Ejecutar npm run check; para aceptación conjunta establecer AXIOM_ENGINE_PATH. Para comprobar enlaces y entregables documentales: `python scripts/check_docs.py`. No se requieren herramientas del motor para leer o verificar P0. [Contribución](CONTRIBUTING.md).
+[MIT](LICENSE); third-party licenses remain applicable. Commercial decisions remain deferred. Future work is maintenance or separately scoped expansion, not additional hidden MVP phases.

@@ -1,21 +1,21 @@
-# Versiones, instalación y distribución
+# Versions, installation and distribution
 
-## Versionado
+Platform, products, native documents and Game Engine scripting SDK have independent versions. A product declares the supported Platform API range and project formats. Pin the tested provider HTTPS archive and lockfile integrity; never depend on a moving remote main. During 0.x, document incompatible minor changes; stable incompatible contracts require major versions. Retire contracts only after consumer evidence and a deprecation period.
 
-Platform, SDK y productos tienen versiones independientes. Un producto declara rango admitido del contrato de Platform y versiones de documentos. Fijar dependencias a una versión comprobada y lockfile; no consumir main remoto como dependencia. Los cambios incompatibles del contrato requieren nueva versión mayor cuando el contrato sea estable; durante 0.x explicitar qué minor rompe compatibilidad. Documentar deprecaciones y pruebas del consumidor antes de retirar un contrato.
+## P4 prepared distribution
 
-El SDK de scripting del motor conserva su numeración: no es la versión del SDK de Platform. P0 no asigna una versión ejecutable a Platform ni publica paquetes.
+The combined Windows ZIP contains sibling AxiomPlatform/AxiomEngine folders, sources, locked dependencies metadata, built editor/Wasm, launchers and version/hash manifest. It excludes credentials, user projects, .git, node_modules and local caches. The root launcher derives paths from its own location. Keep both folders together when relocating.
 
-## Distribución objetivo
+Start-Axiom.cmd invokes the relative PowerShell bootstrap. It checks Node.js 24+ and .NET 10 with wasm-tools; missing compatible runtimes are downloaded from official HTTPS metadata into the local .axiom runtime folder. Node ZIP SHA256 and .NET ZIP SHA512 are verified before bounded extraction. npm ci installs the exact lockfile. A prepared bundle requires no Rust build; a source-only checkout without built output needs Rust 1.90/wasm target and reports this explicitly. First setup needs Internet and may take several minutes. No global runtime replacement or administrator installation is requested.
 
-Platform administra instalaciones oficiales y proyectos; artefactos separados por producto/SO/arquitectura y metadatos de compatibilidad/integridad. No mezclar directorios de programas con documentos del usuario. Instalar/actualizar en una ubicación nueva, comprobar integridad y salud, y activar solo al terminar tareas o cerrar sesiones. Mantener versión anterior para recuperación. No ejecutar instrucciones de instalación contenidas en proyectos no confiables.
+The host starts on a free loopback port and opens the default browser automatically. The console remains attached to the host; errors print diagnostics and the .cmd wrapper pauses. Ctrl+C stops the host. Profile data normally lives in APPDATA/AxiomPlatform, independent of the extracted ZIP. Existing PerfilPruebas profiles are recognized for compatibility. Projects default to the user's Documents/Axiom Projects.
 
-El arranque directo del motor puede utilizar paquetes comunes instalados sin necesitar la ventana del Hub. El runtime exportado del juego no depende del host/editor/AI. El formato concreto de instalador, registro local y verificación de artefactos se elige mediante ADR en P4 con pruebas de Windows; P0 define requisitos, no promete un instalador existente.
+## Product installations and rollback
 
-## Offline y plataformas
+Register an explicitly prepared product folder containing platform/product.json (or product.json). Validate descriptor, protocol/API range, capabilities and adapter containment. The local installation ID fingerprints the canonical descriptor and entry file; it is a change detector, not an authenticity signature or a complete recursive package attestation. Only register trusted local product packages.
 
-Los flujos locales no requieren cuenta ni nube. AI remota, GitHub y descargas de productos informan conectividad necesaria; no bloquean abrir/guardar localmente. Windows es el primer recorrido de aceptación de la separación, preservando las verificaciones multiplataforma existentes del motor. No declarar soporte de distribución para otros sistemas sin ejecutar sus pruebas.
+Install versions side by side. Adding does not activate. Activate immediately only when that product has no starting/ready sessions; otherwise queue until sessions close. Existing sessions retain the original process/version. Keep the previous registration for rollback, and reopen saved projects using the selected compatible version. Missing/changed installations stay visible with errors for recovery. Do not delete prior program folders until no session uses them. Project files are never moved by activation.
 
-## Repositorios y licencia
+This is local package registration and activation, not a signed registry, background downloader or universal installer. Future online product distribution needs an additional ADR and acceptance. Incompatible document migrations remain opt-in with backups.
 
-AxiomPlatform y AxiomGameEngine públicos bajo MIT por decisión explícita del propietario. Las dependencias y fixtures mantienen sus licencias y atribuciones; la extracción incluye trazabilidad de origen y avisos. No copiar node_modules, binarios de dependencias o credenciales a Platform. La nueva licencia del motor no reescribe tags ni entregas históricas. El modelo comercial continúa postergado; la decisión MIT es vigente.
+Local authoring requires no account/cloud. AI/GitHub/runtime downloads expose their network requirements separately. Windows is the first distribution acceptance platform; cross-platform contract tests do not certify macOS/Linux installers. Standalone exported games remain independent of Platform/editor/AI. Both repositories are MIT; dependencies retain their licenses and historical tags are unchanged. Commercial decisions remain open.
