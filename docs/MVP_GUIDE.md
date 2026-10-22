@@ -1,4 +1,4 @@
-# MVP0.1.5 — startup and final acceptance
+# MVP0.1.6 — startup and final acceptance
 
 Extract the entire ZIP anywhere writable. Keep AxiomPlatform, AxiomEngine and AxiomMathLab together. Close old Platform consoles; double-click **Start Axiom.cmd**. The launcher checks dependencies, installs missing official local runtimes/locked packages, opens the browser and retains startup errors. Keep its console open. Missing dependencies require Internet; the built editor needs no Rust for ordinary startup.
 
@@ -18,3 +18,12 @@ Automation: set AXIOM_ENGINE_PATH and AXIOM_MATH_PATH to product folders. Platfo
 [Closure record and limits](MVP_CLOSURE.md). Real model/account acceptance is separate from the simulated providers in automation. Game export belongs to Game Engine's roadmap, remains missing, and is not a Platform MVP feature.
 
 Technical references: [OpenAI account probe model](https://developers.openai.com/api/docs/models/gpt-4.1-nano), [model-dependent reasoning](https://developers.openai.com/api/docs/guides/reasoning), [Windows process associations](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/start-process?view=powershell-5.1).
+
+
+## Startup lock recovery (0.1.6)
+
+All extracted releases use `%APPDATA%\AxiomPlatform` by default. Consequently, an active instance or stale lock can block P4, P5 and MVP together; reinstalling dependencies does not fix it. Use a separate `SettingsRoot` only for intentionally isolated profiles.
+
+0.1.6 automatically recovers a `platform.lock` whose recorded process is positively dead. It accepts older PID-only locks without resetting `platform.json`, the catalog or project files. A live PID, reused PID or permission uncertainty remains blocked: close the existing Platform console, then retry. Do not kill all Node processes or remove a lock for a running instance.
+
+Malformed, linked or oversized locks require inspection and are never silently reset. Recovery is serialized with `platform.lock.recovery`; if a crash interrupts that short recovery step, its directory is deliberately retained for explicit inspection. Never remove it while another launch/recovery may be running. Closing the console abruptly can lose unsaved product edits; lock recovery restores access to previously saved data only.
