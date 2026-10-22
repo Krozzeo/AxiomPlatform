@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.5 / Platform MVP — 2026-10-21
+
+P0–P5 feature scope integrated into main through PR6, including the previously stacked P2–P5 work. Independent account connection now uses a fixed small probe; model/Reasoning Effort remain editable and separately testable after connection. Defaults save without credentials and products retain overrides. Added reference-style gear icons, visible bell in both themes, empty-space deselection, distinct blue active rows and canonical Windows Shell folder opening with surfaced errors. Automatic high-range loopback ports avoid browser-blocked service ports observed in Windows regression.
+
+Math Lab0.1.1 demonstrates independent native documents, reviewed AI operations, default inheritance and project model/reasoning tests. Engine0.0.55 consumes the shared contracts; its script-boundaries CI setup now installs locked SDK dependencies before testing. Public source pins/integrity and prepared ZIP evidence remain reproducible. Local checks: Platform40, Math7, Engine447; browser P1–P5 plus MVP passed. Platform acceptance13 and Documentation15 approved the feature integration; Math acceptance7 passed. Live-provider/interactive native/hardware checks remain separate.
+
+ADR-P0007 moves the still-missing standalone game exporter into its owning Engine build/export plan. It is not implemented by this release. No Unity/shader/compute/GPU milestone credit. Existing recovery refs are preserved; the MVP tag is an additional recovery point. New Platform functionality requires a separately scoped expansion; maintenance can address regressions.
+
+## 0.1.4 / P5 — 2026-10-21 (historical candidate)
+
+Introduced independent Math Lab, stable authenticated editor shells, one hosted editor per project, disconnection/input blocking and reconnection. Added modern native Open/Folder/Save dialogs, recoverable recycling, notification toasts/history and shared AI transport budgets. The final MVP supersedes the candidate account/model UI and export-gate ownership. Earlier reports retain their original evidence and limits.
+
 ## 0.1.3 / P4 — 2026-10-21 (review candidate)
 
 Redesigned English Hub with one project/session table and icon actions. Separate Settings pages, shared GitHub/AI account icons, disconnected import gate, light/dark/system appearance, keyboard support and Axiom identity. Added rename, catalog removal and reviewed permanent deletion. Native picker has an owned foreground dialog, cancellation and bounded timeout. Relocatable Windows startup verifies/downloads missing runtimes, installs locked dependencies, opens the browser and retains startup errors. Product installations support compatibility validation, deferred activation and rollback. Game Engine hosted project creation restores its 3D starter scene. Earlier P2/P3 branches and remote CI issues remain separate integration gates.

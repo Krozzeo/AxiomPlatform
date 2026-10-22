@@ -2,7 +2,11 @@
 
 Platform, products, native documents and Game Engine scripting SDK have independent versions. A product declares the supported Platform API range and project formats. Pin the tested provider HTTPS archive and lockfile integrity; never depend on a moving remote main. During 0.x, document incompatible minor changes; stable incompatible contracts require major versions. Retire contracts only after consumer evidence and a deprecation period.
 
-## P4 prepared distribution
+## MVP0.1.5 prepared distribution
+
+The current bundle has three sibling folders: AxiomPlatform, AxiomEngine and AxiomMathLab, with built Engine assets, source/integrity locks, launchers, English guides and exact revision/file hashes. Platform0.1.5 and Math0.1.1 are integrated into main; the separately reviewed Engine0.0.55 consumer remains versioned/pinned. The MVP tag adds a recovery point without moving older protected refs. Automatic ports use a browser-safe private high range. See [current guide](../MVP_GUIDE.md) and [closure](../MVP_CLOSURE.md).
+
+## Historical P4 prepared distribution
 
 The combined Windows ZIP contains sibling AxiomPlatform/AxiomEngine folders, sources, locked dependencies metadata, built editor/Wasm, launchers and version/hash manifest. It excludes credentials, user projects, .git, node_modules and local caches. The root launcher derives paths from its own location. Keep both folders together when relocating.
 

@@ -1,6 +1,6 @@
 # Axiom Platform roadmap — P0 to P5
 
-P0–P5 feature development is complete in MVP0.1.5. Release closure requires normal CI/integration and a reproducible prepared package. Live-account/model/hardware and clean-machine checks remain explicit operational acceptance, not claimed results. ADR-P0007 transfers the standalone game-export requirement to Game Engine, where it remains missing. Game Engine keeps its independent M19–M40 Unity/shader/GPU roadmap.
+P0–P5 feature development is complete in MVP0.1.5. The feature scope is integrated into main through PR6 after successful CI; the reproducible prepared package is recorded separately. Live-account/model/hardware and clean-machine checks remain explicit operational acceptance, not claimed results. ADR-P0007 transfers the standalone game-export requirement to Game Engine, where it remains missing. Game Engine keeps its independent M19–M40 Unity/shader/GPU roadmap.
 
 | Milestone | Delivery | Dependency | Acceptance gate |
 | --- | --- | --- | --- |
@@ -22,3 +22,5 @@ P0 has [documentary acceptance](P0_ACCEPTANCE.md); P1–P4 each have reports. Ev
 Historical P5 candidate guide: [manual acceptance](P5_GUIDE.md) and [evidence/limits](reports/P5_REPORT.md).
 
 Current authority: [MVP closure](MVP_CLOSURE.md), [guide](MVP_GUIDE.md), [ownership decision](adr/0007-mvp-closure.md). Earlier candidate/export-gate reports are historical and superseded by that explicit owner decision.
+
+P0, P1, P2, P3, P4 and P5 development status: **complete** within the scope of ADR-P0007. No additional MVP phase is pending. Source integration/evidence: [closure record](MVP_CLOSURE.md). Operational validation remains explicit.
