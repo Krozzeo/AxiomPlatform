@@ -10,9 +10,16 @@ async function snapshot(root,file){
 }
 export class ProjectDeletion {
  constructor(manager){this.manager=manager;this.recycle=manager.recycle??recycleNative;this.plans=new Map();}
- async review(entry){const m=this.manager,root=await realpath(m.root),file=await authorizedPath(m.root,entry.path),folder=dirname(file);assert(folder!==root&&inside(root,folder),'permissionDenied','The storage root cannot be deleted as a project.');assert(!m.store.value.recents.some(p=>p.path!==entry.path&&inside(folder,inside(m.root,p.path)?resolve(root,relative(m.root,p.path)):p.path)),'projectBusy','This folder contains another registered project.');const info=await snapshot(folder,file),id=randomUUID();this.plans.set(id,{entry:structuredClone(entry),folder,...info,expires:Date.now()+120000});if(this.plans.size>64)this.plans.delete(this.plans.keys().next().value);return {planId:id,projectId:entry.projectId,name:entry.name,folder,files:info.files,bytes:info.bytes};}
+ async target(entry){
+  const m=this.manager,grant=entry.storageRoot??m.root,root=await realpath(grant),file=await authorizedPath(grant,entry.path),folder=dirname(file);
+  assert(folder!==root&&inside(root,folder),'permissionDenied','The storage root cannot be deleted as a project.');
+  for(const path of [m.root,m.store.value.productRoot,...(m.registry?.view()??[]).map(i=>i.path)].filter(Boolean)){const canonical=await realpath(path).catch(e=>{if(e.code==='ENOENT')return resolve(path);throw e;});assert(!inside(folder,canonical),'permissionDenied','This project contains protected storage or an installation.');}
+  for(const p of m.store.value.recents)if(p.path!==entry.path){const canonical=await realpath(p.path).catch(e=>{if(e.code==='ENOENT')return inside(grant,p.path)?resolve(root,relative(grant,p.path)):resolve(p.path);throw e;});assert(!inside(folder,canonical),'projectBusy','This folder contains another registered project.');}
+  return {root,file,folder};
+ }
+ async review(entry){const {file,folder}=await this.target(entry),info=await snapshot(folder,file),id=randomUUID();this.plans.set(id,{entry:structuredClone(entry),folder,...info,expires:Date.now()+120000});if(this.plans.size>64)this.plans.delete(this.plans.keys().next().value);return {planId:id,projectId:entry.projectId,name:entry.name,folder,files:info.files,bytes:info.bytes};}
  async remove(entry,data){const plan=this.plans.get(data.planId);assert(plan&&plan.expires>Date.now()&&plan.entry.projectId===entry.projectId&&plan.entry.path===entry.path&&data.confirm===true,'invalidRequest','Confirm moving this project to the Recycle Bin and review again.');
-  const root=await realpath(this.manager.root),file=await authorizedPath(this.manager.root,entry.path);assert(dirname(file)===plan.folder&&inside(root,plan.folder)&&plan.folder!==root,'permissionDenied','Deletion target changed.');const current=await snapshot(plan.folder,file);assert(current.hash===plan.hash,'revisionConflict','Project files changed since deletion was reviewed. Review again.');this.plans.delete(data.planId);
+  const {root,file}=await this.target(entry);assert(dirname(file)===plan.folder&&inside(root,plan.folder)&&plan.folder!==root,'permissionDenied','Deletion target changed.');const current=await snapshot(plan.folder,file);assert(current.hash===plan.hash,'revisionConflict','Project files changed since deletion was reviewed. Review again.');this.plans.delete(data.planId);
   // Only the canonical, reviewed folder beneath the authorized storage root is moved to the Recycle Bin.
   await this.recycle(plan.folder);await this.manager.store.update(v=>{v.recents=v.recents.filter(p=>p.path!==entry.path);});return {recycled:entry.projectId};
  }

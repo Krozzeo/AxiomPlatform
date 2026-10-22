@@ -39,7 +39,7 @@ test('P2 real catalog/root survive restart; local import preserves source and na
   const opened=await f.session({action:'open',productId:'axiom.game-engine',path:dirname(imported.path)});
   await assert.rejects(f.post('/v1/settings',{projectRoot:join(f.base,'next')}),e=>e.code==='projectBusy');
   await f.session({action:'close',sessionId:opened.sessionId,expectedRevision:opened.status.revision,decision:'save'});
-  const next=join(f.base,'next');await f.post('/v1/settings',{projectRoot:next});await f.restart();assert.equal(f.host().manager.root,next);
+  const next=join(f.base,'next');await f.post('/v1/settings',{projectRoot:next});await f.restart();assert.equal(f.host().manager.root,next);assert.equal(f.host().manager.catalog().recents[0].projectId,created.id);const oldProject=await f.session({action:'open',productId:'axiom.game-engine',path:imported.path});assert.equal(oldProject.status.projectId,created.id);await f.session({action:'close',sessionId:oldProject.sessionId,expectedRevision:oldProject.status.revision,decision:'save'});await assert.rejects(f.session({action:'open',productId:'axiom.game-engine',path:sourceFile}),e=>e.code==='permissionDenied');
   await f.post('/v1/settings',{projectRoot:f.root});assert.equal(f.host().manager.catalog().recents[0].projectId,created.id);
   assert.deepEqual(await readFile(sourceFile),before);
 });
