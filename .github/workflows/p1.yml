@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: Krozzeo/AxiomGameEngine
-          ref: 30bf32f83e974053f878a402411f7e7099a04346
+          ref: 11466cdd2b45838ad47f15ea9892535d0994a4a0
           path: game-engine
       - uses: actions/checkout@v4
         with:
