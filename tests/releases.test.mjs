@@ -1,7 +1,7 @@
 import {fixture} from './fixtures/releases.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,rm,readFile,readdir} from 'node:fs/promises';
+import {mkdtemp,rm,readFile,readdir,realpath} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {createHash} from 'node:crypto';
@@ -19,7 +19,7 @@ test('release catalog validates official identity, numeric versions, platform an
 test('prepared download installs in persistent product storage, verifies handshake, preserves selection on restart and supports rollback',async t=>{
  const root=await temp(t),f=fixture(),releases=new ReleaseCatalog({fetchImpl:f.fetchImpl,platform:'win32',arch:'x64'});await releases.refresh();let host=await startHost({root:join(root,'projects'),stateRoot:join(root,'profile'),manifests:[],releaseCatalog:releases});t.after(()=>host.close());
  const storage=join(root,'products with spaces');await host.manager.configure({productRoot:storage});await host.manager.installRelease('axiom.game-engine@0.0.56');assert.equal(host.manager.catalog().products[0].productVersion,'0.0.56');assert.equal(host.manager.catalog().releases.pending.length,0);assert.equal(JSON.parse(await readFile(join(storage,'axiom.game-engine-0.0.56/platform/product.json'),'utf8')).productVersion,'0.0.56');
- await assert.rejects(host.manager.installRelease('axiom.game-engine@0.0.56'),/already exists/);await host.close();host=await startHost({stateRoot:join(root,'profile')});assert.equal(host.manager.catalog().productRoot,storage);assert.equal(host.manager.catalog().products[0].productVersion,'0.0.56');const report=host.manager.diagnostics();assert(!JSON.stringify(report).includes(root));assert.equal(report.installations[0].version,'0.0.56');
+ await assert.rejects(host.manager.installRelease('axiom.game-engine@0.0.56'),/already exists/);await host.close();host=await startHost({stateRoot:join(root,'profile')});assert.equal(host.manager.catalog().productRoot,await realpath(storage));assert.equal(host.manager.catalog().products[0].productVersion,'0.0.56');const report=host.manager.diagnostics();assert(!JSON.stringify(report).includes(root));assert.equal(report.installations[0].version,'0.0.56');
 });
 test('bad checksum and unsafe ZIP paths do not install or touch sibling files',async t=>{
  const root=await temp(t),f=fixture(),catalog=new ReleaseCatalog({fetchImpl:f.fetchImpl,platform:'win32',arch:'x64'});await catalog.refresh();catalog.items[0].artifacts[0].sha256='0'.repeat(64);const host=await startHost({root:join(root,'projects'),stateRoot:join(root,'profile'),manifests:[],releaseCatalog:catalog});t.after(()=>host.close());await assert.rejects(host.manager.installRelease('axiom.game-engine@0.0.56'),/checksum/);assert.equal(host.manager.registry.items.size,0);
