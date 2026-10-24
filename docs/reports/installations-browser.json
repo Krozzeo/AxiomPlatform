@@ -1,0 +1,10 @@
+{
+  "criteria": [
+    "Product tabs filter installed rows; Add installation auto-refreshes and labels stable/experimental entries; same-version experimental download preserves the active stable installation",
+    "Remove uses the project trash icon, supports Cancel and Confirm, recycles just the selected version and preserves the real open project",
+    "Settings sources autosave, survive reload and reset to the original repository defaults"
+  ],
+  "pageErrors": [],
+  "transport": "Controlled release service; real Engine project lifecycle",
+  "passed": true
+}

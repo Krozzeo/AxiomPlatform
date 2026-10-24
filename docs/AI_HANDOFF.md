@@ -1,3 +1,17 @@
+# Current handoff — Platform0.1.8
+
+The approved post-MVP expansion adds same-version, commit-pinned experimental packages alongside stable installations. Main list contains installed versions only, with All/product tabs, explicit experimental activation and reviewed Recycle Bin removal that preserves projects. Add installation refreshes automatically and labels Installed/Active/Experimental separately. Accounts, native documents, protocol1 and Platform API0.1 are unchanged.
+
+Settings → General → Updates stores editable public GitHub repository URLs for Platform, Game Engine and Math Lab. Defaults remain Krozzeo repositories, reset is available, and changes clear stale catalogs. Credentials are never added to public release requests. The full source/manifest/hash/handshake contract still applies to the selected repository.
+
+Axiom Hub is a portable Windows shortcut with the Axiom icon targeting Start Axiom.cmd. Its native template contains no development checkout path; copying the delivery folder resolves the launcher beside the copied shortcut. Tests exercise it with harmless temporary launchers.
+
+Experimental publishing requires passing exact-commit CI and an open same-repository PR. Candidate build jobs have read-only permissions; the separate publisher executes pinned trusted tooling, uploads verified artifacts and never overwrites an existing publication. workflow_run automation needs the workflow on main once; bootstrap tags can publish an already accepted PR without merging product code. Stable main publication and experimental PR publication remain distinct. See [guide](EXPERIMENTAL_INSTALLATIONS.md) and [release contract](PRODUCT_RELEASES.md). Release/remote acceptance states are recorded separately; a local ZIP is not proof of a public release.
+
+Earlier handoff below is historical.
+
+---
+
 # Current handoff — Platform0.1.7 product services
 
 Owner-approved post-MVP expansion, jointly with Engine0.0.56. P0–P5 remains closed. Platform0.1.6 recovery was merged to main at5fb826792fa58032c932174634bafb3d5f14bc0b. This branch adds [product release/account/diagnostic contracts](PRODUCT_RELEASES.md): exclusive host account authority, product model inheritance/overrides, official stable GitHub manifests, bounded/hash-verified staged installs, persistent product storage, deferred activation/rollback and sanitized report export. Host version derives from package metadata. First launch can open an empty Hub and add products later; Windows startup still prepares Node/.NET for the family.

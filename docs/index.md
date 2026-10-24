@@ -15,3 +15,5 @@ Maintained documentation is English. Original-language pre-P4 snapshots in docs/
 - [MVP0.1.5 closure](MVP_CLOSURE.md), [final guide](MVP_GUIDE.md), [scope/ownership ADR](adr/0007-mvp-closure.md).
 
 - [Post-MVP product releases, account authority, storage and diagnostics](PRODUCT_RELEASES.md).
+
+- [Platform0.1.8 experimental installations, removal, configurable sources and portable shortcut](EXPERIMENTAL_INSTALLATIONS.md).

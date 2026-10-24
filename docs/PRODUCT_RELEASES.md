@@ -1,3 +1,9 @@
+# Current release channel extension — Platform0.1.8
+
+[Experimental installation/source guide](EXPERIMENTAL_INSTALLATIONS.md) supersedes earlier stable-only catalog statements below. Experimental identity includes the complete commit, independent of numeric version. Removing an installation preserves projects and uses reviewed native recycling. Sources are configurable per product in persistent General settings. Protocol/API and existing stable manifests remain compatible.
+
+---
+
 # Product releases, accounts and diagnostics — Platform0.1.7
 
 Owner-approved post-MVP maintenance/expansion, 2026-10-22. P0–P5 remain closed. Game Engine0.0.56 is the reference consumer; the native game document format remains1 and scripting SDK remains8.

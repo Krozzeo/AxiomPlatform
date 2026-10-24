@@ -7,3 +7,7 @@
 :root{--session-row:#173551;--session-hover:#204563;--chosen-row:#24598a}:root[data-theme=light]{--session-row:#e4effc;--session-hover:#d6e7fa;--chosen-row:#b8d8fc}tbody tr.session-active{background:var(--session-row)}tbody tr.session-active:hover{background:var(--session-hover)}tbody tr.project-selected,tbody tr.project-selected:hover{background:var(--chosen-row)!important}#notifications-toggle img{width:22px;height:22px}.model-test-status{font-size:13px;color:var(--muted)}.model-test-status[data-state=passed]{color:#69c99c}
 
 .sidebar-link{position:relative}.updates-badge{position:absolute;right:5px;top:3px;background:#d64049;color:white;border-radius:20px;min-width:18px;height:18px;display:grid;place-items:center;font:600 11px system-ui;font-style:normal}.update-banner{border:1px solid #498fd2;background:#183047;padding:12px 16px;border-radius:6px;color:#e5f1ff}.update-banner a{color:#9fcdff}.release-unavailable{color:var(--muted)}
+
+.installation-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.installation-tabs [aria-selected=true]{background:var(--accent,#2785e5);color:white}.experimental{color:#e7b559;margin-left:8px}.release-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.installation-actions{display:flex;align-items:center;gap:8px}
+
+.installation-card .badge.experimental{color:#e7b559}
