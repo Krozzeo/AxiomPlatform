@@ -4,7 +4,7 @@ The approved post-MVP expansion adds same-version, commit-pinned experimental pa
 
 Settings → General → Updates stores editable public GitHub repository URLs for Platform, Game Engine and Math Lab. Defaults remain Krozzeo repositories, reset is available, and changes clear stale catalogs. Credentials are never added to public release requests. The full source/manifest/hash/handshake contract still applies to the selected repository.
 
-Axiom Hub is a portable Windows shortcut with the Axiom icon targeting Start Axiom.cmd. Its native template contains no development checkout path; copying the delivery folder resolves the launcher beside the copied shortcut. Tests exercise it with harmless temporary launchers.
+Axiom Hub is a portable Windows launcher with the Axiom icon targeting Start Axiom.cmd. Its small Windows launcher embeds the Axiom icon and resolves Start Axiom.cmd beside its own executable, without a checkout path. Tests exercise it with harmless temporary launchers.
 
 Experimental publishing requires passing exact-commit CI and an open same-repository PR. Candidate build jobs have read-only permissions; the separate publisher executes pinned trusted tooling, uploads verified artifacts and never overwrites an existing publication. workflow_run automation needs the workflow on main once; bootstrap tags can publish an already accepted PR without merging product code. Stable main publication and experimental PR publication remain distinct. See [guide](EXPERIMENTAL_INSTALLATIONS.md) and [release contract](PRODUCT_RELEASES.md). Release/remote acceptance states are recorded separately; a local ZIP is not proof of a public release.
 

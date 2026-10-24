@@ -64,7 +64,7 @@ jobs:
           AXIOM_RELEASE_BRANCH: ${{ needs.verify.outputs.branch }}
           AXIOM_RELEASE_PR: ${{ needs.verify.outputs.pullRequest }}
           AXIOM_RELEASE_RUN_ID: ${{ needs.verify.outputs.runId }}
-        run: node .release-tooling/scripts/prepare-release.mjs . .axiom/release
+        run: node scripts/prepare-release.mjs . .axiom/release
       - uses: actions/upload-artifact@v4
         with:
           name: prepared-product

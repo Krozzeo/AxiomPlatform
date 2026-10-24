@@ -1,4 +1,4 @@
-import {shortcutBytes} from './hub-shortcut.mjs';
+import {hubLauncherBytes} from './hub-shortcut.mjs';
 import {distribution} from '../services/local-host/distribution.mjs';
 import {readFile,readdir,lstat,mkdir,writeFile} from 'node:fs/promises';
 import {resolve,join,relative} from 'node:path';
@@ -17,7 +17,7 @@ export async function prepareRelease(root,out,{platform='win32',arch='x64',build
  async function add(path){const info=await lstat(path);if(info.isSymbolicLink())throw Error('Prepared packages cannot contain links: '+relative(root,path));if(info.isDirectory()){for(const n of await readdir(path))await add(join(path,n));}else if(info.isFile())files.set(relative(root,path).replaceAll('\\','/'),await readFile(path));}
  for(const name of tracked){if(name.startsWith('.github/')||name.startsWith('.axiom/'))continue;await add(join(root,name));}
  if(!isHost){await add(join(root,'node_modules'));if(descriptor.productId==='axiom.game-engine')await add(join(root,'dist/editor'));}
- files.set('axiom-build.json',Buffer.from(JSON.stringify(build,null,2)+'\n'));if(isHost){files.set('Axiom Hub.lnk',shortcutBytes());files.set('Axiom.ico',await readFile(new URL('../apps/hub/icons/axiom.ico',import.meta.url)));}
+ files.set('axiom-build.json',Buffer.from(JSON.stringify(build,null,2)+'\n'));if(isHost){files.set('Axiom Hub.exe',hubLauncherBytes());}
  const data=zipEntries([...files].sort(([a],[b])=>a.localeCompare(b)).map(([name,data])=>({name,data}))),name=(isHost?'AxiomPlatform':descriptor.productId==='axiom.game-engine'?'AxiomGameEngine':'AxiomMathLab')+'-'+pkg.version+(build.channel==='experimental'?'-experimental-'+build.commit.slice(0,12):'')+'-'+platform+'-'+arch+'.zip';
  if(data.length>128*1024*1024)throw Error('Prepared release exceeds download budget.');await mkdir(out,{recursive:true});await writeFile(join(out,name),data);
  const manifest={schemaVersion:1,channel:build.channel,...(build.channel==='experimental'?{build}:{}),productId:descriptor.productId,version:pkg.version,platformApiRange:'>=0.1.0 <0.2.0',artifacts:[{platform,arch,name,bytes:data.length,sha256:createHash('sha256').update(data).digest('hex')}]};await writeFile(join(out,'axiom-release.json'),JSON.stringify(manifest,null,2)+'\n');return manifest;
