@@ -1,4 +1,5 @@
-export const PLATFORM_VERSION = '0.1.6';
+import packageData from '../../package.json' with {type:'json'};
+export const PLATFORM_VERSION = packageData.version;
 export const PROTOCOL_VERSION = 1;
 export const CAPABILITIES = ['project.detect','project.create','project.open','project.status','project.save','project.close'];
 export const METHODS = ['initialize', ...CAPABILITIES];

@@ -2,6 +2,7 @@ import {fork} from 'node:child_process';
 import {randomUUID} from 'node:crypto';
 import {once} from 'node:events';
 import {PROTOCOL_VERSION, failure} from '../contracts/index.mjs';
+export function productEnvironment(source=process.env){const env={...source};for(const key of Object.keys(env))if(['OPENAI_API_KEY','GITHUB_TOKEN','GH_TOKEN','AXIOM_SESSION_TOKEN'].includes(key.toUpperCase()))delete env[key];return env;}
 
 // Only an explicitly registered installation supplies this executable; projects never do.
 export class ProductClient {
@@ -10,7 +11,7 @@ export class ProductClient {
     this.pending = new Map();
     this.dead = false;
     this.productId=productId;
-    const env={...process.env};delete env.OPENAI_API_KEY;
+    const env=productEnvironment();
     this.child = fork(entry, [], {stdio: ['ignore','ignore','ignore','ipc'], windowsHide: true,env});
     this.child.on('message', value => {
       if(value?.kind==='service.request'){

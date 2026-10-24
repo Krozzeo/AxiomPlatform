@@ -5,6 +5,7 @@ export class GitHubClient {
  constructor({fetchImpl=fetch,timeoutMs=20000}={}){this.fetch=fetchImpl;this.timeoutMs=timeoutMs;this.token=null;}
  disconnect(){this.token=null;}
  async request(path,{method='GET',body,missing=false}={}){
+  if(typeof path!=='string'||!path.startsWith('/')||path.startsWith('//')||path.length>2048||/[\\#\r\n]/.test(path)||new URL('https://api.github.com'+path).origin!=='https://api.github.com')throw githubError('Unsupported GitHub request target.');
   if(!this.token)throw githubError('Connect your GitHub account first','AX_GITHUB_0002');
   let response;try{response=await this.fetch('https://api.github.com'+path,{method,redirect:'error',signal:AbortSignal.timeout(this.timeoutMs),headers:{Authorization:'Bearer '+this.token,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});}catch{throw githubError('GitHub did not confirm the request. Check publication status before retrying.','AX_GITHUB_0003');}
   if(missing&&response.status===404)return null;

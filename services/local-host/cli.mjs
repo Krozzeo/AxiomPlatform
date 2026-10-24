@@ -1,3 +1,4 @@
+import {PLATFORM_VERSION} from '../../packages/contracts/index.mjs';
 import {resolve,join} from 'node:path';
 import {homedir} from 'node:os';
 import {startHost} from './server.mjs';
@@ -12,8 +13,8 @@ for(let i=0;i<args.length;i++){
   else if(args[i]==='--open')open=true;
   else throw Error('Usage: npm start -- --product <installation/product.json> --projects-root <directory> [--port 4320]');
 }
-const host=await startHost({root,manifests,port,stateRoot});
-console.log('Axiom Platform 0.1.6 — local session. Browser URL:');
+const host=await startHost({checkReleases:true,root,manifests,port,stateRoot});
+console.log('Axiom Platform '+PLATFORM_VERSION+' — local session. Browser URL:');
 console.log(host.url);
 if(open)try{await openBrowser(host.url);}catch(error){console.error('The browser could not be opened automatically: '+error.message);console.error('Open the URL above manually.');}
 let closing=false;

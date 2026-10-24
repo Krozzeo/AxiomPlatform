@@ -28,7 +28,7 @@ export class SessionManager {
   async probeInstallation(id){const item=this.registry.items.get(id);assert(item&&!item.error,'incompatibleVersion','Choose an available installation.');const client=new ProductClient(item.entry,{timeoutMs:10000,productId:item.productId});try{const hello=await client.call('initialize',{platformVersion:PLATFORM_VERSION,authorizedRoot:this.root},randomUUID());assert(hello.protocolVersion===PROTOCOL_VERSION&&hello.productId===item.productId&&hello.productVersion===item.manifest.productVersion&&Array.isArray(hello.capabilities)&&item.manifest.capabilities.every(c=>hello.capabilities.includes(c)),'incompatibleVersion','Installation handshake does not match its descriptor.');}finally{await client.stop();}}
 
   catalog() {
-    return {version: PLATFORM_VERSION, projectRoot:this.root, preferences:this.store?.value.preferences??{},recents:(this.store?.value.recents??[]).filter(p=>inside(this.root,p.path)),github:this.account?.status(),ai:this.ai?{...this.ai.status(),usage:structuredClone(this.ai.usage)}:null,products:[...this.products.values()].map(p => p.manifest), installations:this.registry?.view()??[],sessions:[...this.sessions.values()].map(s => this.view(s))};
+    return {version: PLATFORM_VERSION, productRoot:this.store?.value.productRoot, releases:this.releases?.view(this.registry?.view()??[])??null, projectRoot:this.root, preferences:this.store?.value.preferences??{},recents:this.store?.value.recents??[],github:this.account?.status(),ai:this.ai?{...this.ai.status(),usage:structuredClone(this.ai.usage)}:null,products:[...this.products.values()].map(p => p.manifest), installations:this.registry?.view()??[],sessions:[...this.sessions.values()].map(s => this.view(s))};
   }
   view(s) {
     return {sessionId:s.id,productId:s.productId,productVersion:s.productVersion,state:s.state,path:s.path ? relative(this.root,s.path) : null,status:s.status ?? null,error:s.error ?? null,editorUrl:s.state === 'ready' ? s.editorUrl : null};
@@ -55,10 +55,10 @@ export class SessionManager {
   async launch(data) {
     const product = this.products.get(data.productId);
     assert(product, 'unsupportedCapability','The selected product is not registered.');
-    let path;
+    let path,grantedRoot=this.root;
     if (data.action === 'open') {
       assert(typeof data.path==='string','invalidRequest','Choose a project path.');
-      path = await authorizedPath(this.root, data.path,{directory:(await lstat(resolve(this.root,data.path))).isDirectory()});
+      grantedRoot=this.projectGrant(data.path,data.productId);path = await authorizedPath(grantedRoot, resolve(this.root,data.path),{directory:(await lstat(resolve(this.root,data.path))).isDirectory()});
       const existing=this.sessions.get(this.owners.get(path.toLowerCase()));if(existing?.state==='ready'&&existing.productId===data.productId)return this.view(existing);assert(!existing,'projectBusy','This project is already open in Platform.');
     } else {
       assert(typeof data.name === 'string' && data.name.trim().length > 0 && data.name.length <= 128, 'invalidRequest','Enter a project name of 1–128 characters.');
@@ -70,15 +70,15 @@ export class SessionManager {
       if (!['closed','failed'].includes(s.state)) { s.state='failed'; s.error={code:'operationFailed',message:'Product process exited. Unsaved edits may be lost; reopen saved data.'}; }
       if (s.path) this.owners.delete(s.path.toLowerCase());
       if(!this.shuttingDown&&s.state==='failed'){const next=this.pending.then(async()=>{await this.registry.flush(this.busyProducts);this.products=this.registry.products;});this.pending=next.catch(()=>{});}
-    },onService:value=>{assert(s.state==='starting'||s.state==='ready','permissionDenied','Product session is closed.');if(value.service==='ai'){assert(this.ai&&s.state==='ready'&&s.status?.projectId,'permissionDenied','Open a project before using AI.');return this.ai.invoke(s.id,s.productId+':'+s.status.projectId,value.action,value.data).then(result=>value.action==='request'?result:{response:result,state:this.ai.status()});}assert(value.service==='github'&&this.account,'unsupportedCapability','Shared service is not available.');return this.account.invoke(value.action,value.data);}});
+    },onService:value=>{assert(s.state==='starting'||s.state==='ready','permissionDenied','Product session is closed.');if(value.service==='ai'){assert(this.ai&&s.state==='ready'&&s.status?.projectId,'permissionDenied','Open a project before using AI.');if(value.action==='request')assert(this.ai.status().connected,'permissionDenied','Connect OpenAI in Axiom Platform Settings first.');return (assert(!['connect','disconnect'].includes(value.action)&&(!value.data?.key||value.data.key==='platform-session')&&!value.data?.apiKey,'permissionDenied','Account credentials are managed only by Platform.'),this.ai.invoke(s.id,s.productId+':'+s.status.projectId,value.action,value.data)).then(result=>value.action==='request'?result:{response:result,state:this.ai.status()});}assert(value.service==='github'&&this.account,'unsupportedCapability','Shared service is not available.');assert(!['connect','disconnect'].includes(value.action),'permissionDenied','Account credentials are managed only by Platform.');return this.account.invoke(value.action,value.data);}});
     s.client = client; this.sessions.set(s.id,s);
     try {
-      const hello = await client.call('initialize',this.initialize(),s.id);
+      const hello = await client.call('initialize',this.initialize({authorizedRoot:grantedRoot}),s.id);
       assert(hello.protocolVersion === PROTOCOL_VERSION && hello.productId === data.productId && hello.productVersion === product.manifest.productVersion, 'incompatibleVersion','Product handshake does not match its registered descriptor.');
       assert(Array.isArray(hello.capabilities)&&product.manifest.capabilities.every(c=>hello.capabilities.includes(c)),'unsupportedCapability','Product handshake is missing required lifecycle capabilities.');
       if (path) {
         const detected = await client.call('project.detect',{path},s.id);
-        path=await authorizedPath(this.root,detected.path);s.path=path;
+        path=await authorizedPath(grantedRoot,detected.path);s.path=path;
         assert(!this.owners.has(path.toLowerCase()),'projectBusy','This project is already open in Platform.');
         const known=this.store?.value.recents.find(p=>p.projectId===detected.projectId&&p.productId===data.productId);
         assert(!known||known.path.toLowerCase()===path.toLowerCase(),'projectBusy','This identity is already registered. Open its catalog entry.');
@@ -90,11 +90,11 @@ export class SessionManager {
       }
       this.owners.set(path.toLowerCase(),s.id);
       const opened = await client.call('project.'+data.action,{path,name:data.name,operationId:data.operationId},s.id);
-      s.path=await authorizedPath(this.root,opened.path); s.status=opened.status; s.editorUrl=opened.editorUrl;
+      s.path=await authorizedPath(grantedRoot,opened.path);s.storageRoot=grantedRoot; s.status=opened.status; s.editorUrl=opened.editorUrl;
       const url = new URL(s.editorUrl);
       assert(url.protocol==='http:' && url.hostname==='127.0.0.1' && url.port && !url.username && !url.password,'permissionDenied','The product must expose a loopback editor.');
       s.state='ready'; this.owners.delete(path.toLowerCase()); this.owners.set(s.path.toLowerCase(),s.id);
-      await this.store?.remember({productId:s.productId,projectId:s.status.projectId,name:s.status.name,path:s.path,savedRevision:s.status.savedRevision,productVersion:s.productVersion});
+      await this.store?.remember({productId:s.productId,projectId:s.status.projectId,name:s.status.name,path:s.path,storageRoot:s.storageRoot,savedRevision:s.status.savedRevision,productVersion:s.productVersion});
       return this.view(s);
     } catch (error) {
       s.state='failed'; s.error={code:error.code ?? 'operationFailed',message:error.message};
@@ -108,41 +108,50 @@ export class SessionManager {
   accountChanged(state){for(const s of this.sessions.values())s.client?.notify({kind:'service.account',state});}
   configure(data){const task=this.pending.then(()=>this.applySettings(data));this.pending=task.catch(()=>{});return task;}
   async applySettings(data){
-    if(data.aiDefaults!==undefined){const next=selection(data.aiDefaults);await this.store.update(v=>{v.preferences.aiDefaults=next;});this.ai.defaults=next;this.ai.modelTest=null;this.ai.onChange(this.ai.status());}
-    if(data.aiTransport!==undefined){const t=data.aiTransport;assert(t&&Number.isInteger(t.timeoutSeconds)&&t.timeoutSeconds>=15&&t.timeoutSeconds<=300&&Number.isInteger(t.maxConcurrentRequests)&&t.maxConcurrentRequests>=1&&t.maxConcurrentRequests<=8&&Number.isInteger(t.maxResponseBytes)&&t.maxResponseBytes>=262144&&t.maxResponseBytes<=2097152,'invalidRequest','AI transport settings are outside supported limits.');await this.store.update(v=>{v.preferences.aiTransport={timeoutSeconds:t.timeoutSeconds,maxConcurrentRequests:t.maxConcurrentRequests,maxResponseBytes:t.maxResponseBytes};});this.ai.setTransport(t);this.ai.onChange(this.ai.status());}
+    assert(data&&typeof data==='object','invalidRequest','Invalid settings.');
+    const preferences={};
+    if(data.aiDefaults!==undefined)preferences.aiDefaults=selection(data.aiDefaults);
+    if(data.aiTransport!==undefined){const t=data.aiTransport;assert(t&&Number.isInteger(t.timeoutSeconds)&&t.timeoutSeconds>=15&&t.timeoutSeconds<=300&&Number.isInteger(t.maxConcurrentRequests)&&t.maxConcurrentRequests>=1&&t.maxConcurrentRequests<=8&&Number.isInteger(t.maxResponseBytes)&&t.maxResponseBytes>=262144&&t.maxResponseBytes<=2097152,'invalidRequest','AI transport settings are outside supported limits.');preferences.aiTransport={...t};}
+    if(data.theme!==undefined){assert(['dark','light','system'].includes(data.theme),'invalidRequest','Choose a supported theme.');preferences.theme=data.theme;}
+    if(data.sortBy!==undefined){assert(['recent','name'].includes(data.sortBy),'invalidRequest','Choose a supported sort order.');preferences.sortBy=data.sortBy;}
+    if(data.defaultProduct!==undefined){assert(this.products.has(data.defaultProduct),'invalidRequest','Select a registered product.');preferences.defaultProduct=data.defaultProduct;}
     if(data.projectRoot!==undefined)assert(![...this.sessions.values()].some(s=>['starting','ready'].includes(s.state)),'projectBusy','Close active projects before changing project storage.');
-    assert(typeof data.projectRoot==='string'||data.projectRoot===undefined,'invalidRequest','Choose a storage path.');const next=data.projectRoot===undefined?this.root:resolve(data.projectRoot);
-    assert(typeof data.projectRoot==='string'||data.projectRoot===undefined,'invalidRequest','Choose a project storage directory.');
-    await mkdir(next,{recursive:true});const root=await realpath(next);
-    if(data.defaultProduct!==undefined)assert(this.products.has(data.defaultProduct),'invalidRequest','Select a registered product.');
-    if(data.theme!==undefined)assert(['dark','light','system'].includes(data.theme),'invalidRequest','Choose a supported theme.');if(data.sortBy!==undefined)assert(['recent','name'].includes(data.sortBy),'invalidRequest','Choose a supported sort order.');await this.store.update(v=>{if(data.theme!==undefined)v.preferences.theme=data.theme;if(data.sortBy!==undefined)v.preferences.sortBy=data.sortBy;v.projectRoot=root;if(data.defaultProduct!==undefined)v.preferences.defaultProduct=data.defaultProduct;});this.root=root;
-    return this.catalog();
+    const roots={};for(const key of ['projectRoot','productRoot'])if(data[key]!==undefined){assert(typeof data[key]==='string'&&data[key].trim().length>0,'invalidRequest','Choose a storage directory.');const path=resolve(data[key]);await mkdir(path,{recursive:true});assert(!(await lstat(path)).isSymbolicLink(),'permissionDenied','Storage cannot be a symbolic link.');roots[key]=await realpath(path);}
+    await this.store.update(v=>{Object.assign(v,roots);Object.assign(v.preferences,preferences);});this.root=this.store.value.projectRoot;
+    if(preferences.aiDefaults){this.ai.defaults=preferences.aiDefaults;this.ai.modelTest=null;}if(preferences.aiTransport)this.ai.setTransport(preferences.aiTransport);if(preferences.aiDefaults||preferences.aiTransport)this.ai.onChange(this.ai.status());return this.catalog();
   }
+  installRelease(id){const task=this.pending.then(()=>this.releases.install(id,this));this.pending=task.catch(()=>{});return task;}
+  diagnostics(){return {schemaVersion:1,generatedAt:new Date().toISOString(),compatibility:{protocol:PROTOCOL_VERSION,platformApi:'0.1'},errors:[...this.sessions.values()].filter(s=>s.error).slice(-20).map(s=>({productId:s.productId,code:s.error.code??'operationFailed'})),platformVersion:PLATFORM_VERSION,nodeVersion:process.versions.node,os:process.platform,arch:process.arch,accounts:{ai:!!this.ai?.status().connected,github:!!this.account?.status().connected},installations:this.registry.view().map(({productId,version,active,pending,error})=>({productId,version,active,pending,available:!error})),sessions:[...this.sessions.values()].map(s=>({productId:s.productId,version:s.productVersion,state:s.state,dirty:!!s.status?.dirty})),releaseChecks:this.releases?{checkedAt:this.releases.checkedAt,errors:this.releases.errors}:null};}
   async importProject(data){
     const product=this.products.get(data.productId);assert(product?.manifest.capabilities.includes('project.import'),'unsupportedCapability','Install a product adapter with P2 import support.');
     if(data.kind!=='github'&&data.action!=='github-projects')assert(typeof data.sourcePath==='string'&&data.sourcePath.length>0,'invalidRequest','Choose the project folder to import.');
     let destination;
-    const id=randomUUID(),client=new ProductClient(product.entry,{productId:data.productId,timeoutMs:60000,onService:value=>{assert(value.service==='github'&&this.account,'unsupportedCapability','Shared GitHub is not available.');assert(['status','request'].includes(value.action),'permissionDenied','Import cannot change the GitHub account.');assert((value.data?.options?.method??'GET')==='GET','permissionDenied','Import is read-only on GitHub.');return this.account.invoke(value.action,value.data);}});
+    const id=randomUUID(),client=new ProductClient(product.entry,{productId:data.productId,timeoutMs:60000,onService:value=>{assert(value.service==='github'&&this.account,'unsupportedCapability','Shared GitHub is not available.');assert(['status','request'].includes(value.action),'permissionDenied','Import cannot change the GitHub account.');assert((value.data?.options?.method??'GET')==='GET','permissionDenied','Import is read-only on GitHub.');assert(!['connect','disconnect'].includes(value.action),'permissionDenied','Account credentials are managed only by Platform.');return this.account.invoke(value.action,value.data);}});
     try{
       await client.call('initialize',this.initialize({readSources:data.sourcePath?[await realpath(data.sourcePath)]:[]}),id);
       if(data.action==='github-projects')return await client.call('project.github.list',data,id);
       destination=await mkdtemp(join(this.root,'import-'));
       const imported=await client.call('project.import',{...data,destination},id);
       const path=await authorizedPath(this.root,imported.path),old=this.store.value.recents.find(p=>p.projectId===imported.projectId&&p.productId===data.productId);
-      if(old){assert(inside(this.root,old.path),'projectBusy','This project is already registered under another storage root.');await rm(destination,{recursive:true,force:true});destination=null;return {...old,alreadyRegistered:true};}
+      if(old){await rm(destination,{recursive:true,force:true});destination=null;return {...old,alreadyRegistered:true};}
       const entry={productId:data.productId,projectId:imported.projectId,name:imported.name,path};await this.store.remember(entry);return entry;
     }catch(error){if(destination&&inside(this.root,destination))await rm(destination,{recursive:true,force:true});throw error;}
     finally{await client.stop();}
   }
-  async inspectProject(productId,path,run){const product=this.products.get(productId);assert(product,'unsupportedCapability','Select a compatible installed product.');const client=new ProductClient(product.entry,{productId,timeoutMs:30000}),id=randomUUID();try{await client.call('initialize',this.initialize(),id);const detected=await client.call('project.detect',{path},id);return await run({client,id,detected,product});}finally{await client.stop();}}
+  projectGrant(path,productId){
+    const target=resolve(this.root,path);if(inside(this.root,target))return this.root;
+    const entry=this.store.value.recents.find(p=>p.productId===productId&&(resolve(p.path)===target||dirname(resolve(p.path))===target));
+    assert(entry&&typeof entry.storageRoot==='string'&&inside(entry.storageRoot,target),'permissionDenied','This project location has not been registered.');return entry.storageRoot;
+  }
+  async inspectProject(productId,path,run){const product=this.products.get(productId);assert(product,'unsupportedCapability','Select a compatible installed product.');const client=new ProductClient(product.entry,{productId,timeoutMs:30000}),id=randomUUID();try{await client.call('initialize',this.initialize({authorizedRoot:this.projectGrant(path,productId)}),id);const detected=await client.call('project.detect',{path},id);return await run({client,id,detected,product});}finally{await client.stop();}}
   async manageProject(data){
     if(data.action==='add-local'){
       const source=await realpath(data.sourcePath);if(!inside(this.root,source))return this.importProject({...data,sourcePath:source,action:'import',kind:'local'});
       const path=await authorizedPath(this.root,source,{directory:(await lstat(source)).isDirectory()});return this.inspectProject(data.productId,path,async({detected})=>{const file=await authorizedPath(this.root,detected.path),entry={productId:data.productId,projectId:detected.projectId,name:detected.name,path:file,savedRevision:detected.projectRevision};await this.store.remember(entry);return entry;});
     }
-    const entry=this.store.value.recents.find(p=>p.projectId===data.projectId&&p.productId===data.productId);assert(entry&&inside(this.root,entry.path),'invalidRequest','Select a project in the current storage.');
+    const entry=this.store.value.recents.find(p=>p.projectId===data.projectId&&p.productId===data.productId);assert(entry,'invalidRequest','Select a registered project.');
     const active=[...this.sessions.values()].find(s=>s.state==='ready'&&s.productId===entry.productId&&s.status.projectId===entry.projectId);
-    if(data.action==='open-folder'){await this.folderOpener(dirname(await authorizedPath(this.root,entry.path)));return {opened:true};}
+    if(data.action==='open-folder'){await this.folderOpener(dirname(await authorizedPath(this.projectGrant(entry.path,entry.productId),entry.path)));return {opened:true};}
     if(data.action==='rename'){
       assert(typeof data.name==='string'&&data.name.trim()&&data.name.length<=128,'invalidRequest','Enter a project name of 1–128 characters.');let saved;
       if(active){const result=await active.client.call('project.rename',{name:data.name.trim(),expectedRevision:data.expectedRevision,operationId:data.operationId},active.id);active.status=result.status;saved={...entry,name:result.status.name,savedRevision:result.status.savedRevision};}
@@ -160,7 +169,7 @@ export class SessionManager {
     const result=await s.client.call('project.'+data.action,{expectedRevision:data.expectedRevision,decision:data.decision,operationId:data.operationId},s.id);
     s.status=result.status;
     if(data.action==='close' && result.closed){s.state='closed';this.ai?.cancelOwner(s.id);this.owners.delete(s.path.toLowerCase());await s.client.stop();}
-    if(data.action==='save')await this.store.remember({productId:s.productId,projectId:s.status.projectId,name:s.status.name,path:s.path,savedRevision:s.status.savedRevision,productVersion:s.productVersion});await this.registry.flush(this.busyProducts);this.products=this.registry.products;return {...this.view(s),cancelled:result.cancelled === true};
+    if(data.action==='save')await this.store.remember({productId:s.productId,projectId:s.status.projectId,name:s.status.name,path:s.path,storageRoot:s.storageRoot,savedRevision:s.status.savedRevision,productVersion:s.productVersion});await this.registry.flush(this.busyProducts);this.products=this.registry.products;return {...this.view(s),cancelled:result.cancelled === true};
   }
   async shutdown() {
     this.shuttingDown=true;

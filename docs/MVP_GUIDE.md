@@ -1,3 +1,5 @@
+> Original MVP startup/acceptance guide. Platform0.1.7 product releases, account authority, Product Storage and diagnostics are described in [the current product services contract](PRODUCT_RELEASES.md).
+
 # MVP0.1.6 — startup and final acceptance
 
 Extract the entire ZIP anywhere writable. Keep AxiomPlatform, AxiomEngine and AxiomMathLab together. Close old Platform consoles; double-click **Start Axiom.cmd**. The launcher checks dependencies, installs missing official local runtimes/locked packages, opens the browser and retains startup errors. Keep its console open. Missing dependencies require Internet; the built editor needs no Rust for ordinary startup.

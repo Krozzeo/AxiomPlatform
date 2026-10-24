@@ -1,0 +1,26 @@
+name: Prepared Platform release
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify exact release tag
+        shell: pwsh
+        run: |
+          $version = node -p "JSON.parse(require('fs').readFileSync('package.json')).version"
+          if ($env:GITHUB_REF_NAME -ne "v$version") { throw 'Tag/package version mismatch' }
+      - run: npm run check
+      - run: node scripts/prepare-release.mjs . .axiom/release
+      - name: Publish prepared artifacts
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create $env:GITHUB_REF_NAME .axiom/release/*.zip .axiom/release/axiom-release.json --verify-tag --title "Axiom Platform $env:GITHUB_REF_NAME" --generate-notes

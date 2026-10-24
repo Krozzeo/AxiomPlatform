@@ -1,3 +1,4 @@
+import {ReleaseCatalog} from './releases.mjs';
 import {listenLoopback} from '../../packages/sdk/loopback.mjs';
 import {CONNECTION_MODEL,defaultSelection,selection,probe,effortsFor} from '../ai/settings.mjs';
 import {Notifications} from './notifications.mjs';
@@ -24,11 +25,12 @@ const headers={
   'Cross-Origin-Opener-Policy':'same-origin', 'Cross-Origin-Embedder-Policy':'require-corp', 'Cross-Origin-Resource-Policy':'same-origin',
   'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Cache-Control':'no-store'
 };
-export async function startHost({root,manifests,port=0,timeoutMs,stateRoot,githubClient,aiProvider,folderPicker=pickFolder,filePicker=pickNativePath,recycle=recycleNative,folderOpener=openFolder,downloadSaver=saveDownload}={}) {
+export async function startHost({checkReleases=false,releaseCatalog,root,manifests,port=0,timeoutMs,stateRoot,githubClient,aiProvider,folderPicker=pickFolder,filePicker=pickNativePath,recycle=recycleNative,folderOpener=openFolder,downloadSaver=saveDownload}={}) {
   const store=await PlatformState.load(stateRoot??join(resolve(root),'.axiom-platform'),{root,manifests});
   let manager;
   const account=new GitHubAccount({client:githubClient,onChange:state=>manager?.accountChanged(state)});
   let ai;try{ai=await new AiAccount({provider:aiProvider,transport:store.value.preferences.aiTransport,usagePath:join(store.root,'ai-usage.json'),onChange:state=>manager?.aiChanged(state)}).initialize();manager=await SessionManager.create({root:store.value.projectRoot,manifests:store.value.manifests,timeoutMs,store,account,ai,allowUnavailable:!manifests?.length});}catch(error){await store.close();throw error;}
+  const releases=releaseCatalog??new ReleaseCatalog();manager.releases=releases;const check=()=>void releases.refresh().catch(()=>{});if(checkReleases||releaseCatalog)check();const releaseTimer=checkReleases?setInterval(check,1800000):null;releaseTimer?.unref();
   ai.defaults=selection(store.value.preferences.aiDefaults??{...defaultSelection,...(store.value.preferences.aiModel?{model:store.value.preferences.aiModel}:{})});manager.recycle=recycle;manager.deletion.recycle=recycle;manager.folderOpener=folderOpener;const notifications=await new Notifications(join(store.root,'notifications.json')).load(),editors=new EditorLeases(manager);
   const token=randomBytes(32).toString('base64url');let origin,closing,picker;
   const reply=(res,status,value)=>{res.writeHead(status,{...headers,'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(value));};
@@ -42,8 +44,9 @@ export async function startHost({root,manifests,port=0,timeoutMs,stateRoot,githu
         if(!same)return reply(res,403,{code:'permissionDenied',message:'Origin is not authorized.'});
         if(req.headers.authorization!==`Bearer ${token}`)return reply(res,401,{code:'permissionDenied',message:'The Platform session is not authenticated.'});
         if(req.method==='GET'&&url.pathname==='/v1/notifications')return reply(res,200,notifications.items);
+        if(req.method==='GET'&&url.pathname==='/v1/diagnostics')return reply(res,200,manager.diagnostics());
         if(req.method==='GET'&&url.pathname==='/v1/catalog')return reply(res,200,manager.catalog());
-        if(req.method==='POST'&&['/v1/editor','/v1/notifications','/v1/download','/v1/sessions','/v1/settings','/v1/folders/pick','/v1/github','/v1/ai','/v1/installations'].includes(url.pathname)){
+        if(req.method==='POST'&&['/v1/editor','/v1/notifications','/v1/download','/v1/sessions','/v1/settings','/v1/folders/pick','/v1/github','/v1/ai','/v1/installations','/v1/releases'].includes(url.pathname)){
           const chunks=[];let bytes=0;
           for await(const part of req){bytes+=part.length;if(bytes>16384)return reply(res,413,{code:'invalidRequest',message:'Request exceeds 16 KiB.'});chunks.push(part);}
           let data;try{data=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{return reply(res,400,{code:'invalidRequest',message:'Malformed JSON.'});}
@@ -55,6 +58,7 @@ export async function startHost({root,manifests,port=0,timeoutMs,stateRoot,githu
             if(picker)return reply(res,409,{code:'projectBusy',message:'A folder chooser is already open.'});const controller=new AbortController();picker=controller;res.on('close',()=>{if(!res.writableEnded)controller.abort();});
             try{return reply(res,200,await (data.mode==='file'?filePicker:folderPicker)({initial:data.initial??manager.root,mode:data.mode==='file'?'file':'folder',signal:controller.signal}));}finally{picker=null;}
           }
+          if(url.pathname==='/v1/releases'){if(data.action==='refresh'){await releases.refresh(true);return reply(res,200,manager.catalog());}if(data.action==='install')return reply(res,200,await manager.installRelease(data.releaseId));throw Object.assign(Error('Unknown release action.'),{code:'invalidRequest'});}
           if(url.pathname==='/v1/installations')return reply(res,200,await manager.installations(data));
           if(url.pathname==='/v1/ai'){
             if(data.action==='disconnect')return reply(res,200,ai.disconnect());
@@ -90,7 +94,7 @@ export async function startHost({root,manifests,port=0,timeoutMs,stateRoot,githu
   catch(error){await manager.shutdown();await store.close();throw error;}
   origin=`http://127.0.0.1:${server.address().port}`;manager.platformOrigin=origin;
   return {origin,token,url:`${origin}/#token=${token}`,manager,account,ai,close:()=>closing??=(async()=>{
-    const done=new Promise(yes=>server.close(yes));server.closeAllConnections();try{picker?.abort();await manager.shutdown();await account.disconnect();await ai.close();await done;}finally{await store.close();}
+    const done=new Promise(yes=>server.close(yes));server.closeAllConnections();try{clearInterval(releaseTimer);picker?.abort();await manager.shutdown();await account.disconnect();await ai.close();await done;}finally{await store.close();}
   })()};
 }
 
