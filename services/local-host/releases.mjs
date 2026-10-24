@@ -8,7 +8,7 @@ import {inside} from './paths.mjs';
 export {defaultSources as sources} from './release-sources.mjs';
 import {releaseSources} from './release-sources.mjs';
 export function compareVersions(a,b){const x=a.split('.').map(Number),y=b.split('.').map(Number);for(let i=0;i<3;i++)if(x[i]!==y[i])return x[i]>y[i]?1:-1;return 0;}
-function assetUrl(url,repository,tag){const u=new URL(url);assert(u.protocol==='https:'&&u.hostname==='github.com'&&!u.port&&!u.username&&!u.password&&u.pathname.startsWith('/'+repository+'/releases/download/'+encodeURIComponent(tag)+'/'),'invalidRequest','Release asset must belong to the official repository and tag.');return u.href;}
+function assetUrl(url,repository,tag){const u=new URL(url);assert(u.protocol==='https:'&&u.hostname==='github.com'&&!u.port&&!u.username&&!u.password&&u.pathname.slice(0,('/'+repository+'/releases/download/').length).toLowerCase()===('/'+repository+'/releases/download/').toLowerCase()&&u.pathname.slice(('/'+repository+'/releases/download/').length).startsWith(encodeURIComponent(tag)+'/'),'invalidRequest','Release asset must belong to the official repository and tag.');return u.href;}
 export function validateRelease(value,source,release){
  const build=distribution({...value?.build,channel:value?.channel??'stable'}),experimental=build.channel==='experimental';
  assert(experimental===!!release.prerelease,'invalidRequest','Release channel does not match GitHub publication.');
