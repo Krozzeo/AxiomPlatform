@@ -1,3 +1,11 @@
+# 0.1.10 — Resilient published-version discovery
+
+- Keep the last validated public catalog in the local profile across restarts, bound to its configured repository; validate cached entries before reuse.
+- Reuse fresh checks on opening Add installation; explicit Refresh uses conditional GitHub requests and reuses unchanged release manifests. Retain the previous complete source catalog on network/service failures.
+- Use the connected GitHub account only for API calls to the official GitHub API, after account restoration; never send its token to artifact downloads or redirects. Anonymous discovery remains supported.
+- Honor shared rate-limit reset/Retry-After and transient-error backoff, including after restart. Distinguish rate limits, credentials, permissions, missing sources, service failures, malformed metadata, loading, unchecked and successful-empty results in the dialog and list. Product filters show their own relevant errors.
+- Add offline/restart/quota/conditional-request/token-boundary and real-browser acceptance. IPC/API/product SDK and formats are unchanged. No executable signing is added.
+
 # 0.1.9 — Provider accounts and background installations
 
 - Authenticate OpenAI through model discovery; keep model availability/errors independent of account authentication.

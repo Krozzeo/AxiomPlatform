@@ -1,6 +1,6 @@
 {
   "name": "axiom-platform",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -20,7 +20,8 @@
     "test:browser:products": "node tests/browser-products.mjs",
     "prepare:release": "node scripts/prepare-release.mjs",
     "test:browser:installations": "node tests/browser-installations.mjs",
-    "test:browser:providers": "node tests/browser-providers-jobs.mjs"
+    "test:browser:providers": "node tests/browser-providers-jobs.mjs",
+    "test:browser:discovery": "node tests/browser-release-discovery.mjs"
   },
   "exports": {
     "./github": "./services/integrations/github/client.mjs",

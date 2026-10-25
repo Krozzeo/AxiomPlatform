@@ -97,6 +97,9 @@ jobs:
         env:
           AXIOM_ENGINE_PATH: ../game-engine
           AXIOM_MATH_PATH: ../math-lab
+      - run: npm run test:browser:discovery
+        env:
+          AXIOM_ENGINE_PATH: ../game-engine
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -111,4 +114,5 @@ jobs:
             platform/.axiom/mvp-browser
             platform/.axiom/installations-browser
             platform/.axiom/providers-jobs-browser
+            platform/.axiom/release-discovery-browser
           include-hidden-files: true

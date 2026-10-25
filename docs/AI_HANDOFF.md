@@ -1,4 +1,6 @@
-# Current handoff — Platform 0.1.9
+# Current handoff — Platform 0.1.10
+
+Version discovery now persists a bounded, validated source-bound catalog in `release-catalog.json`, uses account-authenticated API queries after restoration, conditional requests and unchanged-manifest reuse, and honors persisted rate/transient backoff. Add installation opening respects the fresh-check interval; explicit Refresh still checks physical installs and requests a conditional update. Failed queries retain known versions and show a specific reason; a successful empty result has its own state. Tokens are never cached, sent to download URLs or followed through API redirects. No signing change. [Recovery guide](RELEASE_DISCOVERY.md).
 
 Owner-requested provider/account/catalog expansion. OpenAI connection now authenticates by model discovery, not a fixed gpt-4.1-nano generation. Restricted model-list403 can test the explicitly selected model as a fallback; 404/403 generation errors preserve a valid connection. Model tests remain separate and may bill. OpenAI Responses, Anthropic Messages, Google Gemini generateContent, Ollama and loopback OpenAI-compatible local servers translate to the existing stateless tool/result/usage contract. Native thinking controls are opt-in; exact model capabilities must be tested. Tool execution/review still belongs to products. Cloud keys are never sent to local endpoints or another provider. No universal model capability or paid-provider quality certification is claimed.
 
