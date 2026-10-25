@@ -35,12 +35,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: Krozzeo/AxiomGameEngine
-          ref: bdad5522b308ac51586f81c203bed2f020bfa5b8
+          ref: a9e775ca88f3e6917f06a031b8d2d1ce6bbd9677
           path: game-engine
       - uses: actions/checkout@v4
         with:
           repository: Krozzeo/AxiomMathLab
-          ref: 4171441658640a6d8da29dcdcee5b27888a3aa75
+          ref: f913fe79f8aad1281d79e4a290f66a0a17fbb5b5
           path: math-lab
       - uses: actions/setup-node@v4
         with:
