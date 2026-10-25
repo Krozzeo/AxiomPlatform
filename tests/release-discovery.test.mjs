@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,rm,readFile,writeFile} from 'node:fs/promises';
+import {mkdtemp,rm,readFile,writeFile,stat} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {fixture} from './fixtures/releases.mjs';
@@ -15,7 +15,7 @@ const ui=(c,filter='all')=>releaseFeedback({releases:c.view()},filter);
 test('saved catalog survives restart, skips fresh automatic checks, retains versions offline and recovers',async t=>{
  const path=await temp(t),f=fixture();let now=1000000,offline=false,calls=0;
  const fetchImpl=async(...a)=>{calls++;if(offline)throw Error('offline');return f.fetchImpl(...a);};
- const first=new ReleaseCatalog({clock:()=>now,fetchImpl});await first.initialize({cachePath:path});await first.refresh();assert.equal(first.items.length,1);const count=calls;
+ const first=new ReleaseCatalog({clock:()=>now,fetchImpl});await first.initialize({cachePath:path});await first.refresh();assert.equal(first.items.length,1);const count=calls,savedTime=(await stat(path)).mtimeMs;await new Promise(r=>setTimeout(r,20));await first.refresh();assert.equal((await stat(path)).mtimeMs,savedTime);
  const second=new ReleaseCatalog({clock:()=>now,fetchImpl});await second.initialize({cachePath:path});assert.equal(second.items.length,1);await second.refresh();assert.equal(calls,count);assert.equal(ui(second).state,'ready');
  now+=600001;offline=true;await second.refresh();assert.equal(second.items.length,1);assert.equal(ui(second).state,'cached');assert.match(ui(second).message,/last saved catalog/);assert.equal(second.errors[0].code,'network');
  const third=new ReleaseCatalog({clock:()=>now,fetchImpl});await third.initialize({cachePath:path});assert.equal(third.items.length,1);assert.equal(ui(third).state,'cached');const failedCalls=calls;await third.refresh(true);assert.equal(calls,failedCalls);
@@ -66,4 +66,8 @@ test('host waits for saved GitHub account restoration before its first catalog q
  const releases=new ReleaseCatalog({fetchImpl:(url,options)=>{requests.push({url,authorization:options.headers.Authorization});return f.fetchImpl(url,options);}});
  const vault={get:name=>name==='github'?token:null,status:()=>({available:true}),set:async()=>true};
  const h=await startHost({root:join(root,'projects'),stateRoot:join(root,'profile'),manifests:[],credentialVault:vault,githubClient,releaseCatalog:releases});try{await h.restore;await releases.flight;assert.equal(h.account.status().connected,true);assert(requests.filter(r=>r.url.startsWith('https://api.github.com/')).every(r=>r.authorization==='Bearer '+token));assert(requests.some(r=>r.url.startsWith('https://api.github.com/')));assert(requests.filter(r=>!r.url.startsWith('https://api.github.com/')).every(r=>!r.authorization));assert(!(await readFile(join(root,'profile/release-catalog.json'),'utf8')).includes(token));}finally{await h.close();}
+});
+
+test('host initializes a preloaded catalog cache before returning and fresh background checks do not race cleanup',async t=>{
+ const path=await temp(t),root=join(path,'..'),f=fixture(),catalog=new ReleaseCatalog({fetchImpl:f.fetchImpl});await catalog.refresh();const h=await startHost({root:join(root,'projects'),stateRoot:join(root,'profile'),manifests:[],releaseCatalog:catalog});try{const saved=JSON.parse(await readFile(join(root,'profile/release-catalog.json'),'utf8'));assert.equal(saved.items.length,1);await h.restore;await catalog.flight;assert.equal(catalog.items.length,1);}finally{await h.close();}
 });

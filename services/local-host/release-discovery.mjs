@@ -13,7 +13,7 @@ export class ReleaseDiscovery {
  constructor({fetchImpl=fetch,platform=process.platform,arch=process.arch,clock=Date.now,validateRelease,assetUrl,compareVersions}={}){
   Object.assign(this,{fetchImpl,platform,arch,clock,validateRelease,assetUrl,compareVersions});this.sources=releaseSources();this.items=[];this.errors=[];this.checkedAt=null;this.flight=null;this.installs=new Set();this.states={};this.manifestKeys={};this.httpCache=new Map();this.getToken=()=>null;
  }
- async initialize({cachePath,getToken}={}){this.cachePath=cachePath;if(getToken)this.getToken=getToken;await this.loadCache();return this;}
+ async initialize({cachePath,getToken}={}){this.cachePath=cachePath;if(getToken)this.getToken=getToken;await this.loadCache();if(this.checkedAt!=null)await this.saveCache();return this;}
  async configure(overrides={}){const next=releaseSources(overrides);if(this.flight)await this.flight;if(JSON.stringify(next)===JSON.stringify(this.sources))return;this.sources=next;this.items=[];this.errors=[];this.states={};this.manifestKeys={};this.checkedAt=null;this.httpCache.clear();await this.loadCache();}
  async loadCache(){
   if(!this.cachePath)return;
@@ -53,10 +53,11 @@ export class ReleaseDiscovery {
   if(this.flight)return this.flight;
   this.flight=(async()=>{
    const credential=this.getToken();if(this.lastCredential!==undefined&&credential!==this.lastCredential){this.apiRetry=null;for(const state of Object.values(this.states))state.retryAt=null;}this.lastCredential=credential;
+   let didCheck=false;
    // Sequential source checks share GitHub's quota and stop immediately on a limit response.
    for(const source of this.sources){const state=this.states[key(source)]??={},now=this.clock(),authMode=mode(this.getToken());
     if(state.retryAt>now&&state.retryMode===authMode||!force&&state.checkedAt!=null&&now-state.checkedAt<ttl&&!state.error)continue;
-    const previous=this.items.filter(i=>i.productId===source.productId&&i.repository===source.repository),items=[],prs=new Map(),nextKeys={};let partial=false;
+    didCheck=true;const previous=this.items.filter(i=>i.productId===source.productId&&i.repository===source.repository),items=[],prs=new Map(),nextKeys={};let partial=false;
     try{
      const releases=[];for(let page=1;page<=10;page++){let batch;try{batch=JSON.parse((await this.bytes(`https://api.github.com/repos/${source.repository}/releases?per_page=100&page=${page}`,4*1024*1024,{metadata:true})).toString());}catch(e){throw e.discoveryCode?e:problem('invalidResponse');}if(!Array.isArray(batch))throw problem('invalidResponse');releases.push(...batch);if(batch.length<100)break;if(page===10)throw problem('invalidResponse');}
      for(const release of releases.filter(r=>!r.draft&&(/^v\d+\.\d+\.\d+$/.test(r.tag_name)||/^experimental-pr-\d+-[a-f0-9]{40}$/.test(r.tag_name)))){
@@ -68,6 +69,7 @@ export class ReleaseDiscovery {
      Object.assign(this.manifestKeys,nextKeys);this.items=[...this.items.filter(i=>i.productId!==source.productId),...items];this.states[key(source)]={checkedAt:now,lastAttemptAt:now,error:partial?'invalidRelease':null,retryAt:partial?now+60000:null,retryMode:authMode};
     }catch(e){const code=e.discoveryCode??'network';this.states[key(source)]={...state,lastAttemptAt:now,error:code,retryAt:e.retryAt??now+60000,retryMode:authMode,status:e.status??null};}
    }
+   if(!didCheck)return this.view();
    this.items.sort((a,b)=>(Date.parse(b.publishedAt)||0)-(Date.parse(a.publishedAt)||0)||this.compareVersions(b.version,a.version));this.checkedAt=this.clock();this.updateErrors();await this.saveCache();return this.view();
   })();try{await this.flight;}finally{this.flight=null;}return this.view();
  }
