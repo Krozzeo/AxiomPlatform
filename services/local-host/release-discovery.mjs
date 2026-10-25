@@ -3,7 +3,7 @@ import {atomicJson} from '../local-files/files.mjs';
 import {releaseSources} from './release-sources.mjs';
 
 const ttl=600000,cacheLimit=8*1024*1024;
-const problem=(code,status,retryAt)=>Object.assign(Error(code),{discoveryCode:code,status,retryAt});
+const problem=(code,status,retryAt)=>Object.assign(Error(messages[code]??'Release service could not complete the request.'),{discoveryCode:code,status,retryAt});
 const messages={rateLimited:'GitHub request limit reached.',unauthorized:'GitHub rejected the account credential. Refresh the GitHub connection.',forbidden:'GitHub denied access. Check the repository and account permissions.',notFound:'Repository or release was not found. Check its source URL.',serviceUnavailable:'GitHub is temporarily unavailable.',network:'Could not reach GitHub. Check the connection and retry.',invalidResponse:'GitHub returned an invalid catalog response.',invalidRelease:'Some published packages could not be validated.'};
 const mode=token=>token?'authenticated':'anonymous';
 const key=source=>source.productId+'#'+source.repository;
