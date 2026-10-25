@@ -2,7 +2,7 @@
 
 Local Windows acceptance uses disposable profiles, fake account keys, controlled provider/release HTTP and the real Engine/Math product processes. No user profile, live token, paid model call or real GitHub write is used by these tests.
 
-- General check: 69 cases, 68 pass, zero failures; one existing opt-in native Recycle Bin test is skipped. The new Windows DPAPI protect/unprotect/forget/locked-file test runs and passes.
+- General check: 70 cases, 69 pass, zero failures; one existing opt-in native Recycle Bin test is skipped. The new Windows DPAPI protect/unprotect/forget/locked-file test runs and passes.
 - Browser profiles pass: P1, P2, P3, P4, P5, MVP, products, installations and providers/jobs. P2 validates encrypted GitHub restoration on Windows. P3 validates isolated domain edits and human Apply, and now expects four actual generations rather than billing a removed connection-generation probe.
 - New browser criteria cover model-independent OpenAI connection with a separate404, all four provider selections/tests, local controls, outside-click notifications, product-specific creation, gray installed/bold unread version options, persistent hover reads, publication-date sorting, real streamed progress while navigating, scheduled activation and completion toasts.
 - Provider cases cover tool/results/usage, destination-bound credentials, local loopback validation, native thinking configuration and signed blocks, token-free local servers, discovery, cancellation/epochs, account persistence, missing installation reconciliation and closed-PR release removal.
