@@ -35,7 +35,7 @@ The publication picker sorts by newest publication date, then version as a fallb
 
 ## Persistent version inbox
 
-Installed releases appear gray; available releases use normal text; unread compatible/uninstalled releases appear bold. Hover or keyboard focus marks an unread release read, whether or not it is installed. Read identities are persisted per repository and immutable release ID. First discovery treats previously unknown, uninstalled releases as new. Refresh/restart does not repeatedly flag a read version. The sidebar badge counts all unread product releases; product tabs count their own unread releases; All has no tab badge. Add installation counts unread releases for the selected product or all products in All. Platform's own newer-version banner remains separate.
+Installed releases appear gray; available releases use normal text; unread compatible/uninstalled releases appear bold. Hover or keyboard focus marks an unread release read, whether or not it is installed. Read identities are persisted per repository and immutable release ID. First discovery treats previously unknown, uninstalled releases as new. Previously installed versions are remembered as read, including when an older registry is migrated or their folders are removed manually. Refresh/restart does not repeatedly flag a read version. The sidebar badge counts all unread product releases; product tabs count their own unread releases; All has no tab badge. Add installation counts unread releases for the selected product or all products in All. Platform's own newer-version banner remains separate.
 
 ## Download and installation jobs
 
