@@ -1,3 +1,17 @@
+# Current handoff — Platform 0.1.9
+
+Owner-requested provider/account/catalog expansion. OpenAI connection now authenticates by model discovery, not a fixed gpt-4.1-nano generation. Restricted model-list403 can test the explicitly selected model as a fallback; 404/403 generation errors preserve a valid connection. Model tests remain separate and may bill. OpenAI Responses, Anthropic Messages, Google Gemini generateContent, Ollama and loopback OpenAI-compatible local servers translate to the existing stateless tool/result/usage contract. Native thinking controls are opt-in; exact model capabilities must be tested. Tool execution/review still belongs to products. Cloud keys are never sent to local endpoints or another provider. No universal model capability or paid-provider quality certification is claimed.
+
+Windows remembers GitHub and provider-specific AI credentials in a DPAPI CurrentUser encrypted profile blob. Explicit disconnect forgets the corresponding saved key; ordinary shutdown retains it. Restore revalidates accounts without generation. No plaintext fallback; unsupported operating systems disclose session-only storage. Keys never enter project JSON, readable platform settings, URLs, product processes or diagnostics. Legacy in-memory-only policies below are historical and superseded by this explicit owner request.
+
+Installations revalidate descriptors/adapter startup and missing paths on refresh; projects retain missing entries with a visible status. Release refresh also reconciles physical installs, omits candidates whose PR is closed/merged, sorts newest publication first, and keeps read version identities across host restarts. Stable and Experimental labels are separate from Installed/Active/Scheduled. Counters measure unread compatible, uninstalled releases, not every available version; hover or keyboard focus marks a version read. The first discovery treats previously unknown available releases as new.
+
+Background jobs stream byte progress, verify SHA256/size, report extraction progress, handshake before registration, then optionally activate or schedule. The dialog and Hub navigation may close while the host keeps working. Completion/failure is persisted in notification history and surfaced as a toast; clicking outside closes the notification panel. Host shutdown aborts owned downloads and cleans only their validated staging paths. No resume across process shutdown is claimed. Product tabs infer New project type outside All. Profile/native/API contracts remain version1/API0.1.
+
+[Guide and evidence scope](PROVIDERS_AND_INSTALLATION_JOBS.md). Exact-head CI, publication and prepared-package acceptance must be recorded independently. Do not infer main integration or live credentials from controlled fixtures; no automatic merge. Product SDK pins must use the published provider commit when adopting updated model-ID validation (including IDs with slashes). Engine M20 and the broader Unity/shader/GPU roadmap remain independent.
+
+---
+
 # Current handoff — Platform0.1.8
 
 The approved post-MVP expansion adds same-version, commit-pinned experimental packages alongside stable installations. Main list contains installed versions only, with All/product tabs, explicit experimental activation and reviewed Recycle Bin removal that preserves projects. Add installation refreshes automatically and labels Installed/Active/Experimental separately. Accounts, native documents, protocol1 and Platform API0.1 are unchanged.

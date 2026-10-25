@@ -2,7 +2,7 @@ import {fork} from 'node:child_process';
 import {randomUUID} from 'node:crypto';
 import {once} from 'node:events';
 import {PROTOCOL_VERSION, failure} from '../contracts/index.mjs';
-export function productEnvironment(source=process.env){const env={...source};for(const key of Object.keys(env))if(['OPENAI_API_KEY','GITHUB_TOKEN','GH_TOKEN','AXIOM_SESSION_TOKEN'].includes(key.toUpperCase()))delete env[key];return env;}
+export function productEnvironment(source=process.env){const env={...source};for(const key of Object.keys(env))if(['OPENAI_API_KEY','ANTHROPIC_API_KEY','GOOGLE_API_KEY','GEMINI_API_KEY','GOOGLE_APPLICATION_CREDENTIALS','CLAUDE_CODE_OAUTH_TOKEN','OLLAMA_API_KEY','LM_STUDIO_API_TOKEN','GITHUB_TOKEN','GH_TOKEN','AXIOM_SESSION_TOKEN'].includes(key.toUpperCase()))delete env[key];return env;}
 
 // Only an explicitly registered installation supplies this executable; projects never do.
 export class ProductClient {

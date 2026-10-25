@@ -1,3 +1,12 @@
+# 0.1.9 — Provider accounts and background installations
+
+- Authenticate OpenAI through model discovery; keep model availability/errors independent of account authentication.
+- Add Anthropic, Google, Ollama and loopback OpenAI-compatible transport adapters, native provider controls, tool/result/vision conversion, signature preservation and token accounting.
+- Remember GitHub and provider-specific tokens with Windows user encryption; restore on startup and forget on explicit disconnect. No plaintext storage fallback.
+- Reconcile missing/changed installations and project paths on refresh; show Stable labels, product project tabs and larger Settings icon.
+- Persist unread release state, add per-product/Add installation badges, show installed versions in gray and unread versions in bold, sort by publication time and omit closed-PR candidates.
+- Download in background with progress and optional automatic activation/scheduling; notify on completion and close notification history on outside click.
+
 # Changelog
 
 ## 0.1.7 / Product integration services —2026-10-22

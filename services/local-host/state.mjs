@@ -19,6 +19,7 @@ export class PlatformState{
       if(typeof v.projectRoot!=='string')throw failure('invalidRequest','Choose project storage and register a product for this first launch.');
       await mkdir(v.projectRoot,{recursive:true});v.projectRoot=await realpath(v.projectRoot);
       for(const entry of v.recents)if(typeof entry?.path!=='string'||typeof entry.projectId!=='string'||typeof entry.productId!=='string'||typeof entry.storageRoot!=='string'||!entry.storageRoot.trim())throw failure('invalidRequest','Invalid recent-project entry.');
+      if(v.releaseReadIds!==undefined&&(!Array.isArray(v.releaseReadIds)||v.releaseReadIds.length>10000||v.releaseReadIds.some(id=>typeof id!=='string'||id.length>512)))throw failure('invalidRequest','Invalid version inbox state.');
       v.productRoot??=join(state.root,'products');if(typeof v.productRoot!=='string'||!v.productRoot.trim())throw failure('invalidRequest','Choose product storage.');v.productRoot=resolve(v.productRoot);
       await atomicJson(state.path,v);return state;
     }catch(error){await state.close();throw error;}

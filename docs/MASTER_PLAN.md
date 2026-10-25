@@ -14,7 +14,7 @@ A person opens Platform, creates/adds a project, opens the compatible product, e
 2. Platform owns the Hub, shared services and integration SDK; specialized domains remain in products. No universal renderer, geometry kernel or scene format is assumed.
 3. Independently versioned products. Platform is the ordinary entry point; direct product startup remains available for development and automation. Exported runtimes remain independent.
 4. Extract gradually behind public ports/adapters. No stack rewrite, permanent source copies, submodules or simultaneous-only merges as the integration mechanism.
-5. Separate Platform, product, project and session configuration. Credentials stay outside projects and repositories; current credentials live in memory.
+5. Separate Platform, product, project and session configuration. Credentials stay outside projects and repositories. Since 0.1.9, Windows remembers account tokens with DPAPI CurrentUser encryption; other operating systems remain session-only until a native secure store is implemented.
 6. Shared AI provides transport, turn execution, cancellation, usage, tool validation and review gates. Domain tools, context, PMD content, acceptance and transactional application remain product-owned.
 7. Native formats remain specialized, with explicit exchange contracts. A CAD does not become a Game Engine entity graph by default.
 8. Official integrations first. Marketplace, third-party extensions, real-time collaboration, private cloud and cross-product automation are future scope.

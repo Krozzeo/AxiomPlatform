@@ -8,7 +8,7 @@ import {GitHubClient} from '../services/integrations/github/client.mjs';
 import {ProjectDeletion} from '../services/local-host/deletion.mjs';
 import {startHost} from '../services/local-host/server.mjs';
 test('product process environment strips provider and host credentials while retaining runtime paths',()=>{
- const source={OPENAI_API_KEY:'fake-ai',GITHUB_TOKEN:'fake-gh',GH_TOKEN:'fake-cli',AXIOM_SESSION_TOKEN:'fake-host',PATH:'runtime-path',DOTNET_ROOT:'runtime-root'};assert.deepEqual(productEnvironment(source),{PATH:'runtime-path',DOTNET_ROOT:'runtime-root'});assert.equal(source.GH_TOKEN,'fake-cli');
+ const source={OPENAI_API_KEY:'fake-ai',ANTHROPIC_API_KEY:'fake-anthropic',GOOGLE_API_KEY:'fake-google',GEMINI_API_KEY:'fake-gemini',GOOGLE_APPLICATION_CREDENTIALS:'fake-credential-file',CLAUDE_CODE_OAUTH_TOKEN:'fake-claude',OLLAMA_API_KEY:'fake-ollama',LM_STUDIO_API_TOKEN:'fake-local',GITHUB_TOKEN:'fake-gh',GH_TOKEN:'fake-cli',AXIOM_SESSION_TOKEN:'fake-host',PATH:'runtime-path',DOTNET_ROOT:'runtime-root'};assert.deepEqual(productEnvironment(source),{PATH:'runtime-path',DOTNET_ROOT:'runtime-root'});assert.equal(source.GH_TOKEN,'fake-cli');
 });
 test('GitHub credentials cannot be sent to a product-controlled origin or redirect-like target',async()=>{
  let calls=0;const client=new GitHubClient({fetchImpl:async url=>{calls++;assert.equal(url,'https://api.github.com/user');return Response.json({id:1});}});client.token='controlled-test-only';
