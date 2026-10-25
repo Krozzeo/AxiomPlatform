@@ -1,9 +1,10 @@
 # Axiom Platform
 
-**Platform 0.1.10 / persistent version discovery and explicit query failures.** A local browser workspace for the Axiom family: project/product Hub, authorized local services and shared AI integration. Axiom Game Engine and independent Axiom Math Lab are the reference products. The P0–P5 feature scope is implemented; [closure evidence and remaining operational checks](docs/MVP_CLOSURE.md) distinguish development completion from live-account/hardware acceptance.
+**Platform 0.1.11 / version-owned demos and automatic project recognition.** A local browser workspace for the Axiom family: project/product Hub, authorized local services and shared AI integration. Axiom Game Engine and independent Axiom Math Lab are the reference products. The P0–P5 feature scope is implemented; [closure evidence and remaining operational checks](docs/MVP_CLOSURE.md) distinguish development completion from live-account/hardware acceptance.
 
 Extract the complete prepared bundle and double-click **Axiom Hub** (or **Start Axiom.cmd**). It prepares missing dependencies and opens your browser; errors remain visible in the console. Keep all three folders together. [Startup and final test guide](docs/MVP_GUIDE.md).
 
+- [Demo loading and project recognition](docs/PRODUCT_DEMOS.md).
 - [0.1.10 catalog recovery](docs/RELEASE_DISCOVERY.md).
 - [0.1.9 guide and validation](docs/PROVIDERS_AND_INSTALLATION_JOBS.md).
 - [Master plan](docs/MASTER_PLAN.md), [P0–P5 roadmap](docs/ROADMAP.md), [handoff](docs/AI_HANDOFF.md), [documentation map](docs/index.md).

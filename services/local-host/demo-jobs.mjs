@@ -1,0 +1,32 @@
+import {mkdtemp,lstat,rm,realpath} from 'node:fs/promises';
+import {join} from 'node:path';
+import {randomUUID,createHash} from 'node:crypto';
+import {ProductClient} from '../../packages/sdk/client.mjs';
+import {assert} from '../../packages/contracts/index.mjs';
+import {inside,authorizedPath} from './paths.mjs';
+import {inspectInstallation} from './installations.mjs';
+
+export class DemoJobs {
+ constructor(manager,notifications){this.manager=manager;this.notifications=notifications;this.jobs=new Map();this.closed=false;}
+ view(){return [...this.jobs.values()].map(({flight,client,...value})=>structuredClone(value));}
+ start(installationId){
+  assert(!this.closed,'projectBusy','Platform is closing.');const m=this.manager,item=m.registry.items.get(installationId);assert(item&&!item.error&&item.manifest.capabilities.includes('project.demos')&&item.manifest.demos?.length,'unsupportedCapability','This installation does not supply a version-specific demo catalog.');
+  const prior=[...this.jobs.values()].find(j=>j.installationId===installationId&&j.state==='running');if(prior)return {jobId:prior.id};assert(![...this.jobs.values()].some(j=>j.state==='running'),'projectBusy','Wait for the current demo load to finish.');
+  for(const [id,j]of this.jobs)if(j.state!=='running'&&this.jobs.size>=64)this.jobs.delete(id);
+  const job={id:randomUUID(),installationId,productId:item.productId,version:item.version,name:item.manifest.displayName,root:m.root,state:'running',createdAt:new Date().toISOString()};this.jobs.set(job.id,job);
+  job.flight=(async()=>{try{const entries=await this.load(job,item);Object.assign(job,{state:'completed',finishedAt:new Date().toISOString(),count:entries.length});await this.notifications.run({action:'add',type:'success',message:`${job.name} ${job.version}: ${entries.length} demo project(s) loaded and available in Projects.`});}catch(e){Object.assign(job,{state:'failed',finishedAt:new Date().toISOString(),error:e.code?e.message:'Demo loading failed. Check the installation and project storage.'});await this.notifications.run({action:'add',type:'error',message:`${job.name} ${job.version}: ${job.error}`});}})();return {jobId:job.id};
+ }
+ async load(job,item){
+  const m=this.manager,checked=await inspectInstallation(item.path);assert(checked.id===item.id,'revisionConflict','Installation changed. Refresh before loading demos.');const root=await realpath(job.root),key=createHash('sha256').update(item.id+'\0'+root).digest('hex'),previous=m.store.value.demoProjects?.find(r=>r.key===key),entries=[],missing=[];
+  const client=job.client=new ProductClient(item.entry,{productId:item.productId,timeoutMs:120000}),sessionId=randomUUID();let destination,committed=false;
+  try{
+   const hello=await client.call('initialize',m.initialize({authorizedRoot:root,services:{}}),sessionId);assert(hello.protocolVersion===1&&hello.productId===item.productId&&hello.productVersion===item.version&&hello.capabilities?.includes('project.demos'),'incompatibleVersion','Demo adapter handshake differs from its installation.');
+   for(const demo of item.manifest.demos){const saved=previous?.entries.find(e=>e.demoId===demo.id);if(!saved){missing.push(demo.id);continue;}assert(inside(root,saved.path),'permissionDenied','Saved demo path is outside its project storage.');const active=[...m.sessions.values()].find(s=>s.state==='ready'&&s.productId===saved.productId&&s.path===saved.path&&s.status?.projectId===saved.projectId);if(active){entries.push({...saved,name:active.status.name,savedRevision:active.status.savedRevision});continue;}const exists=await lstat(saved.path).then(()=>true,e=>{if(e.code==='ENOENT')return false;throw e;});if(!exists){missing.push(demo.id);continue;}const path=await authorizedPath(root,saved.path),detected=await client.call('project.detect',{path},sessionId);assert(detected.projectId===saved.projectId,'revisionConflict','Previously loaded demo identity changed. Restore it before loading demos.');entries.push({...saved,name:detected.name,savedRevision:detected.projectRevision});}
+   if(missing.length){destination=await mkdtemp(join(root,'Demos-'+item.productId+'-'+item.version+'-'));const result=await client.call('project.demos',{destination,demoIds:missing,operationId:randomUUID()},sessionId);assert(result?.productVersion===item.version&&Array.isArray(result.projects)&&result.projects.length===missing.length&&new Set(result.projects.map(p=>p.demoId)).size===missing.length,'incompatibleVersion','Product returned an invalid demo catalog.');
+    for(const p of result.projects){assert(missing.includes(p.demoId)&&typeof p.path==='string'&&inside(destination,p.path),'permissionDenied','Demo output must stay inside the new demo directory.');const path=await authorizedPath(destination,p.path),detected=await client.call('project.detect',{path},sessionId);assert(typeof detected.projectId==='string'&&typeof detected.name==='string','invalidRequest','Demo is not a valid product project.');entries.push({demoId:p.demoId,productId:item.productId,productVersion:item.version,demoInstallationId:item.id,projectId:detected.projectId,name:detected.name,path,storageRoot:root,savedRevision:detected.projectRevision});}
+   }
+   assert(!this.closed,'cancelled','Demo loading stopped because Platform closed.');await m.store.update(v=>{for(const e of entries){const old=v.recents.find(p=>p.productId===e.productId&&p.projectId===e.projectId);assert(!old||old.path===e.path,'projectBusy','This demo identity is already registered elsewhere.');}assert(v.recents.filter(p=>!entries.some(e=>p.productId===e.productId&&p.projectId===e.projectId)).length+entries.length<=128,'projectBusy','Project list is full. Remove a list entry before loading demos.');v.recents=[...entries.map(e=>({...e,lastOpenedAt:new Date().toISOString()})),...v.recents.filter(p=>!entries.some(e=>p.productId===e.productId&&p.projectId===e.projectId))].slice(0,128);v.demoProjects=[{key,entries},...(v.demoProjects??[]).filter(r=>r.key!==key)].slice(0,128);});committed=true;return entries;
+  }finally{await client.stop();delete job.client;if(destination&&!committed){assert(inside(root,destination),'permissionDenied','Invalid demo cleanup target.');await rm(destination,{recursive:true,force:true});}}
+ }
+ async close(){this.closed=true;for(const job of this.jobs.values())if(job.state==='running')job.client?.child.kill();await Promise.allSettled([...this.jobs.values()].map(j=>j.flight));}
+}

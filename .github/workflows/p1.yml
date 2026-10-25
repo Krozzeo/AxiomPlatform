@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: Krozzeo/AxiomGameEngine
-          ref: a9e775ca88f3e6917f06a031b8d2d1ce6bbd9677
+          ref: 1d31a70b7d26bc1891ff45cc609e5bc6f813dfd9
           path: game-engine
       - uses: actions/checkout@v4
         with:
@@ -103,6 +103,10 @@ jobs:
       - run: npm run test:browser:discovery
         env:
           AXIOM_ENGINE_PATH: ../game-engine
+      - run: npm run test:browser:demos
+        env:
+          AXIOM_ENGINE_PATH: ../game-engine
+          AXIOM_MATH_PATH: ../math-lab
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -118,4 +122,5 @@ jobs:
             platform/.axiom/installations-browser
             platform/.axiom/providers-jobs-browser
             platform/.axiom/release-discovery-browser
+            platform/.axiom/demos-browser
           include-hidden-files: true

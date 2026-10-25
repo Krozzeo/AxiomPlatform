@@ -12,3 +12,7 @@ export function releaseFeedback(catalog,filter='all'){
  if(releases.cacheWarning)message+=' '+releases.cacheWarning;
  return {state,label,message};
 }
+
+export function visibleInstallationJobs(jobs,now=Date.now()){
+ return jobs.filter(j=>j.state==='running'||now-Date.parse(j.finishedAt??'')<(j.state==='completed'?6000:15000)).slice(-8).reverse();
+}

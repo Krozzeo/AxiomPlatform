@@ -1,3 +1,10 @@
+# 0.1.11 — Version-owned demos and automatic project recognition
+
+- Installed version cards open their own folder with the existing folder icon. Completed downloads show a confirmation instead of a100% progress bar; finished main-list indicators expire while notification history remains.
+- Optional product-owned `project.demos` and manifest catalogs generate only that build's declared demos in configured Project Storage. Load Demos runs in the background, shows a spinner and emits completion/failure notifications. Repeated loads preserve edits and registration; generated projects open with their source installation without changing the global active version. Removal waits for demo loading.
+- Local Add project uses read-only product detection regardless of the current tab or hidden creation selection. Ambiguous folders are rejected explicitly. Successful local/GitHub imports select their actual product tab; GitHub discovery aggregates installed adapters with the relevant capability.
+- Standardization starts with a new immutable experimental Game Engine0.0.60 build supplying the M20 lab. Older publications remain unchanged; Math Lab demo generation is intentionally out of scope. IPC/API/native formats and M20 completion status remain unchanged.
+
 # 0.1.10 — Resilient published-version discovery
 
 - Keep the last validated public catalog in the local profile across restarts, bound to its configured repository; validate cached entries before reuse.

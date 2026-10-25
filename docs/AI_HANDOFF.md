@@ -1,4 +1,6 @@
-# Current handoff — Platform 0.1.10
+# Current handoff — Platform 0.1.11
+
+Optional version-owned demo catalogs use `project.demos`, fresh host-owned destinations and installed product IPC. Only the chosen installation supplies factories. Catalog entries are pinned to that installation, repeated loads preserve edits, and project storage is captured per job. Math demo generation is deferred; the first product implementation is a new immutable0.0.60 Engine build. Local project detection is product-owned/read-only and independent of tabs; successful adds select their product tab. Finished download bars become confirmation text and main-list status expires. [Contract and acceptance](PRODUCT_DEMOS.md).
 
 Version discovery now persists a bounded, validated source-bound catalog in `release-catalog.json`, uses account-authenticated API queries after restoration, conditional requests and unchanged-manifest reuse, and honors persisted rate/transient backoff. Add installation opening respects the fresh-check interval; explicit Refresh still checks physical installs and requests a conditional update. Failed queries retain known versions and show a specific reason; a successful empty result has its own state. Tokens are never cached, sent to download URLs or followed through API redirects. No signing change. [Recovery guide](RELEASE_DISCOVERY.md).
 

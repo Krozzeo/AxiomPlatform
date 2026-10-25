@@ -15,5 +15,6 @@ export function validateManifest(value) {
   assert(Array.isArray(value.capabilities) && CAPABILITIES.every(c => value.capabilities.includes(c)), 'unsupportedCapability', 'Product does not implement the P1 project lifecycle.');
   assert(Array.isArray(value.projectFormats) && value.projectFormats.length > 0 && value.projectFormats.every(f => typeof f.id === 'string' && Array.isArray(f.versions) && f.versions.every(Number.isSafeInteger)), 'invalidRequest', 'Invalid product format declaration.');
   assert(value.launch?.adapter === 'official-local' && typeof value.launch.entry === 'string' && value.launch.entry.endsWith('.mjs'), 'invalidRequest', 'A registered local adapter is required.');
+  if(value.demos!==undefined)assert(value.capabilities.includes('project.demos')&&Array.isArray(value.demos)&&value.demos.length<=32&&new Set(value.demos.map(d=>d.id)).size===value.demos.length&&value.demos.every(d=>/^[a-z0-9][a-z0-9.-]{0,63}$/.test(d.id)&&typeof d.name==='string'&&d.name.length>0&&d.name.length<=128),'invalidRequest','Invalid version-specific demo catalog.');
   return structuredClone(value);
 }
