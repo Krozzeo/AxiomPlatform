@@ -21,6 +21,7 @@ jobs:
         with:
           node-version: '24'
       - run: npm run check
+        timeout-minutes: 3
 
   real-product:
     runs-on: ubuntu-latest
@@ -56,8 +57,10 @@ jobs:
       - run: npm ci --no-audit --no-fund
         working-directory: math-lab
       - run: npm run check
+        timeout-minutes: 3
         working-directory: math-lab
       - run: npm run check
+        timeout-minutes: 3
         env:
           AXIOM_ENGINE_PATH: ../game-engine
           AXIOM_MATH_PATH: ../math-lab
