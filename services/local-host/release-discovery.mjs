@@ -13,7 +13,7 @@ export class ReleaseDiscovery {
  constructor({fetchImpl=fetch,platform=process.platform,arch=process.arch,clock=Date.now,validateRelease,assetUrl,compareVersions}={}){
   Object.assign(this,{fetchImpl,platform,arch,clock,validateRelease,assetUrl,compareVersions});this.sources=releaseSources();this.items=[];this.errors=[];this.checkedAt=null;this.flight=null;this.installs=new Set();this.states={};this.manifestKeys={};this.httpCache=new Map();this.getToken=()=>null;
  }
- async initialize({cachePath,getToken}={}){this.cachePath=cachePath;if(getToken)this.getToken=getToken;await this.loadCache();if(this.checkedAt!=null)await this.saveCache();return this;}
+ async initialize({cachePath,getToken}={}){const preloaded=this.checkedAt!=null;this.cachePath=cachePath;if(getToken)this.getToken=getToken;await this.loadCache();if(preloaded)await this.saveCache();return this;}
  async configure(overrides={}){const next=releaseSources(overrides);if(this.flight)await this.flight;if(JSON.stringify(next)===JSON.stringify(this.sources))return;this.sources=next;this.items=[];this.errors=[];this.states={};this.manifestKeys={};this.checkedAt=null;this.httpCache.clear();await this.loadCache();}
  async loadCache(){
   if(!this.cachePath)return;
