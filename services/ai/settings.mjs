@@ -4,7 +4,8 @@ import {aiError,textOf} from './contracts.mjs';
 export const CONNECTION_MODEL='gpt-4.1-nano';
 export const defaultSelection={model:CONNECTION_MODEL,reasoning:'default'};
 export const reasoningEfforts=['default','none','minimal','low','medium','high','xhigh','max'];
-export function effortsFor(model){
+export function effortsFor(model,provider='openai'){
+ if(provider!=='openai')return ['default'];
  if(/^gpt-6/.test(model))return ['default','low','medium','high','xhigh','max'];
  if(/^(?:gpt-4(?:[.-]|$)|chatgpt-4|ft:gpt-4)/.test(model))return ['default'];
  if(/^gpt-5(?:-mini|-nano)?(?:-\d{4}-\d{2}-\d{2})?$/.test(model))return ['default','minimal','low','medium','high'];

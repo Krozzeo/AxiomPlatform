@@ -1,3 +1,17 @@
+# Current extension — Platform 0.1.9
+
+[Provider/account/background-installation guide](PROVIDERS_AND_INSTALLATION_JOBS.md) supersedes the historical session-only account policy and explicit-only experimental activation default below. Installation jobs now offer automatic activation/scheduling (checked by default), which the user can disable. Stable/experimental publications remain separately identified and verified. Version inbox reads are persistent and repository-scoped; missing files reconcile before refresh. Closed/merged-PR candidates stop being offered, while already installed packages remain usable until explicitly removed. Newest publication time orders the picker.
+
+Earlier contract snapshots follow for provenance.
+
+---
+
+# Current release channel extension — Platform0.1.8
+
+[Experimental installation/source guide](EXPERIMENTAL_INSTALLATIONS.md) supersedes earlier stable-only catalog statements below. Experimental identity includes the complete commit, independent of numeric version. Removing an installation preserves projects and uses reviewed native recycling. Sources are configurable per product in persistent General settings. Protocol/API and existing stable manifests remain compatible.
+
+---
+
 # Product releases, accounts and diagnostics — Platform0.1.7
 
 Owner-approved post-MVP maintenance/expansion, 2026-10-22. P0–P5 remain closed. Game Engine0.0.56 is the reference consumer; the native game document format remains1 and scripting SDK remains8.

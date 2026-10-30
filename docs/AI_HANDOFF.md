@@ -1,3 +1,35 @@
+# Current handoff — Platform 0.1.11
+
+Optional version-owned demo catalogs use `project.demos`, fresh host-owned destinations and installed product IPC. Only the chosen installation supplies factories. Catalog entries are pinned to that installation, repeated loads preserve edits, and project storage is captured per job. Math demo generation is deferred; the first product implementation is a new immutable0.0.60 Engine build. Local project detection is product-owned/read-only and independent of tabs; successful adds select their product tab. Finished download bars become confirmation text and main-list status expires. [Contract and acceptance](PRODUCT_DEMOS.md).
+
+Version discovery now persists a bounded, validated source-bound catalog in `release-catalog.json`, uses account-authenticated API queries after restoration, conditional requests and unchanged-manifest reuse, and honors persisted rate/transient backoff. Add installation opening respects the fresh-check interval; explicit Refresh still checks physical installs and requests a conditional update. Failed queries retain known versions and show a specific reason; a successful empty result has its own state. Tokens are never cached, sent to download URLs or followed through API redirects. No signing change. [Recovery guide](RELEASE_DISCOVERY.md).
+
+Owner-requested provider/account/catalog expansion. OpenAI connection now authenticates by model discovery, not a fixed gpt-4.1-nano generation. Restricted model-list403 can test the explicitly selected model as a fallback; 404/403 generation errors preserve a valid connection. Model tests remain separate and may bill. OpenAI Responses, Anthropic Messages, Google Gemini generateContent, Ollama and loopback OpenAI-compatible local servers translate to the existing stateless tool/result/usage contract. Native thinking controls are opt-in; exact model capabilities must be tested. Tool execution/review still belongs to products. Cloud keys are never sent to local endpoints or another provider. No universal model capability or paid-provider quality certification is claimed.
+
+Windows remembers GitHub and provider-specific AI credentials in a DPAPI CurrentUser encrypted profile blob. Explicit disconnect forgets the corresponding saved key; ordinary shutdown retains it. Restore revalidates accounts without generation. No plaintext fallback; unsupported operating systems disclose session-only storage. Keys never enter project JSON, readable platform settings, URLs, product processes or diagnostics. Legacy in-memory-only policies below are historical and superseded by this explicit owner request.
+
+Installations revalidate descriptors/adapter startup and missing paths on refresh; projects retain missing entries with a visible status. Release refresh also reconciles physical installs, omits candidates whose PR is closed/merged, sorts newest publication first, and keeps read version identities across host restarts. Stable and Experimental labels are separate from Installed/Active/Scheduled. Counters measure unread compatible, uninstalled releases, not every available version; hover or keyboard focus marks a version read. The first discovery treats previously unknown available releases as new.
+
+Background jobs stream byte progress, verify SHA256/size, report extraction progress, handshake before registration, then optionally activate or schedule. The dialog and Hub navigation may close while the host keeps working. Completion/failure is persisted in notification history and surfaced as a toast; clicking outside closes the notification panel. Host shutdown aborts owned downloads and cleans only their validated staging paths. No resume across process shutdown is claimed. Product tabs infer New project type outside All. Profile/native/API contracts remain version1/API0.1.
+
+[Guide and evidence scope](PROVIDERS_AND_INSTALLATION_JOBS.md). Exact-head CI, publication and prepared-package acceptance must be recorded independently. Do not infer main integration or live credentials from controlled fixtures; no automatic merge. Product SDK pins must use the published provider commit when adopting updated model-ID validation (including IDs with slashes). Engine M20 and the broader Unity/shader/GPU roadmap remain independent.
+
+---
+
+# Current handoff — Platform0.1.8
+
+The approved post-MVP expansion adds same-version, commit-pinned experimental packages alongside stable installations. Main list contains installed versions only, with All/product tabs, explicit experimental activation and reviewed Recycle Bin removal that preserves projects. Add installation refreshes automatically and labels Installed/Active/Experimental separately. Accounts, native documents, protocol1 and Platform API0.1 are unchanged.
+
+Settings → General → Updates stores editable public GitHub repository URLs for Platform, Game Engine and Math Lab. Defaults remain Krozzeo repositories, reset is available, and changes clear stale catalogs. Credentials are never added to public release requests. The full source/manifest/hash/handshake contract still applies to the selected repository.
+
+Axiom Hub is a portable Windows launcher with the Axiom icon targeting Start Axiom.cmd. Its small Windows launcher embeds the Axiom icon and resolves Start Axiom.cmd beside its own executable, without a checkout path. Tests exercise it with harmless temporary launchers.
+
+Experimental publishing requires passing exact-commit CI and an open same-repository PR. Candidate build jobs have read-only permissions; the separate publisher executes pinned trusted tooling, uploads verified artifacts and never overwrites an existing publication. workflow_run automation needs the workflow on main once; bootstrap tags can publish an already accepted PR without merging product code. Stable main publication and experimental PR publication remain distinct. See [guide](EXPERIMENTAL_INSTALLATIONS.md) and [release contract](PRODUCT_RELEASES.md). Release/remote acceptance states are recorded separately; a local ZIP is not proof of a public release.
+
+Earlier handoff below is historical.
+
+---
+
 # Current handoff — Platform0.1.7 product services
 
 Owner-approved post-MVP expansion, jointly with Engine0.0.56. P0–P5 remains closed. Platform0.1.6 recovery was merged to main at5fb826792fa58032c932174634bafb3d5f14bc0b. This branch adds [product release/account/diagnostic contracts](PRODUCT_RELEASES.md): exclusive host account authority, product model inheritance/overrides, official stable GitHub manifests, bounded/hash-verified staged installs, persistent product storage, deferred activation/rollback and sanitized report export. Host version derives from package metadata. First launch can open an empty Hub and add products later; Windows startup still prepares Node/.NET for the family.

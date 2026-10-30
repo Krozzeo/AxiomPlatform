@@ -1,6 +1,6 @@
 {
   "name": "axiom-platform",
-  "version": "0.1.7",
+  "version": "0.1.11",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -9,8 +9,8 @@
   },
   "scripts": {
     "start": "node services/local-host/cli.mjs",
-    "test": "node --test tests/*.test.mjs",
-    "check": "node scripts/check-boundaries.mjs && node --test tests/*.test.mjs",
+    "test": "node --test --test-timeout=120000 tests/*.test.mjs",
+    "check": "node scripts/check-boundaries.mjs && node --test --test-timeout=120000 tests/*.test.mjs",
     "test:browser": "node tests/browser-p1.mjs",
     "test:browser:p2": "node tests/browser-p2.mjs",
     "test:browser:p3": "node tests/browser-p3.mjs",
@@ -18,7 +18,11 @@
     "test:browser:p5": "node tests/browser-p5.mjs",
     "test:browser:mvp": "node tests/browser-mvp.mjs",
     "test:browser:products": "node tests/browser-products.mjs",
-    "prepare:release": "node scripts/prepare-release.mjs"
+    "prepare:release": "node scripts/prepare-release.mjs",
+    "test:browser:installations": "node tests/browser-installations.mjs",
+    "test:browser:providers": "node tests/browser-providers-jobs.mjs",
+    "test:browser:discovery": "node tests/browser-release-discovery.mjs",
+    "test:browser:demos": "node tests/browser-demos.mjs"
   },
   "exports": {
     "./github": "./services/integrations/github/client.mjs",

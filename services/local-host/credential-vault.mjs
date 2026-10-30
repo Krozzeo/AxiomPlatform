@@ -1,0 +1,13 @@
+import {spawn} from 'node:child_process';
+import {readFile} from 'node:fs/promises';
+import {atomicJson} from '../local-files/files.mjs';
+import {fileURLToPath} from 'node:url';
+// DPAPI CurrentUser binds the encrypted blob to this Windows user. No plaintext fallback.
+export function windowsProtect(mode,value){return new Promise((resolve,reject)=>{const child=spawn('powershell.exe',['-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',fileURLToPath(new URL('./credentials.ps1',import.meta.url)),mode],{windowsHide:true,stdio:['pipe','pipe','pipe']});let output='',size=0;const timer=setTimeout(()=>{child.kill();reject(Error('Windows credential protection timed out.'));},15000);child.stdout.on('data',b=>{size+=b.length;if(size>131072)child.kill();else output+=b;});child.stderr.resume();child.on('error',()=>{clearTimeout(timer);reject(Error('Windows credential protection is unavailable.'));});child.on('close',code=>{clearTimeout(timer);if(code||size>131072)reject(Error('Windows could not unlock saved accounts for this user.'));else resolve(output.trim());});child.stdin.on('error',()=>{});child.stdin.end(value);});}
+export class CredentialVault{
+ constructor(path,{platform=process.platform,protect=windowsProtect}={}){this.path=path;this.available=platform==='win32';this.protect=protect;this.values={};this.queue=Promise.resolve();this.error=null;}
+ async load(){if(!this.available)return this;try{const v=JSON.parse(await readFile(this.path,'utf8'));if(v.version!==1||v.protection!=='windows-dpapi-current-user')throw Error();this.values=JSON.parse(await this.protect('unprotect',v.blob));if(!this.values||typeof this.values!=='object'||Array.isArray(this.values))throw Error();}catch(e){if(e.code!=='ENOENT'){this.locked=true;this.error='Saved accounts could not be unlocked. Recover this Windows profile or use a new profile; this session will not overwrite the locked file.';}}return this;}
+ get(name){return this.values[name]??null;}
+ set(name,value){const task=this.queue.then(async()=>{if(!this.available)return false;if(this.locked)throw Error('Saved accounts are locked.');if(typeof name!=='string'||name.length>256||value!==null&&(typeof value!=='string'||value.length>512))throw Error('Invalid saved credential.');const next={...this.values};if(value===null)delete next[name];else next[name]=value;const blob=await this.protect('protect',JSON.stringify(next));await atomicJson(this.path,{version:1,protection:'windows-dpapi-current-user',blob});this.values=next;this.error=null;return true;});this.queue=task.catch(()=>{});return task;}
+ status(){return {available:this.available,error:this.error,protection:this.available?'Windows user encryption':'Session only: secure storage is unavailable on this operating system'};}
+}

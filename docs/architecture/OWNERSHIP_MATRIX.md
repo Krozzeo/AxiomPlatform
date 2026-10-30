@@ -32,3 +32,5 @@ Original inventory: Engine `871a72f`. P1 extracted host/lifecycle through a prod
 New code with one-domain meaning belongs to that product. Mixed infrastructure/domain code gets a port before extraction. No circular imports or permanent source-copy integration.
 
 P5 Math Lab owns calculation documents, parser/evaluation, notebook UI, project model and proposed-cell validation/Apply. Platform owns stable editor leases/shell, generic OS dialogs/recycle, notification history and shared AI transport settings. Math Lab imports only public Platform SDK exports.
+
+Platform 0.1.9 owns provider-native transport adapters, Windows DPAPI credential persistence, the persistent release inbox, physical installation reconciliation and background installation jobs. Products retain model overrides, semantic tools, schema validation, domain transactions, cancellation and human review. The normalized stateless request/response contract and API0.1 boundary remain unchanged.

@@ -1,3 +1,27 @@
+# 0.1.11 — Version-owned demos and automatic project recognition
+
+- Installed version cards open their own folder with the existing folder icon. Completed downloads show a confirmation instead of a100% progress bar; finished main-list indicators expire while notification history remains.
+- Optional product-owned `project.demos` and manifest catalogs generate only that build's declared demos in configured Project Storage. Load Demos runs in the background, shows a spinner and emits completion/failure notifications. Repeated loads preserve edits and registration; generated projects open with their source installation without changing the global active version. Removal waits for demo loading.
+- Local Add project uses read-only product detection regardless of the current tab or hidden creation selection. Ambiguous folders are rejected explicitly. Successful local/GitHub imports select their actual product tab; GitHub discovery aggregates installed adapters with the relevant capability.
+- Standardization starts with a new immutable experimental Game Engine0.0.60 build supplying the M20 lab. Older publications remain unchanged; Math Lab demo generation is intentionally out of scope. IPC/API/native formats and M20 completion status remain unchanged.
+
+# 0.1.10 — Resilient published-version discovery
+
+- Keep the last validated public catalog in the local profile across restarts, bound to its configured repository; validate cached entries before reuse.
+- Reuse fresh checks on opening Add installation; explicit Refresh uses conditional GitHub requests and reuses unchanged release manifests. Retain the previous complete source catalog on network/service failures.
+- Use the connected GitHub account only for API calls to the official GitHub API, after account restoration; never send its token to artifact downloads or redirects. Anonymous discovery remains supported.
+- Honor shared rate-limit reset/Retry-After and transient-error backoff, including after restart. Distinguish rate limits, credentials, permissions, missing sources, service failures, malformed metadata, loading, unchecked and successful-empty results in the dialog and list. Product filters show their own relevant errors.
+- Add offline/restart/quota/conditional-request/token-boundary and real-browser acceptance. IPC/API/product SDK and formats are unchanged. No executable signing is added.
+
+# 0.1.9 — Provider accounts and background installations
+
+- Authenticate OpenAI through model discovery; keep model availability/errors independent of account authentication.
+- Add Anthropic, Google, Ollama and loopback OpenAI-compatible transport adapters, native provider controls, tool/result/vision conversion, signature preservation and token accounting.
+- Remember GitHub and provider-specific tokens with Windows user encryption; restore on startup and forget on explicit disconnect. No plaintext storage fallback.
+- Reconcile missing/changed installations and project paths on refresh; show Stable labels, product project tabs and larger Settings icon.
+- Persist unread release state, add per-product/Add installation badges, show installed versions in gray and unread versions in bold, sort by publication time and omit closed-PR candidates.
+- Download in background with progress and optional automatic activation/scheduling; notify on completion and close notification history on outside click.
+
 # Changelog
 
 ## 0.1.7 / Product integration services —2026-10-22
