@@ -1,3 +1,4 @@
+import {selectReleaseBuilds} from './release-selection.mjs';
 import {ReleaseDiscovery} from './release-discovery.mjs';
 import {inspectInstallation} from './installations.mjs';
 import {distribution} from './distribution.mjs';
@@ -23,8 +24,8 @@ export function validateRelease(value,source,release){
 export class ReleaseCatalog extends ReleaseDiscovery{
  constructor(options={}){super({...options,validateRelease,assetUrl,compareVersions});}
  view(installations=[]){
-  const compatible=this.items.map(i=>({...i,artifact:i.artifacts.find(a=>a.platform===this.platform&&a.arch===this.arch)??null}));
-  const pending=this.sources.filter(s=>s.productId!=='axiom.platform').filter(s=>{const active=installations.find(i=>i.productId===s.productId&&i.active&&!i.error);return active&&(installations.some(i=>i.productId===s.productId&&!i.error&&compareVersions(i.version,active.version)>0)||compatible.some(r=>r.productId===s.productId&&r.artifact&&!installations.some(i=>i.productId===r.productId&&(i.releaseId===r.id||r.channel==='stable'&&i.version===r.version&&i.channel!=='experimental'))&&(compareVersions(r.version,active.version)>0||r.version===active.version&&(r.channel==='experimental'?r.build.commit!==active.commit:active.channel==='experimental'))));});
+  const compatible=selectReleaseBuilds(this.items.map(i=>({...i,artifact:i.artifacts.find(a=>a.platform===this.platform&&a.arch===this.arch)??null})));
+  const pending=this.sources.filter(s=>s.productId!=='axiom.platform').filter(s=>{const active=installations.find(i=>i.productId===s.productId&&i.active&&!i.error);return active&&(installations.some(i=>i.productId===s.productId&&!i.error&&compareVersions(i.version,active.version)>0)||compatible.some(r=>!r.isHistorical&&r.productId===s.productId&&r.artifact&&!installations.some(i=>i.productId===r.productId&&(i.releaseId===r.id||r.channel==='stable'&&i.version===r.version&&i.channel!=='experimental'))&&(compareVersions(r.version,active.version)>0||r.version===active.version&&(r.channel==='experimental'?r.build.commit!==active.commit:active.channel==='experimental'))));});
   return {...this.discoveryView(),sources:this.sources,products:this.sources.filter(s=>s.productId!=='axiom.platform'),checkedAt:this.checkedAt,checking:!!this.flight,items:compatible,errors:this.errors,pending:pending.map(s=>s.productId),platformUpdate:compatible.find(r=>r.productId==='axiom.platform'&&r.channel==='stable'&&r.artifact&&compareVersions(r.version,PLATFORM_VERSION)>0)??null};
  }
  async install(id,manager,{onProgress=()=>{},activate,signal}={}){

@@ -1,9 +1,10 @@
 # Axiom Platform
 
-**Platform 0.1.11 / version-owned demos and automatic project recognition.** A local browser workspace for the Axiom family: project/product Hub, authorized local services and shared AI integration. Axiom Game Engine and independent Axiom Math Lab are the reference products. The P0–P5 feature scope is implemented; [closure evidence and remaining operational checks](docs/MVP_CLOSURE.md) distinguish development completion from live-account/hardware acceptance.
+**Platform 0.1.12 / latest builds, installation history and Engineer CAD readiness.** A local browser workspace for the Axiom family: project/product Hub, authorized local services and shared AI integration. Axiom Game Engine and independent Axiom Math Lab are the reference products; [Axiom Engineer CAD](https://github.com/Krozzeo/AxiomEngineerCAD) is registered as a planned product with no executable release yet. The P0–P5 feature scope is implemented; [closure evidence and remaining operational checks](docs/MVP_CLOSURE.md) distinguish development completion from live-account/hardware acceptance.
 
 Extract the complete prepared bundle and double-click **Axiom Hub** (or **Start Axiom.cmd**). It prepares missing dependencies and opens your browser; errors remain visible in the console. Keep all three folders together. [Startup and final test guide](docs/MVP_GUIDE.md).
 
+- [Build history, Engineer CAD and startup refresh](docs/CATALOG_HISTORY_AND_ENGINEER_CAD.md).
 - [Demo loading and project recognition](docs/PRODUCT_DEMOS.md).
 - [0.1.10 catalog recovery](docs/RELEASE_DISCOVERY.md).
 - [0.1.9 guide and validation](docs/PROVIDERS_AND_INSTALLATION_JOBS.md).

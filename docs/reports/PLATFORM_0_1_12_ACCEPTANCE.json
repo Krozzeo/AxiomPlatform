@@ -1,0 +1,143 @@
+{
+  "version": "0.1.12",
+  "localContracts": {
+    "total": 88,
+    "passed": 87,
+    "failed": 0,
+    "skipped": 1,
+    "skipReason": "Existing opt-in Windows native Recycle Bin fixture"
+  },
+  "referenceProducts": [
+    "Game Engine1d31a70b7d26bc1891ff45cc609e5bc6f813dfd9",
+    "current Game Engine0.0.62",
+    "Math Lab0.1.2"
+  ],
+  "browsers": [
+    {
+      "profile": "p1",
+      "passed": true,
+      "criteria": [
+        "Hub create and real product process ready",
+        "Editor opens the selected project in an independent tab",
+        "Manual entity edit is visible as dirty in Platform",
+        "Cancel close retains the live dirty session",
+        "Platform Save persists the real engine scene",
+        "Close and reopen preserve project identity and saved scene"
+      ]
+    },
+    {
+      "profile": "p2",
+      "passed": true,
+      "criteria": [
+        "Native-folder result fills source; import preserves original bytes and populates persistent catalog",
+        "Account connects for session, clears token input, refreshes repositories and imports a second project without writing GitHub",
+        "Picker cancellation preserves storage; changed root and catalog survive backend restart; Windows-encrypted credentials restore (session-only on unsupported operating systems); recent project reopens"
+      ]
+    },
+    {
+      "profile": "p3",
+      "passed": true,
+      "criteria": [
+        "Hub connects the shared account; Engine inherits the model without a second login or credential input",
+        "AI plan requires human approval; typed tools edit an isolated proposal; persisted MAIN stays unchanged until review",
+        "Human Apply adopts and saves reviewed proposal through the shared review gate and domain transaction"
+      ]
+    },
+    {
+      "profile": "p4",
+      "passed": true,
+      "criteria": [
+        "Account icons navigate to Settings; disconnected import hides all fields; session GitHub and AI connect with cleared inputs",
+        "Folder cancellation preserves storage; native error is visible and browse button recovers",
+        "One project/session row; keyboard New project opens a seeded real editor; rename/save/cancel close work with icon actions",
+        "Close retains one catalog row; cancelled removal preserves files; recycling requires explicit confirmation of a reviewed folder (controlled OS fixture)",
+        "Separate installations page; theme persists across reload; compact viewport keeps page within screen"
+      ]
+    },
+    {
+      "profile": "p5",
+      "passed": true,
+      "criteria": [
+        "Verified account hides key/test inputs; shared transport controls; icon-only AI and Settings shortcut",
+        "Independent Math document evaluates manual cells, saves, isolates AI proposal and requires human review/apply",
+        "Click selection, active highlight, one named tab/host lease, blocked disconnected editor and reconnection in the same tab",
+        "Game Engine and Math Lab run concurrently through the same generic shell; seeded game scene and cross-origin isolation retained",
+        "Persistent notification history, unread +9 badge and marking history read",
+        "Action errors use expiring toasts; hover marks read; connectivity errors persist across routes until recovery"
+      ]
+    },
+    {
+      "profile": "mvp",
+      "passed": true,
+      "criteria": [
+        "Independent model-list account probe, editable model/reasoning after connection, separately tested selection and persistent defaults",
+        "Product inherits defaults without forcing overrides; model test sends selected effort; row deselection, distinct blue active highlight and folder button reach canonical project folder",
+        "Bell and replacement gear icons visible across dark/light themes"
+      ]
+    },
+    {
+      "profile": "products",
+      "passed": true,
+      "criteria": [
+        "Real Engine0.0.60 inherits the Hub account/model; account inputs are hidden; project model configuration stays available",
+        "Persistent product storage survives reload; exported diagnostics omit keys and private paths",
+        "Published versions list downloads and verifies a prepared fixture; activation is deferred while real Engine0.0.60 remains open",
+        "Closing flushes the scheduled release; rollback restores the previous real installation; Platform update banner persists across navigation"
+      ]
+    },
+    {
+      "profile": "installations",
+      "passed": true,
+      "criteria": [
+        "Product tabs filter installed rows; Add installation reuses the fresh cache, explicit refresh rechecks GitHub and labels stable/experimental entries; same-version experimental download preserves the active stable installation",
+        "Remove uses the project trash icon, supports Cancel and Confirm, recycles just the selected version and preserves the real open project",
+        "Settings sources autosave, survive reload and reset to the original repository defaults"
+      ]
+    },
+    {
+      "profile": "providers-jobs",
+      "passed": true,
+      "criteria": [
+        "OpenAI connects without fixed generation; selected-model404 is shown separately and keeps the valid account connected",
+        "Refreshing discovery preserves an explicitly configured custom model even when it is not listed",
+        "Anthropic, Google and token-free Local connect through their actual adapters; provider-specific controls and independent model tests work",
+        "Notification panel closes when clicking outside",
+        "A model override queued behind a delayed model test survives polling and persists to the real Math document",
+        "Product tabs filter projects, infer the selected product for New project, and All restores the product selector; a real Math editor opens",
+        "Version list shows Stable/Installed and New styles, publication-date ordering, per-product badges and persistent read-on-hover state",
+        "Download reports streamed progress, continues after closing the dialog and changing pages, schedules activation behind the live product and emits a completion toast"
+      ]
+    },
+    {
+      "profile": "release-discovery",
+      "passed": true,
+      "criteria": [
+        "First startup under GitHub quota failure shows the reason and retry time, not a false empty-publication message",
+        "A new host process restores the actual saved catalog offline, keeps versions selectable and respects the retry cooldown",
+        "A successful empty query has its own message and stays distinct from network, quota and permission failures"
+      ]
+    },
+    {
+      "profile": "demos",
+      "passed": true,
+      "criteria": [
+        "The installation folder icon opens the selected version root through the native folder service",
+        "Load Demos shows a spinner, continues across navigation, creates only the declared M20 project in configured storage and emits a completion toast",
+        "Reloading demos does not duplicate projects; the generated demo opens and passes all32 editable M20 C#/Wasm checks through Platform",
+        "Add project detects a Game project from All despite the Math default, and detects a Math project from the Game tab; both switch to the correct product tab",
+        "Completed download changes to a completion message without a100% bar; the main Installations job row expires while dialog confirmation remains"
+      ]
+    },
+    {
+      "profile": "catalog-history",
+      "passed": true,
+      "criteria": [
+        "Engineer CAD is visible in Projects and Installations before any executable exists; creation/install stay unavailable with a truthful empty state",
+        "Default list retains all stable versions and one latest build per PR; history exposes earlier builds separately without new-update badges",
+        "An earlier build downloads and installs through the normal verified path; reopening Add installation resets to latest while installed history stays available",
+        "Engineer CAD repository URL autosaves across reload and restores its official default"
+      ]
+    }
+  ],
+  "scope": "Controlled GitHub/provider HTTP and real Game Engine/Math products; future CAD installation uses an explicit IPC fixture. No CAD implementation, user account or paid model call is claimed."
+}

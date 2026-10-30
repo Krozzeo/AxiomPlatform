@@ -25,7 +25,7 @@ test('saved catalog survives restart, skips fresh automatic checks, retains vers
 test('rate limit is distinguished from empty, shared across sources and honored after restart',async t=>{
  const path=await temp(t);let calls=0,now=1000000;
  const fetchImpl=async()=>{calls++;return new Response('',{status:403,headers:{'x-ratelimit-remaining':'0','x-ratelimit-reset':String((now+120000)/1000)}});};
- const c=new ReleaseCatalog({clock:()=>now,fetchImpl});await c.initialize({cachePath:path});await c.refresh();assert.equal(calls,1);assert.equal(c.errors.length,3);assert(c.errors.every(e=>e.code==='rateLimited'&&e.retryAt===1120000));assert.equal(ui(c).state,'error');assert.equal(ui(c).label,'Version check failed');assert.match(ui(c).message,/does not mean no versions/);await c.refresh(true);assert.equal(calls,1);
+ const c=new ReleaseCatalog({clock:()=>now,fetchImpl});await c.initialize({cachePath:path});await c.refresh();assert.equal(calls,1);assert.equal(c.errors.length,4);assert(c.errors.every(e=>e.code==='rateLimited'&&e.retryAt===1120000));assert.equal(ui(c).state,'error');assert.equal(ui(c).label,'Version check failed');assert.match(ui(c).message,/does not mean no versions/);await c.refresh(true);assert.equal(calls,1);
  const restart=new ReleaseCatalog({clock:()=>now,fetchImpl});await restart.initialize({cachePath:path});await restart.refresh(true);assert.equal(calls,1);now+=120001;await restart.refresh(true);assert.equal(calls,2);
 });
 

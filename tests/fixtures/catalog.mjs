@@ -1,0 +1,3 @@
+import assert from 'node:assert/strict';
+import {ReleaseCatalog} from '../../services/local-host/releases.mjs';
+export function controlledCatalog(fixtures,requests=[]){return new ReleaseCatalog({platform:'win32',arch:'x64',fetchImpl:url=>{requests.push(url);if(url.includes('/pulls/'))return Response.json({state:'open'});if(url.startsWith('https://api.github.com/'))return Response.json(fixtures.filter(f=>url.includes('/'+f.source.repository+'/')).map(f=>f.release));const f=fixtures.find(f=>f.release.assets.some(a=>a.browser_download_url===url));assert(f,'Unexpected controlled URL');return f.fetchImpl(url);}});}

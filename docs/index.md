@@ -17,3 +17,5 @@ Maintained documentation is English. Original-language pre-P4 snapshots in docs/
 - [Post-MVP product releases, account authority, storage and diagnostics](PRODUCT_RELEASES.md).
 
 - [Platform0.1.8 experimental installations, removal, configurable sources and portable shortcut](EXPERIMENTAL_INSTALLATIONS.md).
+
+- [Platform 0.1.12 — build history, Engineer CAD and startup refresh](CATALOG_HISTORY_AND_ENGINEER_CAD.md).

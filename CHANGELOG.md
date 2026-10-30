@@ -1,3 +1,9 @@
+# 0.1.12 — Latest builds, history and Engineer CAD readiness
+
+- Show only the latest published experimental build per repository/product/PR by default; retain all stable versions and an installable Build history. Historical builds do not inflate new-update badges or remove installed versions.
+- Register Axiom Engineer CAD as a planned product, with configurable official repository source, product tabs, truthful unavailable states and automatic future compatible-release integration. Add its distinct prepared artifact name; no CAD implementation, schema or placeholder adapter is shipped.
+- Automatically refresh installations at normal startup: reconcile missing/changed packages, apply valid pending activations and force a metadata check after account restoration while preserving rate-limit/backoff/offline behavior. Keep Hub startup responsive.
+
 # 0.1.11 — Version-owned demos and automatic project recognition
 
 - Installed version cards open their own folder with the existing folder icon. Completed downloads show a confirmation instead of a100% progress bar; finished main-list indicators expire while notification history remains.

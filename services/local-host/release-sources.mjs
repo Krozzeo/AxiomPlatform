@@ -2,7 +2,8 @@ import {assert} from '../../packages/contracts/index.mjs';
 export const defaultSources=Object.freeze([
  {productId:'axiom.platform',name:'Axiom Platform',repository:'Krozzeo/AxiomPlatform'},
  {productId:'axiom.game-engine',name:'Axiom Game Engine',repository:'Krozzeo/AxiomGameEngine'},
- {productId:'axiom.math-lab',name:'Axiom Math Lab',repository:'Krozzeo/AxiomMathLab'}
+ {productId:'axiom.math-lab',name:'Axiom Math Lab',repository:'Krozzeo/AxiomMathLab'},
+ {productId:'axiom.engineer-cad',name:'Axiom Engineer CAD',repository:'Krozzeo/AxiomEngineerCAD',availability:'planned'}
 ]);
 export function releaseSources(overrides={}){
  assert(overrides&&typeof overrides==='object'&&!Array.isArray(overrides)&&Object.keys(overrides).every(id=>defaultSources.some(s=>s.productId===id)),'invalidRequest','Choose release sources for known Axiom products.');

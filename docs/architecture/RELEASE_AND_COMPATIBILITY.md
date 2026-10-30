@@ -1,3 +1,9 @@
+# Current extension — Platform 0.1.12
+
+Latest experimental build per PR is the default; earlier builds remain installable in history and do not count as new updates. Engineer CAD is registered as planned, with a configurable repository and automatic future release integration; no executable CAD is claimed. Normal startup refreshes local installations, pending activation and remote versions. [Contract and acceptance](../CATALOG_HISTORY_AND_ENGINEER_CAD.md). P0–P5 scope, IPC/API versions and product-owned formats remain unchanged.
+
+## Earlier contract and release snapshots
+
 # Versions, installation and distribution
 
 Platform, products, native documents and Game Engine scripting SDK have independent versions. A product declares the supported Platform API range and project formats. Pin the tested provider HTTPS archive and lockfile integrity; never depend on a moving remote main. During 0.x, document incompatible minor changes; stable incompatible contracts require major versions. Retire contracts only after consumer evidence and a deprecation period.
