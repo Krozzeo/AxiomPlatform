@@ -1,3 +1,9 @@
+# Current extension — Platform 0.1.12
+
+Latest experimental build per PR is the default; earlier builds remain installable in history and do not count as new updates. Engineer CAD is registered as planned, with a configurable repository and automatic future release integration; no executable CAD is claimed. Normal startup refreshes local installations, pending activation and remote versions. [Contract and acceptance](CATALOG_HISTORY_AND_ENGINEER_CAD.md). P0–P5 scope, IPC/API versions and product-owned formats remain unchanged.
+
+## Earlier contract and release snapshots
+
 # Current handoff — Platform 0.1.11
 
 Optional version-owned demo catalogs use `project.demos`, fresh host-owned destinations and installed product IPC. Only the chosen installation supplies factories. Catalog entries are pinned to that installation, repeated loads preserve edits, and project storage is captured per job. Math demo generation is deferred; the first product implementation is a new immutable0.0.60 Engine build. Local project detection is product-owned/read-only and independent of tabs; successful adds select their product tab. Finished download bars become confirmation text and main-list status expires. [Contract and acceptance](PRODUCT_DEMOS.md).

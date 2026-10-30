@@ -103,9 +103,12 @@ export async function startHost({credentialVault,checkReleases=false,releaseCata
   catch(error){await manager.shutdown();await store.close();throw error;}
   origin=`http://127.0.0.1:${server.address().port}`;manager.platformOrigin=origin;
   const restore=accountAction(async()=>{const githubKey=vault.get('github');if(githubKey)try{await account.connect(githubKey);}catch{}const aiKey=vault.get(providerCredentialName(ai.provider));if(aiKey||ai.provider.id==='local'&&store.value.preferences.aiLocalConnected){ai.provider.key=aiKey??'';try{await ai.invoke('platform-settings','platform-settings','request',{requestId:randomUUID(),epoch:ai.epoch,path:'/models'});ai.connectionError=null;}catch(e){ai.connectionError='The saved AI account could not be verified. Refresh the connection or reconnect.';}}});
-  if(checkReleases||releaseCatalog)void restore.then(check,check);
-  return {origin,token,restore,url:`${origin}/#token=${token}`,manager,account,ai,close:()=>closing??=(async()=>{
-    const done=new Promise(yes=>server.close(yes));server.closeAllConnections();try{clearInterval(releaseTimer);picker?.abort();await restore;await manager.installJobs.close();await manager.demoJobs.close();await releases.flight;await manager.shutdown();await account.disconnect();await ai.close();await done;}finally{await store.close();}
+  // Start reconciliation even when no browser is opened. Normal CLI startup forces a
+  // fresh remote check; persisted GitHub cooldowns and offline cache still apply.
+  manager.startupRefresh={state:'checking'};
+  const startup=(async()=>{try{await Promise.all([manager.reconcile(),restore.then(()=>checkReleases||releaseCatalog?releases.refresh(checkReleases):undefined)]);manager.startupRefresh={state:'completed'};}catch{manager.startupRefresh={state:'failed'};await notifications.run({action:'add',type:'error',message:'Installation refresh could not finish. Use Refresh in Installations to retry.'}).catch(()=>{});}})();
+  return {origin,token,restore,startup,url:`${origin}/#token=${token}`,manager,account,ai,close:()=>closing??=(async()=>{
+    const done=new Promise(yes=>server.close(yes));server.closeAllConnections();try{clearInterval(releaseTimer);picker?.abort();await startup;await manager.installJobs.close();await manager.demoJobs.close();await releases.flight;await manager.shutdown();await account.disconnect();await ai.close();await done;}finally{await store.close();}
   })()};
 }
 

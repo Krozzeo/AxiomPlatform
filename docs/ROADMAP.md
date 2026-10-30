@@ -1,3 +1,9 @@
+# Current extension — Platform 0.1.12
+
+Latest experimental build per PR is the default; earlier builds remain installable in history and do not count as new updates. Engineer CAD is registered as planned, with a configurable repository and automatic future release integration; no executable CAD is claimed. Normal startup refreshes local installations, pending activation and remote versions. [Contract and acceptance](CATALOG_HISTORY_AND_ENGINEER_CAD.md). P0–P5 scope, IPC/API versions and product-owned formats remain unchanged.
+
+## Earlier contract and release snapshots
+
 # Axiom Platform roadmap — P0 to P5
 
 P0–P5 feature development is complete in MVP0.1.5. The feature scope is integrated into main through PR6 after successful CI; the reproducible prepared package is recorded separately. Live-account/model/hardware and clean-machine checks remain explicit operational acceptance, not claimed results. ADR-P0007 transfers the standalone game-export requirement to Game Engine, where it remains missing. Game Engine keeps its independent M19–M40 Unity/shader/GPU roadmap.
