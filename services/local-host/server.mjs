@@ -25,7 +25,7 @@ import {pickFolder} from '../local-files/folders.mjs';
 import {join,resolve} from 'node:path';
 
 const headers={
-  'Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-src http://127.0.0.1:*; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'",
+  'Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-src http://127.0.0.1:*; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'",
   'Cross-Origin-Opener-Policy':'same-origin', 'Cross-Origin-Embedder-Policy':'require-corp', 'Cross-Origin-Resource-Policy':'same-origin',
   'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Cache-Control':'no-store'
 };
@@ -41,7 +41,7 @@ export async function startHost({credentialVault,checkReleases=false,releaseCata
   const remember=async(name,value)=>{try{return await vault.set(name,value);}catch{vault.error??='Account connected for this session, but Windows could not save it securely.';ai.storage=vault.status();return false;}};
   const token=randomBytes(32).toString('base64url');let origin,closing,picker;
   const reply=(res,status,value)=>{res.writeHead(status,{...headers,'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(value));};
-  const assets=new Map([['/',['index.html','text/html']],['/editor.html',['editor.html','text/html']],['/editor.css',['editor.css','text/css']],['/editor.mjs',['editor.mjs','text/javascript']],['/notifications.mjs',['notifications.mjs','text/javascript']],['/app.mjs',['app.mjs','text/javascript']],['/installations-view.mjs',['installations-view.mjs','text/javascript']],['/styles.css',['styles.css','text/css']],['/ui.mjs',['ui.mjs','text/javascript']],['/platform-ui.mjs',['../../packages/sdk/ui.mjs','text/javascript']]]);
+  const assets=new Map([['/',['index.html','text/html']],['/editor.html',['editor.html','text/html']],['/editor.css',['editor.css','text/css']],['/editor.mjs',['editor.mjs','text/javascript']],['/editor-presentation.mjs',['editor-presentation.mjs','text/javascript']],['/notifications.mjs',['notifications.mjs','text/javascript']],['/app.mjs',['app.mjs','text/javascript']],['/installations-view.mjs',['installations-view.mjs','text/javascript']],['/styles.css',['styles.css','text/css']],['/ui.mjs',['ui.mjs','text/javascript']],['/platform-ui.mjs',['../../packages/sdk/ui.mjs','text/javascript']]]);
   const server=createServer(async(req,res)=>{
     try {
       const url=new URL(req.url,'http://127.0.0.1');
