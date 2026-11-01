@@ -1,3 +1,8 @@
+# 0.1.13 — Product editor tab branding
+
+- The active product can supply its public title and a bounded PNG favicon to its containing editor tab. A fresh per-load challenge, frame source and origin checks reject foreign or stale messages. No product/native/account authority changes.
+- Older products and hosts retain the generic editor presentation. Platform self replacement remains manual.
+
 # 0.1.12 — Latest builds, history and Engineer CAD readiness
 
 - Show only the latest published experimental build per repository/product/PR by default; retain all stable versions and an installable Build history. Historical builds do not inflate new-update badges or remove installed versions.

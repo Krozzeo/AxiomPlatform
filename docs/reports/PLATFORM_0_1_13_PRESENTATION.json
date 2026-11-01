@@ -1,0 +1,11 @@
+{
+  "pageErrors": [],
+  "reconnectFreshChallenge": true,
+  "passed": true,
+  "actualEngineer": true,
+  "genericBridge": true,
+  "logoPNG": true,
+  "foreignSourceRejected": true,
+  "staleChallengeRejected": true,
+  "svgRejected": true
+}

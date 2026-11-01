@@ -1,3 +1,7 @@
+# Current extension — Platform 0.1.13
+
+Optional product tab presentation fixes the generic favicon on hosted CAD. See [presentation contract](EDITOR_PRESENTATION.md). Frame-source/origin/challenge validation and bounded PNG input; no CAD types, credentials, native changes or isolation relaxation. Experimental candidate until exact-head CI and prepared publication.
+
 # Current extension — Platform 0.1.12
 
 Latest experimental build per PR is the default; earlier builds remain installable in history and do not count as new updates. Engineer CAD is registered as planned, with a configurable repository and automatic future release integration; no executable CAD is claimed. Normal startup refreshes local installations, pending activation and remote versions. [Contract and acceptance](CATALOG_HISTORY_AND_ENGINEER_CAD.md). P0–P5 scope, IPC/API versions and product-owned formats remain unchanged.
